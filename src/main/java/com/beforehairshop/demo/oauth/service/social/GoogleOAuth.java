@@ -28,7 +28,9 @@ public class GoogleOAuth implements SocialOAuth {
     @Override
     public String getOauthRedirectURL() {
         Map<String, Object> params = new HashMap<>();
-        params.put("scope", "profile");
+        params.put("scope", "email");
+        params.put("access_type", "offline");
+        //params.put("include_granted_scopes", "true");
         params.put("response_type", "code");
         params.put("client_id", getGoogleSnsClientId());
         params.put("redirect_uri", getGoogleSnsCallbackUrl());
@@ -37,6 +39,7 @@ public class GoogleOAuth implements SocialOAuth {
                 .map(x -> x.getKey() + "=" + x.getValue())
                 .collect(Collectors.joining("&"));
 
+        System.out.println("요청 rediretURL : " + getGoogleSnsBaseUrl() + "?" + parameterString);
         return getGoogleSnsBaseUrl() + "?" + parameterString;
     }
 
@@ -59,6 +62,54 @@ public class GoogleOAuth implements SocialOAuth {
         }
         return "구글 로그인 요청 처리 실패";
     }
+
+    @Override
+    public String requestEmail(String accessToken) {
+        String emailRequestUrl = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken;
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.getForEntity(emailRequestUrl, String.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            return responseEntity.getBody();
+        }
+        return "이메일 가져오기 실패";
+    }
+
+//    public String getUserInfo(String code) {
+//        String RequestUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
+//
+//        final HttpClient client = HttpClientBuilder.create().build();
+//        final HttpGet get = new HttpGet(RequestUrl);
+//
+//        JsonNode returnNode = null;
+//
+//        // add header
+//        get.addHeader("Authorization", "Bearer " + autorize_code);
+//
+//        try {
+//            final HttpResponse response = client.execute(get);
+//            final int responseCode = response.getStatusLine().getStatusCode();
+//
+//            ObjectMapper mapper = new ObjectMapper();
+//            returnNode = mapper.readTree(response.getEntity().getContent());
+//
+//            System.out.println("\nSending 'GET' request to URL : " + RequestUrl);
+//            System.out.println("Response Code : " + responseCode);
+//
+//
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        } catch (ClientProtocolException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            // clear resources
+//        }
+//        return returnNode;
+//    }
 
     public String requestAccessTokenUsingURL(String code) {
         try {

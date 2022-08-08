@@ -27,4 +27,10 @@ public interface SocialOAuth {
         }
     }
 
+    /**
+     * API server로부터 받은 access token을 이용해서, 이메일 정보 요청
+     * @param accessToken
+     * @return
+     */
+    String requestEmail(String accessToken);
 }

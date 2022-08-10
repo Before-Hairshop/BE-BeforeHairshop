@@ -13,4 +13,9 @@ public class KakaoOAuth implements SocialOAuth {
     public String requestAccessToken(String code) {
         return null;
     }
+
+    @Override
+    public String requestEmail(String accessToken) {
+        return null;
+    }
 }

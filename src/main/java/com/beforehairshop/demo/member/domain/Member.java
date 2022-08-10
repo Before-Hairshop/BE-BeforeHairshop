@@ -28,10 +28,10 @@ public class Member {
     @Column(columnDefinition = "VARCHAR(200) DEFAULT NULL")
     private String socialLoginType; // KAKAO, GOOGLE...
 
-    @Column(columnDefinition = "VARCHAR(250)")
+    @Column(columnDefinition = "VARCHAR(250) DEFAULT 'tmp_name'")
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT DEFAULT NULL")
     private String imageUrl;
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
@@ -48,4 +48,6 @@ public class Member {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+
 }

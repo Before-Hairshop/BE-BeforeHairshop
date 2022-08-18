@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Tag(name = "헤어 디자이너 관련 Controller")
 @AllArgsConstructor
-@RequestMapping("/api/v1/designers")
+@RequestMapping("/api/v1/hair-designers")
 public class HairDesignerController {
 
     private final HairDesignerService hairDesignerService;

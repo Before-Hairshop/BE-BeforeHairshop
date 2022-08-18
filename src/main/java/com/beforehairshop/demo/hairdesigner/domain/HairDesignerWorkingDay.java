@@ -1,10 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.domain;
 
-import com.beforehairshop.demo.member.domain.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -18,7 +14,7 @@ import java.util.Date;
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class HairDesignerHashtag {
+public class HairDesignerWorkingDay {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +24,13 @@ public class HairDesignerHashtag {
     private HairDesigner hairDesigner;
 
     @Column
-    private String tag;
+    private String workingDay;
+
+    @Column(columnDefinition = "TIMESTAMP")
+    private Date startTime;
+
+    @Column(columnDefinition = "TIMESTAMP")
+    private Date endTime;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
@@ -38,4 +40,8 @@ public class HairDesignerHashtag {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+
+
+
 }

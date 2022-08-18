@@ -33,10 +33,10 @@ public class Member {
     private String imageUrl;
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int designer_flag;
+    private int designerFlag;
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int premium_flag;
+    private int premiumFlag;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;

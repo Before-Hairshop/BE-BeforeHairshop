@@ -27,10 +27,19 @@ public class HairDesignerService {
     @Transactional
     public ResponseEntity<ResultDto> save(HairDesignerSaveRequestDto hairDesignerSaveRequestDto) {
         Member member = memberRepository.findById(hairDesignerSaveRequestDto.getMemberId()).orElse(null);
+        if (member == null) return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
 
-        HairDesigner hairDesigner = hairDesignerSaveRequestDto.toEntity(member);
+        member.setDesigner_flag(1);
+
+        HairDesigner hairDesigner = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
 
         return makeResult(HttpStatus.OK, hairDesigner);
     }
 
+    @Transactional
+    public ResponseEntity<ResultDto> findOne(Long id) {
+        Member member = memberRepository.findById(id).orElse(null);
+
+
+    }
 }

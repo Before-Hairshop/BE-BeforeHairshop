@@ -40,7 +40,7 @@ public class HairDesignerService {
         HairDesigner hairDesigner = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
 
         try {
-            for (HairDesignerWorkingDaySaveRequestDto hairDesignerWorkingDaySaveRequestDto : hairDesignerSaveRequestDto.getHairDesignerWorkingDaySaveRequestDtoList()) {
+            for (HairDesignerWorkingDaySaveRequestDto hairDesignerWorkingDaySaveRequestDto : hairDesignerSaveRequestDto.getWorkingDayList()) {
                 hairDesignerWorkingDayRepository.save(
                         hairDesignerWorkingDaySaveRequestDto.toEntity(hairDesigner)
                 );

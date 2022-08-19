@@ -5,6 +5,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
@@ -25,11 +26,11 @@ public class HairDesignerWorkingDay {
 
     private String workingDay;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private Date startTime;
+    //@Column(columnDefinition = "TIMESTAMP")
+    private LocalTime startTime;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private Date endTime;
+    //@Column(columnDefinition = "TIMESTAMP")
+    private LocalTime endTime;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;

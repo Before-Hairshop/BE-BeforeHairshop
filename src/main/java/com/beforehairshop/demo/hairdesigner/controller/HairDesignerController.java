@@ -18,9 +18,9 @@ public class HairDesignerController {
 
     private final HairDesignerService hairDesignerService;
 
-    @GetMapping("{id}")
+    @GetMapping
     @Operation(summary = "헤어 디자이너 상세 조회 API")
-    public ResponseEntity<ResultDto> findOne(@PathVariable Long id) {
+    public ResponseEntity<ResultDto> findOne(@RequestParam(value = "id", required = true) Long id) {
         return hairDesignerService.findOne(id);
     }
 

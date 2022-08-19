@@ -2,17 +2,21 @@ package com.beforehairshop.demo.hairdesigner.dto;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalTime;
 import java.util.Date;
 
 @Getter
 @AllArgsConstructor
 public class HairDesignerWorkingDaySaveRequestDto {
     private String workingDay;
-    private Date startTime;
-    private Date endTime;
+    @JsonFormat(pattern = "kk:mm:ss")
+    private LocalTime startTime;
+    @JsonFormat(pattern = "kk:mm:ss")
+    private LocalTime endTime;
 
 
     public HairDesignerWorkingDay toEntity(HairDesigner hairDesigner) {

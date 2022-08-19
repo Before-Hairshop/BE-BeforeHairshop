@@ -23,7 +23,6 @@ public class HairDesignerWorkingDay {
     @JoinColumn(name = "hair_designer_id")
     private HairDesigner hairDesigner;
 
-    @Column
     private String workingDay;
 
     @Column(columnDefinition = "TIMESTAMP")

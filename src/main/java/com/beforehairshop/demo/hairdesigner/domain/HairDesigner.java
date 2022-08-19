@@ -28,16 +28,9 @@ public class HairDesigner {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column
     private String description;
-
-    @Column
     private String zipCode;    // 우편번호
-
-    @Column
     private String detailAddress;   // 상세주소
-
-    @Column
     private String phoneNumber;     // 전화번호
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

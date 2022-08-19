@@ -27,7 +27,6 @@ public class HairDesignerHashtag {
     @JoinColumn(name = "hair_designer_id")
     private HairDesigner hairDesigner;
 
-    @Column
     private String tag;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

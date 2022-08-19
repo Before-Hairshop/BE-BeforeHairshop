@@ -18,7 +18,7 @@ public class HairDesignerSaveRequestDto {
     private String phoneNumber;
     private int status;
 
-    private List<HairDesignerWorkingDaySaveRequestDto> hairDesignerWorkingDaySaveRequestDtoList;
+    private List<HairDesignerWorkingDaySaveRequestDto> workingDayList;
 
     public HairDesigner toEntity(Member member) {
         return HairDesigner.builder()

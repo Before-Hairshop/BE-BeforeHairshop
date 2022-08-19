@@ -9,6 +9,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -20,9 +21,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HairDesigner {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT")
+    private BigInteger id;
 
     @OneToOne
     @JoinColumn(name = "member_id")

@@ -3,11 +3,12 @@ package com.beforehairshop.demo.member.dto;
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.Getter;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 @Getter
 public class MemberDto {
-    private final Long id;
+    private final BigInteger id;
     private final String email;
     private final String socialLoginType; // KAKAO, GOOGLE...
     private final String name;

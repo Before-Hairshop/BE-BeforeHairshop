@@ -12,6 +12,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
+
 @RestController
 @Tag(name = "헤어 디자이너 관련 Controller")
 @AllArgsConstructor
@@ -22,7 +24,7 @@ public class HairDesignerController {
 
     @GetMapping()
     @Operation(summary = "헤어 디자이너 상세 조회 API")
-    public ResponseEntity<ResultDto> findOne(@RequestParam(value = "id", required = true) Long id) {
+    public ResponseEntity<ResultDto> findOne(@RequestParam(value = "id", required = true) BigInteger id) {
         return hairDesignerService.findOne(id);
     }
 

@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
+
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @RestController
@@ -59,7 +61,7 @@ public class OAuthController {
 
         // member save
         if (oAuthDto.getEmail() != null) {
-            Long id = memberService.save(new MemberSaveRequestDto(oAuthDto.getEmail(), socialLoginType.toString(), 1));
+            BigInteger id = memberService.save(new MemberSaveRequestDto(oAuthDto.getEmail(), socialLoginType.toString(), 1));
             oAuthDto.setId(id);
             return makeResult(HttpStatus.OK, oAuthDto);
         }

@@ -9,6 +9,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
@@ -19,9 +20,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HairDesignerHashtag {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT")
+    private BigInteger id;
 
     @ManyToOne
     @JoinColumn(name = "hair_designer_id")

@@ -12,8 +12,8 @@ public class MemberDto {
     private final String socialLoginType; // KAKAO, GOOGLE...
     private final String name;
     private final String imageUrl;
-    private final int designer_flag;
-    private final int premium_flag;
+    private final int designerFlag;
+    private final int premiumFlag;
     private final Date createdAt;
     private final Date updatedAt;
     private final int status;
@@ -24,8 +24,8 @@ public class MemberDto {
         this.socialLoginType = member.getSocialLoginType();
         this.name = member.getName();
         this.imageUrl = member.getImageUrl();
-        this.designer_flag = member.getDesigner_flag();
-        this.premium_flag = member.getPremium_flag();
+        this.designerFlag = member.getDesignerFlag();
+        this.premiumFlag = member.getPremiumFlag();
         this.createdAt = member.getCreatedAt();
         this.updatedAt = member.getUpdatedAt();
         this.status = member.getStatus();

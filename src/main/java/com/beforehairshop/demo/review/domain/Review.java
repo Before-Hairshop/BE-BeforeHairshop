@@ -32,7 +32,7 @@ public class Review {
 
     @OneToOne
     @JoinColumn(name = "hair_designer_id")
-    private HairDesigner hairDesigner;
+    private Member hairDesigner;
 
     @Column(columnDefinition = "TINYINT")
     private Integer totalRating;
@@ -42,6 +42,9 @@ public class Review {
 
     @Column(columnDefinition = "TINYINT")
     private Integer serviceRating;
+
+    @Column(columnDefinition = "TEXT DEFAULT NULL")
+    private String content;
 
     @Column(columnDefinition = "TEXT DEFAULT NULL")
     private String virtualImageUrl;

@@ -12,6 +12,8 @@ import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -68,5 +70,20 @@ public class HairDesignerService {
          */
 
         return makeResult(HttpStatus.OK, new HairDesignerDetailResponseDto(hairDesignerList.get(0), hairDesignerWorkingDayList));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findMany(Pageable pageable) {
+        /**
+         * 유저의 위치 정보가 아직 고려되어 있지 않음.
+         */
+
+        /**
+         * 별점 순 혹은 리뷰 순으로 정렬해주는 기능 빠짐.
+         */
+        Page<HairDesigner> hairDesigners = hairDesignerRepository.findAll(pageable);
+
+        return makeResult(HttpStatus.OK, hairDesigners);
+
     }
 }

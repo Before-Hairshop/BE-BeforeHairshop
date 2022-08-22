@@ -10,10 +10,14 @@ import com.beforehairshop.demo.review.dto.ReviewSaveRequestDto;
 import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigInteger;
+import java.util.List;
 
 import static com.beforehairshop.demo.response.ResultDto.*;
 
@@ -38,4 +42,9 @@ public class ReviewService {
         return makeResult(HttpStatus.OK, review);
     }
 
+    public ResponseEntity<ResultDto> findManyByHairDesigner(BigInteger hairDesignerId, Pageable pageable) {
+        List<Review> reviewList = reviewRepository.findAllByHairDesignerId(hairDesignerId, pageable);
+
+        return makeResult(HttpStatus.OK, reviewList);
+    }
 }

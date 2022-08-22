@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.hairdesigner.service;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerSaveRequestDto;
@@ -45,15 +46,15 @@ public class HairDesignerService {
 
         HairDesigner hairDesigner = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
 
-        try {
-            for (HairDesignerWorkingDaySaveRequestDto hairDesignerWorkingDaySaveRequestDto : hairDesignerSaveRequestDto.getWorkingDayList()) {
-                hairDesignerWorkingDayRepository.save(
-                        hairDesignerWorkingDaySaveRequestDto.toEntity(hairDesigner)
-                );
-            }
-        } catch (Exception exception) {
-            return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, "헤어 디자이너의 일하는 요일/시간에 대한 data 를 삽입하지 못했습니다.");
-        }
+        /**
+         * 헤어 디자이너가 일하는 시간(entity)에 대한 row 생성
+         */
+        hairDesignerWorkingDayRepository.saveAll(
+                hairDesignerSaveRequestDto.getWorkingDayList()
+                        .stream()
+                        .map(hairDesignerWorkingDaySaveRequestDto -> hairDesignerWorkingDaySaveRequestDto.toEntity(member))
+                        .collect(Collectors.toList())
+        );
 
         /**
          *  헤어 디자이너의 스타일링 비용(entity)에 대한 row 생성
@@ -77,13 +78,14 @@ public class HairDesignerService {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
         }
 
-        List<HairDesignerWorkingDay> hairDesignerWorkingDayList = hairDesignerWorkingDayRepository.findAllByHairDesigner(hairDesignerList.get(0));
+        List<HairDesignerWorkingDay> hairDesignerWorkingDayList = hairDesignerWorkingDayRepository.findAllByHairDesigner(member);
+        List<HairDesignerPrice> hairDesignerPriceList = hairDesignerPriceRepository.findAllByHairDesigner(member);
 
         /**
          * 별점, 리뷰 정보 가져오는 부분 추가해야 함!
          */
 
-        return makeResult(HttpStatus.OK, new HairDesignerDetailResponseDto(hairDesignerList.get(0), hairDesignerWorkingDayList));
+        return makeResult(HttpStatus.OK, new HairDesignerDetailResponseDto(hairDesignerList.get(0), hairDesignerWorkingDayList, hairDesignerPriceList));
     }
 
     @Transactional

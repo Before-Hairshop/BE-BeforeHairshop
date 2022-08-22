@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.domain;
 
+import com.beforehairshop.demo.member.domain.Member;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -23,7 +24,7 @@ public class HairDesignerWorkingDay {
 
     @ManyToOne
     @JoinColumn(name = "hair_designer_id")
-    private HairDesigner hairDesigner;
+    private Member hairDesigner;
 
     private String workingDay;
 

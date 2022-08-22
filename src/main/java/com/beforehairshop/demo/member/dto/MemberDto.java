@@ -15,8 +15,8 @@ public class MemberDto {
     private final String imageUrl;
     private final int designerFlag;
     private final int premiumFlag;
-    private final Date createdAt;
-    private final Date updatedAt;
+    private final Date createDate;
+    private final Date updateDate;
     private final int status;
 
     public MemberDto(Member member) {
@@ -27,8 +27,8 @@ public class MemberDto {
         this.imageUrl = member.getImageUrl();
         this.designerFlag = member.getDesignerFlag();
         this.premiumFlag = member.getPremiumFlag();
-        this.createdAt = member.getCreatedAt();
-        this.updatedAt = member.getUpdatedAt();
+        this.createDate = member.getCreateDate();
+        this.updateDate = member.getUpdateDate();
         this.status = member.getStatus();
     }
 }

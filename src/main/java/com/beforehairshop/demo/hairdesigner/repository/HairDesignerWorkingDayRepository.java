@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 
-@Repository
 public interface HairDesignerWorkingDayRepository extends JpaRepository<HairDesignerWorkingDay, BigInteger> {
     List<HairDesignerWorkingDay> findAllByHairDesigner(HairDesigner hairDesigner);
 }

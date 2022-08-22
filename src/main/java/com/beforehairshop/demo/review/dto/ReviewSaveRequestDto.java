@@ -1,12 +1,12 @@
 package com.beforehairshop.demo.review.dto;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.review.domain.Review;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -18,6 +18,8 @@ public class ReviewSaveRequestDto {
     private Integer serviceRating;
     private String content;
     private String virtualImageUrl;
+
+    private List<ReviewHashtagSaveRequestDto> hashtagList;
 
     public Review toEntity(Member member, Member hairDesigner) {
         return Review.builder()

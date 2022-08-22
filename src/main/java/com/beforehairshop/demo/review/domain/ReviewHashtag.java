@@ -1,38 +1,29 @@
-package com.beforehairshop.demo.hairdesigner.domain;
+package com.beforehairshop.demo.review.domain;
 
-import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
 @Builder
-@DynamicUpdate
-@DynamicInsert
-@NoArgsConstructor
 @AllArgsConstructor
-public class HairDesigner {
+@NoArgsConstructor
+public class ReviewHashtag {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @OneToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
-
-    private String description;
-    private String zipCode;    // 우편번호
-    private String detailAddress;   // 상세주소
-    private String phoneNumber;     // 전화번호
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    private Review review;
+    private String hashtag;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
@@ -42,5 +33,4 @@ public class HairDesigner {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
-
 }

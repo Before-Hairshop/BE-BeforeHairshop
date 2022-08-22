@@ -49,10 +49,10 @@ public class Review {
     private String virtualImageUrl;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date createdAt;
+    private Date createDate;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updatedAt;
+    private Date updateDate;
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;

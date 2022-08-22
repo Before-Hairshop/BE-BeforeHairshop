@@ -6,8 +6,11 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.domain.Review;
+import com.beforehairshop.demo.review.domain.ReviewHashtag;
+import com.beforehairshop.demo.review.dto.ReviewHashtagSaveDto;
 import com.beforehairshop.demo.review.dto.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.ReviewSaveRequestDto;
+import com.beforehairshop.demo.review.repository.ReviewHashtagRepository;
 import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.*;
 
@@ -27,6 +31,7 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 public class ReviewService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewHashtagRepository reviewHashtagRepository;
 
     @Transactional
     public ResponseEntity<ResultDto> save(ReviewSaveRequestDto reviewSaveRequestDto) {
@@ -34,11 +39,20 @@ public class ReviewService {
         Member hairDesigner = memberRepository.findById(reviewSaveRequestDto.getHairDesignerId()).orElse(null);
 
         if (member != null && hairDesigner != null && hairDesigner.getDesignerFlag() != 1)
-            return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, "리뷰 대상이 헤어 디자이너가 아니다.");
+            return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, "리뷰 대상이 없거나, 헤어 디자이너가 아니다.");
 
         Review review = reviewRepository.save(
                 reviewSaveRequestDto.toEntity(member, hairDesigner)
         );
+
+        for (ReviewHashtagSaveDto reviewHashtagSaveDto : reviewSaveRequestDto.getHashtagList()) {
+            reviewHashtagRepository.save(reviewHashtagSaveDto.toEntity(review));
+        }
+
+//        reviewHashtagRepository.saveAll(reviewSaveRequestDto.getHashtagList()
+//                .stream()
+//                .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
+//                .collect(Collectors.toList()));
 
         return makeResult(HttpStatus.OK, review);
     }

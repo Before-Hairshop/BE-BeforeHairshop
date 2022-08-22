@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.review.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -11,6 +12,9 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReviewHashtag {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
@@ -19,7 +23,7 @@ public class ReviewHashtag {
     @ManyToOne
     @JoinColumn(name = "review_id")
     private Review review;
-    private String tag;
+    private String hashtag;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;

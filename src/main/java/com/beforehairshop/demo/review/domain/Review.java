@@ -2,10 +2,8 @@ package com.beforehairshop.demo.review.domain;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
 import com.beforehairshop.demo.member.domain.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.beforehairshop.demo.review.dto.ReviewPatchRequestDto;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,6 +13,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
@@ -58,4 +57,11 @@ public class Review {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
+    public void patchReview(ReviewPatchRequestDto reviewPatchRequestDto) {
+        this.totalRating = reviewPatchRequestDto.getTotalRating();
+        this.styleRating = reviewPatchRequestDto.getStyleRating();
+        this.serviceRating = reviewPatchRequestDto.getServiceRating();
+        this.content = reviewPatchRequestDto.getContent();
+        this.virtualImageUrl = reviewPatchRequestDto.getVirtualImageUrl();
+    }
 }

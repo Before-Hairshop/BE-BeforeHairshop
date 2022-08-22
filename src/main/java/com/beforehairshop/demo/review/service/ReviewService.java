@@ -6,6 +6,7 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.domain.Review;
+import com.beforehairshop.demo.review.dto.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.ReviewSaveRequestDto;
 import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
@@ -42,9 +43,21 @@ public class ReviewService {
         return makeResult(HttpStatus.OK, review);
     }
 
+    @Transactional
     public ResponseEntity<ResultDto> findManyByHairDesigner(BigInteger hairDesignerId, Pageable pageable) {
         List<Review> reviewList = reviewRepository.findAllByHairDesignerId(hairDesignerId, pageable);
 
         return makeResult(HttpStatus.OK, reviewList);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> patchOne(BigInteger reviewId, ReviewPatchRequestDto reviewPatchRequestDto) {
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (review == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 id를 가지는 리뷰는 없습니다.");
+
+        review.patchReview(reviewPatchRequestDto);
+
+        return makeResult(HttpStatus.OK, review);
     }
 }

@@ -1,18 +1,15 @@
 package com.beforehairshop.demo.review.service;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
-import com.beforehairshop.demo.hairdesigner.repository.HairDesignerRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.domain.Review;
 import com.beforehairshop.demo.review.domain.ReviewHashtag;
-import com.beforehairshop.demo.review.dto.ReviewHashtagSaveDto;
+import com.beforehairshop.demo.review.dto.ReviewHashtagSaveRequestDto;
 import com.beforehairshop.demo.review.dto.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.ReviewSaveRequestDto;
 import com.beforehairshop.demo.review.repository.ReviewHashtagRepository;
 import com.beforehairshop.demo.review.repository.ReviewRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -45,14 +42,10 @@ public class ReviewService {
                 reviewSaveRequestDto.toEntity(member, hairDesigner)
         );
 
-        for (ReviewHashtagSaveDto reviewHashtagSaveDto : reviewSaveRequestDto.getHashtagList()) {
-            reviewHashtagRepository.save(reviewHashtagSaveDto.toEntity(review));
-        }
-
-//        reviewHashtagRepository.saveAll(reviewSaveRequestDto.getHashtagList()
-//                .stream()
-//                .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
-//                .collect(Collectors.toList()));
+        reviewHashtagRepository.saveAll(reviewSaveRequestDto.getHashtagList()
+                .stream()
+                .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
+                .collect(Collectors.toList()));
 
         return makeResult(HttpStatus.OK, review);
     }
@@ -71,6 +64,16 @@ public class ReviewService {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id를 가지는 리뷰는 없습니다.");
 
         review.patchReview(reviewPatchRequestDto);
+
+        // review hash tag 삭제
+        List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findAllByReview(review);
+        reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
+
+        // review hash tag 생성
+        reviewHashtagRepository.saveAll(reviewPatchRequestDto.getHashtagList()
+                .stream()
+                .map(reviewHashtagPatchRequestDto -> reviewHashtagPatchRequestDto.toEntity(review))
+                .collect(Collectors.toList()));
 
         return makeResult(HttpStatus.OK, review);
     }

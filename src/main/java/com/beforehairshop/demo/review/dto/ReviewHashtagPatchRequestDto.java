@@ -6,12 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewHashtagSaveDto {
+public class ReviewHashtagPatchRequestDto {
     private String hashtag;
 
     public ReviewHashtag toEntity(Review review) {

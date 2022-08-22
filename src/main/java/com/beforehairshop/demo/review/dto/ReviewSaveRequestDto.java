@@ -1,9 +1,7 @@
 package com.beforehairshop.demo.review.dto;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.review.domain.Review;
-import com.beforehairshop.demo.review.domain.ReviewHashtag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,7 +19,7 @@ public class ReviewSaveRequestDto {
     private String content;
     private String virtualImageUrl;
 
-    private List<ReviewHashtagSaveDto> hashtagList;
+    private List<ReviewHashtagSaveRequestDto> hashtagList;
 
     public Review toEntity(Member member, Member hairDesigner) {
         return Review.builder()

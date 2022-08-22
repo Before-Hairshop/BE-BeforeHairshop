@@ -6,12 +6,13 @@ import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class HairDesignerSaveRequestDto {
-    private Long memberId;
+    private BigInteger memberId;
     private String description;
     private String zipCode;
     private String detailAddress;

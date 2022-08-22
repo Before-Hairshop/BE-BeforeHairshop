@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import static com.beforehairshop.demo.response.ResultDto.*;
@@ -55,7 +56,7 @@ public class HairDesignerService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findOne(Long id) {
+    public ResponseEntity<ResultDto> findOne(BigInteger id) {
         Member member = memberRepository.findById(id).orElse(null);
 
         List<HairDesigner> hairDesignerList = hairDesignerRepository.findAllByMember(member);

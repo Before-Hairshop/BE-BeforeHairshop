@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
+
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @Service
@@ -23,7 +25,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long save(MemberSaveRequestDto requestDto) {
+    public BigInteger save(MemberSaveRequestDto requestDto) {
         if (memberRepository.findOneByEmailAndStatusIsLessThan(requestDto.getEmail(), StatusKind.DELETE.getId()).orElse(null) != null) {
             log.error("이미 가입되어 있는 유저입니다.");
             return null;

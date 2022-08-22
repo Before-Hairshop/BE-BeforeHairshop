@@ -1,13 +1,15 @@
 package com.beforehairshop.demo.hairdesigner.domain;
 
 import com.beforehairshop.demo.member.domain.Member;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
@@ -17,7 +19,7 @@ import java.util.Date;
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class HairDesignerWorkingDay {
+public class HairDesignerPrice {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
@@ -26,13 +28,9 @@ public class HairDesignerWorkingDay {
     @JoinColumn(name = "hair_designer_id")
     private Member hairDesigner;
 
-    private String workingDay;
-
-    //@Column(columnDefinition = "TIMESTAMP")
-    private LocalTime startTime;
-
-    //@Column(columnDefinition = "TIMESTAMP")
-    private LocalTime endTime;
+    private String hairCategory;
+    private String hairStyleName;
+    private Integer price;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
@@ -42,8 +40,4 @@ public class HairDesignerWorkingDay {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
-
-
-
-
 }

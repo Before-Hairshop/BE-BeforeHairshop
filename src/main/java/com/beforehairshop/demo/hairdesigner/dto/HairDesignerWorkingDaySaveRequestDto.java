@@ -2,6 +2,7 @@ package com.beforehairshop.demo.hairdesigner.dto;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
+import com.beforehairshop.demo.member.domain.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class HairDesignerWorkingDaySaveRequestDto {
     private LocalTime endTime;
 
 
-    public HairDesignerWorkingDay toEntity(HairDesigner hairDesigner) {
+    public HairDesignerWorkingDay toEntity(Member hairDesigner) {
         return HairDesignerWorkingDay.builder()
                 .hairDesigner(hairDesigner)
                 .workingDay(workingDay)

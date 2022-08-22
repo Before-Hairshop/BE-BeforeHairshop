@@ -2,6 +2,7 @@ package com.beforehairshop.demo.hairdesigner.domain;
 
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -13,6 +14,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Builder
 @DynamicUpdate
 @DynamicInsert
 @NoArgsConstructor
@@ -24,7 +26,7 @@ public class HairDesignerPrice {
 
     @ManyToOne
     @JoinColumn(name = "hair_designer_id")
-    private Member member;
+    private Member hairDesigner;
 
     private String hairCategory;
     private String hairStyleName;

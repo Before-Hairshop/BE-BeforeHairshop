@@ -5,6 +5,7 @@ import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerWorkingDaySaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerWorkingDayRepository;
 import com.beforehairshop.demo.member.domain.Member;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.*;
 
@@ -31,6 +33,7 @@ public class HairDesignerService {
 
     private final HairDesignerRepository hairDesignerRepository;
     private final HairDesignerWorkingDayRepository hairDesignerWorkingDayRepository;
+    private final HairDesignerPriceRepository hairDesignerPriceRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -51,6 +54,16 @@ public class HairDesignerService {
         } catch (Exception exception) {
             return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, "헤어 디자이너의 일하는 요일/시간에 대한 data 를 삽입하지 못했습니다.");
         }
+
+        /**
+         *  헤어 디자이너의 스타일링 비용(entity)에 대한 row 생성
+         */
+        hairDesignerPriceRepository.saveAll(
+                hairDesignerSaveRequestDto.getPriceList()
+                        .stream()
+                        .map(hairDesignerPriceSaveRequestDto -> hairDesignerPriceSaveRequestDto.toEntity(member))
+                        .collect(Collectors.toList()));
+
 
         return makeResult(HttpStatus.OK, hairDesigner);
     }

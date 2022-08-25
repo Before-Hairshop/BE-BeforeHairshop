@@ -47,6 +47,7 @@ public class OAuthController {
     public ResponseEntity<ResultDto> callback(
             @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
             @RequestParam(name = "code") String code) {
+        log.info(">> {}", socialLoginType);
         log.info(">> 소셜 로그인 API 서버로부터 받은 code :: {}", code);
         //String tokenInfoFromGoogle = oAuthService.requestAccessToken(socialLoginType, code);
 
@@ -57,6 +58,7 @@ public class OAuthController {
         oAuthDto.setEmail(oAuthService.requestEmail(socialLoginType, oAuthDto.getAccessToken()));
 
 
+        log.info(oAuthDto.toString());
         // member save
         if (oAuthDto.getEmail() != null) {
             Long id = memberService.save(new MemberSaveRequestDto(oAuthDto.getEmail(), socialLoginType.toString(), 1));
@@ -66,7 +68,8 @@ public class OAuthController {
 
         log.error("Fail to save member. Because email info is null");
         return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, null);
-
+//        log.info(oAuthDto.toString());
+//        return null;
     }
 
 }

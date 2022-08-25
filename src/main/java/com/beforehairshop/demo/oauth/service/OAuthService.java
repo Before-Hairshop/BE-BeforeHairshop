@@ -40,8 +40,9 @@ public class OAuthService {
 
     public String requestEmail(SocialLoginType socialLoginType, String accessToken) {
         SocialOAuth socialOauth = this.findSocialOauthByType(socialLoginType);
+//        System.out.println(socialLoginType.compareTo(SocialLoginType.KAKAO));
         if (socialLoginType.compareTo(SocialLoginType.KAKAO) == 0) {
-            JsonParser.parseKakaoEmailInfo(socialOauth.requestEmail(accessToken));
+            return JsonParser.parseKakaoEmailInfo(socialOauth.requestEmail(accessToken));
         }
         return JsonParser.parseGoogleEmailInfo(socialOauth.requestEmail(accessToken));
     }

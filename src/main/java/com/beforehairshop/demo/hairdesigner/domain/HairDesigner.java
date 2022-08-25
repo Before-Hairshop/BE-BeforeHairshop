@@ -1,43 +1,38 @@
-package com.beforehairshop.demo.member.domain;
+package com.beforehairshop.demo.hairdesigner.domain;
 
-import lombok.*;
+import com.beforehairshop.demo.member.domain.Member;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class HairDesigner {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @Column(columnDefinition = "TEXT")
-    private String email;
+    @OneToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(columnDefinition = "VARCHAR(200) DEFAULT NULL")
-    private String socialLoginType; // KAKAO, GOOGLE...
-
-    @Column(columnDefinition = "VARCHAR(250) DEFAULT 'tmp_name'")
-    private String name;
-
-    @Column(columnDefinition = "TEXT DEFAULT NULL")
-    private String imageUrl;
-
-    @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int designerFlag;
-
-    @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int premiumFlag;
+    private String description;
+    private String zipCode;    // 우편번호
+    private String detailAddress;   // 상세주소
+    private String phoneNumber;     // 전화번호
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
@@ -47,6 +42,5 @@ public class Member {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
-
 
 }

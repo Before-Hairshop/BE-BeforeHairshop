@@ -1,43 +1,38 @@
-package com.beforehairshop.demo.member.domain;
+package com.beforehairshop.demo.hairdesigner.domain;
 
+import com.beforehairshop.demo.member.domain.Member;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class HairDesignerWorkingDay {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @Column(columnDefinition = "TEXT")
-    private String email;
+    @ManyToOne
+    @JoinColumn(name = "hair_designer_id")
+    private Member hairDesigner;
 
-    @Column(columnDefinition = "VARCHAR(200) DEFAULT NULL")
-    private String socialLoginType; // KAKAO, GOOGLE...
+    private String workingDay;
 
-    @Column(columnDefinition = "VARCHAR(250) DEFAULT 'tmp_name'")
-    private String name;
+    //@Column(columnDefinition = "TIMESTAMP")
+    private LocalTime startTime;
 
-    @Column(columnDefinition = "TEXT DEFAULT NULL")
-    private String imageUrl;
-
-    @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int designerFlag;
-
-    @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int premiumFlag;
+    //@Column(columnDefinition = "TIMESTAMP")
+    private LocalTime endTime;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
@@ -47,6 +42,8 @@ public class Member {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+
 
 
 }

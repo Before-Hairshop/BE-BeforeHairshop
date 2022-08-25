@@ -9,7 +9,7 @@ import org.json.simple.parser.ParseException;
 @Slf4j
 public class JsonParser {
 
-    public static OAuthDto parseGoogleTokenInfo(String tokenInfoFromGoogle) {
+    public static OAuthDto parseTokenInfo(String tokenInfoFromGoogle) {
         OAuthDto oAuthDto = new OAuthDto();
         JSONParser jsonParser = new JSONParser();
 
@@ -38,6 +38,7 @@ public class JsonParser {
 
         try {
             JSONObject jsonObject = (JSONObject) jsonParser.parse(emailInfoFromGoogle);
+            log.info(jsonObject.toString());
             String email = (String) jsonObject.get("email");
             log.info("email : " + email);
             return email;
@@ -49,4 +50,25 @@ public class JsonParser {
 
         return null;
     }
+
+    public static String parseKakaoEmailInfo(String emailInfoFromKakao) {
+        JSONParser jsonParser = new JSONParser();
+
+        try {
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(emailInfoFromKakao);
+            log.info(jsonObject.toString());
+            JSONObject accountObject = (JSONObject) jsonObject.get("kakao_account");
+            log.info(accountObject.toString());
+            String email = (String) accountObject.get("email");
+            log.info("email : " + email);
+            return email;
+        }
+        catch (ParseException e) {
+            log.error("fail parsing email info");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

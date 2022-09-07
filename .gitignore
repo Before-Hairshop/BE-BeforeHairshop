@@ -144,3 +144,9 @@ target
 secrets.yml
 .gradletasknamecache
 .sts4-cache
+
+# ===== OAuth Secret Key =====
+Application-oauth.yml
+
+# ==================== Springboot ====================
+secret/

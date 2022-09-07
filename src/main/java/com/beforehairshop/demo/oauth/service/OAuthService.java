@@ -35,11 +35,15 @@ public class OAuthService {
 
     public OAuthDto requestAccessToken(SocialLoginType socialLoginType, String code) {
         SocialOAuth socialOauth = this.findSocialOauthByType(socialLoginType);
-        return JsonParser.parseGoogleTokenInfo(socialOauth.requestAccessToken(code));
+        return JsonParser.parseTokenInfo(socialOauth.requestAccessToken(code));
     }
 
     public String requestEmail(SocialLoginType socialLoginType, String accessToken) {
         SocialOAuth socialOauth = this.findSocialOauthByType(socialLoginType);
+//        System.out.println(socialLoginType.compareTo(SocialLoginType.KAKAO));
+        if (socialLoginType.compareTo(SocialLoginType.KAKAO) == 0) {
+            return JsonParser.parseKakaoEmailInfo(socialOauth.requestEmail(accessToken));
+        }
         return JsonParser.parseGoogleEmailInfo(socialOauth.requestEmail(accessToken));
     }
 

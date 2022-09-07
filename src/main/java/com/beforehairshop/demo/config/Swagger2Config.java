@@ -16,14 +16,6 @@ import java.util.List;
 @Configuration
 public class Swagger2Config {
 
-//    @Bean
-//    public GroupedOpenApi publicApi() {
-//        return GroupedOpenApi.builder()
-//                .group("v1-definition")
-//                .pathsToMatch("/api/**")
-//                .build();
-//    }
-
     @Bean
     public OpenAPI springShopOpenAPI() {
         Info info = new Info()

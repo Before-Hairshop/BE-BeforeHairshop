@@ -1,2 +1,2 @@
-insert into member (designer_flag, email, premium_flag, social_login_type, status) values (0, 'aaaa@naver.com', 0, 'GOOGLE', 1);
-insert into member (designer_flag, email, premium_flag, social_login_type, status) values (0, 'bbbb@naver.com', 0, 'GOOGLE', 1);
+insert into member (designer_flag, email, premium_flag, provider, status) values (0, 'aaaa@naver.com', 0, 'GOOGLE', 1);
+insert into member (designer_flag, email, premium_flag, provider, status) values (0, 'bbbb@naver.com', 0, 'GOOGLE', 1);

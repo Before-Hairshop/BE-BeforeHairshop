@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, BigInteger> {
 
     Optional<Member> findOneByEmailAndStatusIsLessThan(String email, int status);
+    Member findByUsername(String username);
 }

@@ -22,8 +22,8 @@ public class MemberDto {
     public MemberDto(Member member) {
         this.id = member.getId();
         this.email = member.getEmail();
-        this.socialLoginType = member.getSocialLoginType();
-        this.name = member.getName();
+        this.socialLoginType = member.getProvider();
+        this.name = member.getNickname();
         this.imageUrl = member.getImageUrl();
         this.designerFlag = member.getDesignerFlag();
         this.premiumFlag = member.getPremiumFlag();

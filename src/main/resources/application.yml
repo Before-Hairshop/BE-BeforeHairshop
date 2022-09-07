@@ -1,6 +1,8 @@
 server:
   port: 8080
   servlet:
+    session:
+      timeout: 30m
     context-path: /
     encoding:
       charset: UTF-8
@@ -8,17 +10,21 @@ server:
       force: true
 
 spring:
+  config:
+    import:
+      application-oauth.yml
+
   jpa:
     open-in-view: 'false'
     database-platform: org.hibernate.dialect.MySQL57Dialect
     defer-datasource-initialization: 'true'
     show-sql: 'true'
     hibernate:
-      ddl-auto: create # create or update
+      ddl-auto: update # create or update
 
   datasource:
     username: bo
-    url: jdbc:h2:mem:testdb;MODE=MYSQL;DB_CLOSE_DELAY=-1;
+    url: jdbc:h2:mem:bhDB;MODE=MYSQL;DB_CLOSE_DELAY=-1;
 
   h2:
     console:

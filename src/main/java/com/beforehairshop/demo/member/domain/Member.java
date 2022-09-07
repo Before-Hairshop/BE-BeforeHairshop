@@ -25,10 +25,14 @@ public class Member {
     private String email;
 
     @Column(columnDefinition = "VARCHAR(200) DEFAULT NULL")
-    private String socialLoginType; // KAKAO, GOOGLE...
+    private String provider; // KAKAO, GOOGLE...
+
+    private String username;
+    private String password;
+    private String role; // ROLE_USER, ROLE_DESIGNER, ROLE_ADMIN
 
     @Column(columnDefinition = "VARCHAR(250) DEFAULT 'tmp_name'")
-    private String name;
+    private String nickname;
 
     @Column(columnDefinition = "TEXT DEFAULT NULL")
     private String imageUrl;

@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.member.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
+import com.beforehairshop.demo.member.dto.MemberProfileSaveRequestDto;
 import com.beforehairshop.demo.member.service.MemberService;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,10 +23,22 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_DESIGNER') or hasRole('ROLE_ADMIN')")
-    @GetMapping("")
-    public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @GetMapping("test")
+    public ResponseEntity<ResultDto> testFind(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return makeResult(HttpStatus.OK, principalDetails.getMember());
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping("")
+    public ResponseEntity<ResultDto> findMyProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.findMyProfile(principalDetails.getMember());
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PostMapping("")
+    public ResponseEntity<ResultDto> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody MemberProfileSaveRequestDto memberProfileSaveRequestDto) {
+        return memberService.saveMemberProfile(principalDetails.getMember(), memberProfileSaveRequestDto);
     }
 
 //    @PostMapping("signup-google")

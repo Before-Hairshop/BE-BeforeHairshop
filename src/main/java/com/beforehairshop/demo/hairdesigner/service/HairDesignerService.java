@@ -42,7 +42,7 @@ public class HairDesignerService {
         Member member = memberRepository.findById(hairDesignerSaveRequestDto.getMemberId()).orElse(null);
         if (member == null) return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
 
-        member.toHairDesigner();
+        member.setDesignerFlag(1);
 
         HairDesigner hairDesigner = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
 

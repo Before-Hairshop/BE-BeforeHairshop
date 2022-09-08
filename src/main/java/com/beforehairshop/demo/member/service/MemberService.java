@@ -3,6 +3,7 @@ package com.beforehairshop.demo.member.service;
 import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.dto.MemberDto;
+import com.beforehairshop.demo.member.dto.MemberProfileSaveRequestDto;
 import com.beforehairshop.demo.member.dto.MemberSaveRequestDto;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.member.domain.StatusKind;
@@ -37,4 +38,11 @@ public class MemberService {
         return member.getId();
     }
 
+    public ResponseEntity<ResultDto> saveMemberProfile(Member member, MemberProfileSaveRequestDto memberProfileSaveRequestDto) {
+        return null;
+    }
+
+    public ResponseEntity<ResultDto> findMyProfile(Member member) {
+        return null;
+    }
 }

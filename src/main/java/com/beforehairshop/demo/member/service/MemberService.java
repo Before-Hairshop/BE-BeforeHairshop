@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.member.service;
 
+import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.dto.MemberSaveRequestDto;
@@ -35,4 +36,5 @@ public class MemberService {
 
         return member.getId();
     }
+
 }

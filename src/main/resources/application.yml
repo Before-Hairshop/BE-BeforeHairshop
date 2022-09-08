@@ -2,7 +2,7 @@ server:
   port: 8080
   servlet:
     session:
-      timeout: 30m
+      timeout: 8760h
     context-path: /
     encoding:
       charset: UTF-8

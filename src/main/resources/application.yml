@@ -2,7 +2,9 @@ server:
   port: 8080
   servlet:
     session:
-      timeout: 8760h
+      timeout: 525600m # 1년
+      cookie:
+        max-age: 525600m # 1년
     context-path: /
     encoding:
       charset: UTF-8

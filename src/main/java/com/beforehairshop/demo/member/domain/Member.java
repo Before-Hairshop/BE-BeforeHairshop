@@ -10,7 +10,6 @@ import java.util.Date;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
@@ -52,5 +51,13 @@ public class Member {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
+    public Member toHairDesigner() {
+        this.designerFlag = 1;
+        return this;
+    }
 
+    public Member toPremium() {
+        this.premiumFlag = 1;
+        return this;
+    }
 }

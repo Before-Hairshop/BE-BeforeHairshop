@@ -2,14 +2,15 @@ package com.beforehairshop.demo.member.dto;
 
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.response.ResultDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor
-public class MemberProfileSaveRequestDto {
-
+public class MemberProfilePatchRequestDto {
     private Integer hairCondition;
     private Integer hairTendency;
     private String desiredHairstyle;
@@ -18,10 +19,6 @@ public class MemberProfileSaveRequestDto {
     private MultipartFile frontImage;
     private MultipartFile sideImage;
     private MultipartFile backImage;
-//
-//    private String frontImageUrl;
-//    private String sideImageUrl;
-//    private String backImageUrl;
 
     private Integer payableAmount;
     private Integer zipCode;
@@ -50,4 +47,6 @@ public class MemberProfileSaveRequestDto {
                 .build();
 
     }
+
+
 }

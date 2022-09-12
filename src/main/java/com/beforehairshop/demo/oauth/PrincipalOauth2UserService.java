@@ -30,10 +30,10 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
      */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("userRequest : " + userRequest);
-        System.out.println("clientRegistration : " + userRequest.getClientRegistration());
-        System.out.println("accessToken : " + userRequest.getAccessToken().getTokenValue());
-        System.out.println("attributes : " + super.loadUser(userRequest).getAttributes());
+//        System.out.println("userRequest : " + userRequest);
+//        System.out.println("clientRegistration : " + userRequest.getClientRegistration());
+//        System.out.println("accessToken : " + userRequest.getAccessToken().getTokenValue());
+//        System.out.println("attributes : " + super.loadUser(userRequest).getAttributes());
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
@@ -66,7 +66,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                     .email(email)
                     .role(role)
                     .provider(provider)
-                    .status(0)
+                    .status(1)
                     .build();
 
             memberRepository.save(member);

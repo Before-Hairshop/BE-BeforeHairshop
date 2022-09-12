@@ -52,5 +52,4 @@ public class Member {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
-
 }

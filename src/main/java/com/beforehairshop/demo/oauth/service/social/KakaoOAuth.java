@@ -10,9 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-//import static com.beforehairshop.demo.secret.social.SecretKakao.*;
-//import static com.beforehairshop.demo.secret.social.SecretKakao.getKakaoSnsClientId;
-
 @Component
 @Slf4j
 public class KakaoOAuth  {

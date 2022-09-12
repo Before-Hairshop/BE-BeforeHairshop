@@ -144,6 +144,7 @@ target
 secrets.yml
 .gradletasknamecache
 .sts4-cache
+*.jpg
 
 # ===== OAuth Secret Key =====
 application-oauth.yml

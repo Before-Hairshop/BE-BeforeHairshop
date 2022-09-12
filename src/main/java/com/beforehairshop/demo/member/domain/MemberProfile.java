@@ -1,9 +1,7 @@
 package com.beforehairshop.demo.member.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.beforehairshop.demo.member.dto.MemberProfilePatchRequestDto;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.lang.Nullable;
@@ -14,6 +12,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
@@ -25,7 +24,7 @@ public class MemberProfile {
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -61,5 +60,7 @@ public class MemberProfile {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+
 
 }

@@ -36,6 +36,9 @@ dependencies {
 	// aws
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+	// JWT
+	implementation 'com.auth0:java-jwt:3.19.2'
+
 	// devtools
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

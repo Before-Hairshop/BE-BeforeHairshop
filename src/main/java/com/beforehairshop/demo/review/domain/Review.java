@@ -1,6 +1,5 @@
 package com.beforehairshop.demo.review.domain;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.review.dto.ReviewPatchRequestDto;
 import lombok.*;

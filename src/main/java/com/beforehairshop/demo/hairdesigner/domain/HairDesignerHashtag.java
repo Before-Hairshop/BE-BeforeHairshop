@@ -26,7 +26,7 @@ public class HairDesignerHashtag {
 
     @ManyToOne
     @JoinColumn(name = "hair_designer_id")
-    private HairDesigner hairDesigner;
+    private Member hairDesigner;
 
     private String tag;
 

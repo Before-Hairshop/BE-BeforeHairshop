@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.controller;
 
+import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.service.HairDesignerService;
 import com.beforehairshop.demo.response.ResultDto;
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.message.ReusableMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -17,25 +20,32 @@ import java.math.BigInteger;
 @RestController
 @Tag(name = "헤어 디자이너 관련 Controller")
 @AllArgsConstructor
-@RequestMapping("/api/v1/hair-designers")
+@RequestMapping("/api/v1/hair_designers")
 public class HairDesignerController {
 
     private final HairDesignerService hairDesignerService;
 
-    @GetMapping()
+
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 상세 조회 API")
-    public ResponseEntity<ResultDto> findOne(@RequestParam(value = "id", required = true) BigInteger id) {
-        return hairDesignerService.findOne(id);
+    @GetMapping()
+    public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(value = "hairDesignerId", required = true) BigInteger hairDesignerId) {
+        return hairDesignerService.findOne(principalDetails.getMember(), hairDesignerId);
     }
 
-    @GetMapping("list")
+
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 목록 조회 API")
+    @GetMapping("list")
     public ResponseEntity<ResultDto> findMany(@PageableDefault(size = 5)Pageable pageable) {
         return hairDesignerService.findMany(pageable);
     }
 
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 프로필 생성 API")
     @PostMapping()
-    @Operation(summary = "헤어 디자이너 생성 API")
     public ResponseEntity<ResultDto> save(@RequestBody HairDesignerSaveRequestDto hairDesignerSaveRequestDto) {
         return hairDesignerService.save(hairDesignerSaveRequestDto);
     }

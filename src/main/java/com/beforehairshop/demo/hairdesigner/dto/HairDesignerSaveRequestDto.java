@@ -1,7 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.dto;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
-import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,8 +21,8 @@ public class HairDesignerSaveRequestDto {
     private List<HairDesignerWorkingDaySaveRequestDto> workingDayList;
     private List<HairDesignerPriceSaveRequestDto> priceList;
 
-    public HairDesigner toEntity(Member member) {
-        return HairDesigner.builder()
+    public HairDesignerProfile toEntity(Member member) {
+        return HairDesignerProfile.builder()
                 .member(member)
                 .description(description)
                 .zipCode(zipCode)

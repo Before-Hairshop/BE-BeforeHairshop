@@ -1,11 +1,12 @@
 package com.beforehairshop.demo.hairdesigner.service;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesigner;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerSaveRequestDto;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerWorkingDaySaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerWorkingDayRepository;
@@ -35,6 +36,7 @@ public class HairDesignerService {
     private final HairDesignerRepository hairDesignerRepository;
     private final HairDesignerWorkingDayRepository hairDesignerWorkingDayRepository;
     private final HairDesignerPriceRepository hairDesignerPriceRepository;
+    private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -44,7 +46,7 @@ public class HairDesignerService {
 
         member.setDesignerFlag(1);
 
-        HairDesigner hairDesigner = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
+        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
 
         /**
          * 헤어 디자이너가 일하는 시간(entity)에 대한 row 생성
@@ -66,18 +68,18 @@ public class HairDesignerService {
                         .collect(Collectors.toList()));
 
 
-        return makeResult(HttpStatus.OK, hairDesigner);
+        return makeResult(HttpStatus.OK, hairDesignerProfile);
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findOne(BigInteger id) {
-        Member member = memberRepository.findById(id).orElse(null);
+    public ResponseEntity<ResultDto> findOne(Member member, BigInteger hairDesignerId) {
+        Member designer = memberRepository.findById(hairDesignerId).orElse(null);
 
-        List<HairDesigner> hairDesignerList = hairDesignerRepository.findAllByMember(member);
-        if (hairDesignerList == null || hairDesignerList.size() == 0) {
+        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.findByMember(designer).orElse(null);
+        if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
-        }
 
+        List<HairDesignerHashtag> hairDesignerHashtagList = hairDesignerHashtagRepository.findAllByHairDesigner(designer);
         List<HairDesignerWorkingDay> hairDesignerWorkingDayList = hairDesignerWorkingDayRepository.findAllByHairDesigner(member);
         List<HairDesignerPrice> hairDesignerPriceList = hairDesignerPriceRepository.findAllByHairDesigner(member);
 
@@ -85,7 +87,10 @@ public class HairDesignerService {
          * 별점, 리뷰 정보 가져오는 부분 추가해야 함!
          */
 
-        return makeResult(HttpStatus.OK, new HairDesignerDetailResponseDto(hairDesignerList.get(0), hairDesignerWorkingDayList, hairDesignerPriceList));
+        return makeResult(HttpStatus.OK, new HairDesignerDetailResponseDto(hairDesignerProfile
+                , hairDesignerHashtagList
+                , hairDesignerWorkingDayList
+                , hairDesignerPriceList));
     }
 
     @Transactional
@@ -97,7 +102,7 @@ public class HairDesignerService {
         /**
          * 별점 순 혹은 리뷰 순으로 정렬해주는 기능 빠짐.
          */
-        Page<HairDesigner> hairDesigners = hairDesignerRepository.findAll(pageable);
+        Page<HairDesignerProfile> hairDesigners = hairDesignerRepository.findAll(pageable);
 
         return makeResult(HttpStatus.OK, hairDesigners);
 

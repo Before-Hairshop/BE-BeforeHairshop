@@ -26,21 +26,11 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 @RequestMapping("/api/v1/members")
 public class MemberController {
 
-    private final MemberService memberService;
-    private final S3Uploader s3Uploader;
-
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("")
+    @Operation(summary = "본인 정보 조회 API")
     public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return makeResult(HttpStatus.OK, principalDetails.getMember());
-    }
-
-//    @Tag(name = "유저 이미지 수정 API", description = "유저나 헤어 디자이너 모두 이미지를 바꿀 때 사용하는 API")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    @PatchMapping("/image")
-    public ResponseEntity<ResultDto> patchMyImage(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody MultipartFile myImageFile) throws IOException {
-
-        return makeResult(HttpStatus.OK, s3Uploader.upload(myImageFile, principalDetails.getMember().getId().toString() + "/profile.jpg"));
     }
 
 }

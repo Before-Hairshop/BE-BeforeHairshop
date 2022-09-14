@@ -11,7 +11,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +19,7 @@ import java.util.List;
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class HairDesigner {
+public class HairDesignerProfile {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;

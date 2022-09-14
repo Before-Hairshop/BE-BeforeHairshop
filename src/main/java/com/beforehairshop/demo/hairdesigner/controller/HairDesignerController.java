@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.hairdesigner.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.service.HairDesignerService;
 import com.beforehairshop.demo.response.ResultDto;
@@ -54,8 +55,9 @@ public class HairDesignerController {
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 프로필 수정")
     @PatchMapping()
-    public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail) {
-        return null;
+    public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail
+            , HairDesignerProfilePatchRequestDto hairDesignerProfilePatchRequestDto) throws IOException {
+        return hairDesignerService.patchOne(principalDetail.getMember(), hairDesignerProfilePatchRequestDto);
     }
 
 

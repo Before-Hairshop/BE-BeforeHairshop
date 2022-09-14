@@ -6,10 +6,11 @@ import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailGetResponseDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
-import com.beforehairshop.demo.hairdesigner.repository.HairDesignerRepository;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerWorkingDayRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
@@ -35,7 +36,7 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 @AllArgsConstructor
 public class HairDesignerService {
 
-    private final HairDesignerRepository hairDesignerRepository;
+    private final HairDesignerProfileRepository hairDesignerProfileRepository;
     private final HairDesignerWorkingDayRepository hairDesignerWorkingDayRepository;
     private final HairDesignerPriceRepository hairDesignerPriceRepository;
     private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
@@ -55,7 +56,7 @@ public class HairDesignerService {
         String imageUrl = s3Uploader.upload(hairDesignerProfileSaveRequestDto.getImage()
                 , hairDesigner.getId() + "/profile.jpg");
 
-        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner, imageUrl));
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner, imageUrl));
 
         /**
          * 헤어 디자이너의 해쉬 태그(entity)에 대한 row 생성
@@ -94,7 +95,7 @@ public class HairDesignerService {
     public ResponseEntity<ResultDto> findOne(Member member, BigInteger hairDesignerId) {
         Member designer = memberRepository.findById(hairDesignerId).orElse(null);
 
-        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.findByMember(designer).orElse(null);
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByMember(designer).orElse(null);
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
 
@@ -121,9 +122,43 @@ public class HairDesignerService {
         /**
          * 별점 순 혹은 리뷰 순으로 정렬해주는 기능 빠짐.
          */
-        Page<HairDesignerProfile> hairDesigners = hairDesignerRepository.findAll(pageable);
+        Page<HairDesignerProfile> hairDesigners = hairDesignerProfileRepository.findAll(pageable);
 
         return makeResult(HttpStatus.OK, hairDesigners);
 
+    }
+
+    public ResponseEntity<ResultDto> patchOne(Member hairDesigner
+            , HairDesignerProfilePatchRequestDto patchDto) throws IOException {
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByMember(hairDesigner).orElse(null);
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 디자이너 프로필이 없습니다.");
+
+        if (patchDto.getImage() != null)
+           hairDesignerProfile.setImageUrl(s3Uploader.upload(patchDto.getImage(), hairDesigner.getId() + "/profile.jpg"));
+
+        if (patchDto.getName() != null)
+            hairDesignerProfile.setName(patchDto.getName());
+
+        if (patchDto.getDescription() != null)
+            hairDesignerProfile.setDescription(patchDto.getDescription());
+
+        if (patchDto.getHairShopName() != null)
+            hairDesignerProfile.setHairShopName(patchDto.getHairShopName());
+
+        if (patchDto.getZipCode() != null) {
+            hairDesignerProfile.setZipCode(patchDto.getZipCode());
+            hairDesignerProfile.setZipAddress(patchDto.getZipAddress());
+            hairDesignerProfile.setLatitude(patchDto.getLatitude());
+            hairDesignerProfile.setLongitude(patchDto.getLongitude());
+        }
+
+        if (patchDto.getDetailAddress() != null)
+            hairDesignerProfile.setDetailAddress(patchDto.getDetailAddress());
+
+        if (patchDto.getPhoneNumber() != null)
+            hairDesignerProfile.setPhoneNumber(patchDto.getPhoneNumber());
+
+        return makeResult(HttpStatus.OK, hairDesignerProfile);
     }
 }

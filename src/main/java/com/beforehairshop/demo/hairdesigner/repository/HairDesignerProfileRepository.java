@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.math.BigInteger;
 import java.util.Optional;
 
-public interface HairDesignerRepository extends JpaRepository<HairDesignerProfile, BigInteger> {
+public interface HairDesignerProfileRepository extends JpaRepository<HairDesignerProfile, BigInteger> {
     Optional<HairDesignerProfile> findByMember(Member hairDesigner);
 }

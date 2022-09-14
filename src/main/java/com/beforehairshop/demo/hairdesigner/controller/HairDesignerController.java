@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 @RestController
@@ -46,7 +47,7 @@ public class HairDesignerController {
     @Operation(summary = "헤어 디자이너 프로필 생성")
     @PostMapping()
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestBody HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
+            , HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) throws IOException {
         return hairDesignerService.save(principalDetails.getMember(), hairDesignerProfileSaveRequestDto);
     }
 

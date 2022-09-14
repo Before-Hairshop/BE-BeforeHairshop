@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.service;
 
+import com.beforehairshop.demo.aws.S3Uploader;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +40,10 @@ public class HairDesignerService {
     private final HairDesignerPriceRepository hairDesignerPriceRepository;
     private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
     private final MemberRepository memberRepository;
+    private final S3Uploader s3Uploader;
 
     @Transactional
-    public ResponseEntity<ResultDto> save(Member member, HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
+    public ResponseEntity<ResultDto> save(Member member, HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) throws IOException {
         Member hairDesigner = memberRepository.findById(member.getId()).orElse(null);
         if (hairDesigner == null)
             return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
@@ -49,8 +52,10 @@ public class HairDesignerService {
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 이미 헤어 디자이너입니다.");
 
         hairDesigner.setDesignerFlag(1);
+        String imageUrl = s3Uploader.upload(hairDesignerProfileSaveRequestDto.getImage()
+                , hairDesigner.getId() + "/profile.jpg");
 
-        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
+        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner, imageUrl));
 
         /**
          * 헤어 디자이너의 해쉬 태그(entity)에 대한 row 생성

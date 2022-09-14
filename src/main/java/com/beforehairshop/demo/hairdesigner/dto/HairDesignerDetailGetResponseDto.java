@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class HairDesignerDetailResponseDto {
+public class HairDesignerDetailGetResponseDto {
     private HairDesignerProfile hairDesignerProfile;
     private List<HairDesignerHashtag> hairDesignerHashtagList;
     private List<HairDesignerWorkingDay> hairDesignerWorkingDayList;

@@ -1,13 +1,12 @@
 package com.beforehairshop.demo.hairdesigner.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.service.HairDesignerService;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.apache.logging.log4j.message.ReusableMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class HairDesignerController {
 
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 상세 조회 API")
+    @Operation(summary = "헤어 디자이너 상세 조회")
     @GetMapping()
     public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(value = "hairDesignerId", required = true) BigInteger hairDesignerId) {
@@ -36,7 +35,7 @@ public class HairDesignerController {
 
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 목록 조회 API")
+    @Operation(summary = "헤어 디자이너 목록 조회")
     @GetMapping("list")
     public ResponseEntity<ResultDto> findMany(@PageableDefault(size = 5)Pageable pageable) {
         return hairDesignerService.findMany(pageable);
@@ -44,10 +43,18 @@ public class HairDesignerController {
 
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 프로필 생성 API")
+    @Operation(summary = "헤어 디자이너 프로필 생성")
     @PostMapping()
-    public ResponseEntity<ResultDto> save(@RequestBody HairDesignerSaveRequestDto hairDesignerSaveRequestDto) {
-        return hairDesignerService.save(hairDesignerSaveRequestDto);
+    public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestBody HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
+        return hairDesignerService.save(principalDetails.getMember(), hairDesignerProfileSaveRequestDto);
+    }
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 프로필 수정")
+    @PatchMapping()
+    public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail) {
+        return null;
     }
 
 

@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.dto;
 
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
@@ -10,25 +11,24 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class HairDesignerSaveRequestDto {
-    private BigInteger memberId;
+public class HairDesignerProfileSaveRequestDto {
     private String description;
     private String zipCode;
     private String detailAddress;
     private String phoneNumber;
-    private int status;
 
+    private List<HairDesignerHashtagSaveRequestDto> hashtagList;
     private List<HairDesignerWorkingDaySaveRequestDto> workingDayList;
     private List<HairDesignerPriceSaveRequestDto> priceList;
 
-    public HairDesignerProfile toEntity(Member member) {
+    public HairDesignerProfile toEntity(Member hairDesigner) {
         return HairDesignerProfile.builder()
-                .member(member)
+                .member(hairDesigner)
                 .description(description)
                 .zipCode(zipCode)
                 .detailAddress(detailAddress)
                 .phoneNumber(phoneNumber)
-                .status(status)
+                .status(1)
                 .build();
     }
 }

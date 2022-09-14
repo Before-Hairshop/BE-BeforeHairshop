@@ -4,8 +4,8 @@ import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailResponseDto;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailGetResponseDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerRepository;
@@ -40,21 +40,35 @@ public class HairDesignerService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public ResponseEntity<ResultDto> save(HairDesignerSaveRequestDto hairDesignerSaveRequestDto) {
-        Member member = memberRepository.findById(hairDesignerSaveRequestDto.getMemberId()).orElse(null);
-        if (member == null) return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
+    public ResponseEntity<ResultDto> save(Member member, HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
+        Member hairDesigner = memberRepository.findById(member.getId()).orElse(null);
+        if (hairDesigner == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
 
-        member.setDesignerFlag(1);
+        if (hairDesigner.getDesignerFlag() == 1)
+            return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 이미 헤어 디자이너입니다.");
 
-        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.save(hairDesignerSaveRequestDto.toEntity(member));
+        hairDesigner.setDesignerFlag(1);
+
+        HairDesignerProfile hairDesignerProfile = hairDesignerRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
+
+        /**
+         * 헤어 디자이너의 해쉬 태그(entity)에 대한 row 생성
+         */
+        hairDesignerHashtagRepository.saveAll(
+                hairDesignerProfileSaveRequestDto.getHashtagList()
+                        .stream()
+                        .map(hairDesignerHashtagSaveRequestDto -> hairDesignerHashtagSaveRequestDto.toEntity(hairDesigner))
+                        .collect(Collectors.toList())
+        );
 
         /**
          * 헤어 디자이너가 일하는 시간(entity)에 대한 row 생성
          */
         hairDesignerWorkingDayRepository.saveAll(
-                hairDesignerSaveRequestDto.getWorkingDayList()
+                hairDesignerProfileSaveRequestDto.getWorkingDayList()
                         .stream()
-                        .map(hairDesignerWorkingDaySaveRequestDto -> hairDesignerWorkingDaySaveRequestDto.toEntity(member))
+                        .map(hairDesignerWorkingDaySaveRequestDto -> hairDesignerWorkingDaySaveRequestDto.toEntity(hairDesigner))
                         .collect(Collectors.toList())
         );
 
@@ -62,9 +76,9 @@ public class HairDesignerService {
          *  헤어 디자이너의 스타일링 비용(entity)에 대한 row 생성
          */
         hairDesignerPriceRepository.saveAll(
-                hairDesignerSaveRequestDto.getPriceList()
+                hairDesignerProfileSaveRequestDto.getPriceList()
                         .stream()
-                        .map(hairDesignerPriceSaveRequestDto -> hairDesignerPriceSaveRequestDto.toEntity(member))
+                        .map(hairDesignerPriceSaveRequestDto -> hairDesignerPriceSaveRequestDto.toEntity(hairDesigner))
                         .collect(Collectors.toList()));
 
 
@@ -87,7 +101,7 @@ public class HairDesignerService {
          * 별점, 리뷰 정보 가져오는 부분 추가해야 함!
          */
 
-        return makeResult(HttpStatus.OK, new HairDesignerDetailResponseDto(hairDesignerProfile
+        return makeResult(HttpStatus.OK, new HairDesignerDetailGetResponseDto(hairDesignerProfile
                 , hairDesignerHashtagList
                 , hairDesignerWorkingDayList
                 , hairDesignerPriceList));

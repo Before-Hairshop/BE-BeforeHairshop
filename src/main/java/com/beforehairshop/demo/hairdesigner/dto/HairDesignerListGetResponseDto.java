@@ -8,6 +8,6 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class HairDesignerListResponseDto {
+public class HairDesignerListGetResponseDto {
     private List<HairDesignerProfile> designerList;
 }

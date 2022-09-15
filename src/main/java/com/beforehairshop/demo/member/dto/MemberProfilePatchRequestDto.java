@@ -21,7 +21,7 @@ public class MemberProfilePatchRequestDto {
     private MultipartFile backImage;
 
     private Integer payableAmount;
-    private Integer zipCode;
+    private String zipCode;
     private String zipAddress;
     private Float latitude;
     private Float longitude;

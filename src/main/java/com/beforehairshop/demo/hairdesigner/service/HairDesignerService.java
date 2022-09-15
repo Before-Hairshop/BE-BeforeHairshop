@@ -8,11 +8,14 @@ import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailGetResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerWorkingDayRepository;
 import com.beforehairshop.demo.member.domain.Member;
+import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.AllArgsConstructor;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.*;
@@ -41,6 +45,7 @@ public class HairDesignerService {
     private final HairDesignerPriceRepository hairDesignerPriceRepository;
     private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
     private final MemberRepository memberRepository;
+    private final MemberProfileRepository memberProfileRepository;
     private final S3Uploader s3Uploader;
 
     @Transactional
@@ -114,17 +119,19 @@ public class HairDesignerService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findMany(Pageable pageable) {
-        /**
-         * 유저의 위치 정보가 아직 고려되어 있지 않음.
-         */
+    public ResponseEntity<ResultDto> findManyByLocation(Member member, Integer pageNumber) {
 
-        /**
-         * 별점 순 혹은 리뷰 순으로 정렬해주는 기능 빠짐.
-         */
-        Page<HairDesignerProfile> hairDesigners = hairDesignerProfileRepository.findAll(pageable);
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, 1).orElse(null);
+        if (memberProfile == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "이 유저의 프로필 등록이 되어있지 않습니다.");
 
-        return makeResult(HttpStatus.OK, hairDesigners);
+
+
+        List<HairDesignerProfile> hairDesignerProfileList
+                = hairDesignerProfileRepository.findManyByLocation(memberProfile.getLatitude(), memberProfile.getLongitude(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
+
+
+        return makeResult(HttpStatus.OK, hairDesignerProfileList);
 
     }
 

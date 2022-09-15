@@ -1,22 +1,27 @@
 package com.beforehairshop.demo.hairdesigner.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfilePatchRequestDto;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.service.HairDesignerService;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 @Tag(name = "헤어 디자이너 관련 Controller")
@@ -37,18 +42,28 @@ public class HairDesignerController {
 
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 프로필 생성")
+    @Operation(summary = "헤어 디자이너 프로필 생성(이미지 제외)")
     @PostMapping()
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) throws IOException {
+            , @RequestBody HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto, Authentication authentication) {
+
         return hairDesignerService.save(principalDetails.getMember(), hairDesignerProfileSaveRequestDto);
     }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 프로필 수정")
+    @Operation(summary = "헤어 디자이너 프로필 - 이미지 수정(프로필 생성 시에도 필요함)")
+    @PostMapping("image")
+    public ResponseEntity<ResultDto> saveImage(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , MultipartFile image) throws IOException {
+        return hairDesignerService.saveImage(principalDetails.getMember(), image);
+    }
+
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 프로필 수정(이미지 제외)")
     @PatchMapping()
     public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail
-            , HairDesignerProfilePatchRequestDto hairDesignerProfilePatchRequestDto) throws IOException {
+            , @RequestBody HairDesignerProfilePatchRequestDto hairDesignerProfilePatchRequestDto) {
         return hairDesignerService.patchOne(principalDetail.getMember(), hairDesignerProfilePatchRequestDto);
     }
 

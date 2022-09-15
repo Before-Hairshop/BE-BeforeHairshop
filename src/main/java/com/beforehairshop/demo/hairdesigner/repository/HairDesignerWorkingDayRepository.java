@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface HairDesignerWorkingDayRepository extends JpaRepository<HairDesignerWorkingDay, BigInteger> {
     List<HairDesignerWorkingDay> findAllByHairDesigner(Member hairDesigner);
+
+
 }

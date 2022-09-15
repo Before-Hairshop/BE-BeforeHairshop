@@ -26,7 +26,7 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 @RequestMapping("/api/v1/members")
 public class MemberController {
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
     @GetMapping("")
     @Operation(summary = "본인 정보 조회 API")
     public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {

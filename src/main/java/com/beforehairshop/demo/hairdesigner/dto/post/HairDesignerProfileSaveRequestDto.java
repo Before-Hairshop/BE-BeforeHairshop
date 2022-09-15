@@ -1,24 +1,21 @@
-package com.beforehairshop.demo.hairdesigner.dto;
+package com.beforehairshop.demo.hairdesigner.dto.post;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.NoArgsConstructor;
 
-import java.awt.*;
-import java.math.BigInteger;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class HairDesignerProfileSaveRequestDto {
-    private MultipartFile image;
     private String name;
     private String description;
     private String hairShopName;
-    private Integer zipCode;  // 우편번호
+    private String zipCode;  // 우편번호
     private String zipAddress;  // 우편번호에 해당하는 주소
     private Float latitude;  // 위도
     private Float longitude;  // 경도
@@ -29,11 +26,11 @@ public class HairDesignerProfileSaveRequestDto {
     private List<HairDesignerWorkingDaySaveRequestDto> workingDayList;
     private List<HairDesignerPriceSaveRequestDto> priceList;
 
-    public HairDesignerProfile toEntity(Member hairDesigner, String imageUrl) {
+    public HairDesignerProfile toEntity(Member hairDesigner) {
         return HairDesignerProfile.builder()
-                .member(hairDesigner)
+                .hairDesigner(hairDesigner)
                 .name(name)
-                .imageUrl(imageUrl)
+                .imageUrl(null)
                 .description(description)
                 .hairShopName(hairShopName)
                 .zipCode(zipCode)

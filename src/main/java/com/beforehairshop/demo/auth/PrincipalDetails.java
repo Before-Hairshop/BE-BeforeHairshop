@@ -13,6 +13,7 @@ import java.util.Map;
 @Getter
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
+
     private Member member;
 
     private Map<String, Object> attributes;

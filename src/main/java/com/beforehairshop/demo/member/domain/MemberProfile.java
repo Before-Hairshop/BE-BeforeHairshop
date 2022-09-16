@@ -28,6 +28,8 @@ public class MemberProfile {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private String name;
+
     @Column(columnDefinition = "TINYINT")
     private Integer hairCondition;
 

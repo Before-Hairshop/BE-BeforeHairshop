@@ -23,7 +23,7 @@ public class MemberDto {
         this.id = member.getId();
         this.email = member.getEmail();
         this.socialLoginType = member.getProvider();
-        this.name = member.getNickname();
+        this.name = member.getName();
         this.imageUrl = member.getImageUrl();
         this.designerFlag = member.getDesignerFlag();
         this.premiumFlag = member.getPremiumFlag();

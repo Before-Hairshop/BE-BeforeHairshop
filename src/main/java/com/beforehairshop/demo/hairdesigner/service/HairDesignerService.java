@@ -65,6 +65,7 @@ public class HairDesignerService {
 
         hairDesigner.setDesignerFlag(1);
         hairDesigner.setRole("ROLE_DESIGNER");
+        hairDesigner.setName(hairDesignerProfileSaveRequestDto.getName());
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
 
@@ -178,8 +179,12 @@ public class HairDesignerService {
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 디자이너 프로필이 없습니다.");
 
-        if (patchDto.getName() != null)
+        Member updatedMember = memberRepository.findById(hairDesigner.getId()).orElse(null);
+        if (patchDto.getName() != null) {
+
             hairDesignerProfile.setName(patchDto.getName());
+            updatedMember.setName(patchDto.getName());
+        }
 
         if (patchDto.getDescription() != null)
             hairDesignerProfile.setDescription(patchDto.getDescription());
@@ -234,6 +239,13 @@ public class HairDesignerService {
             );
         }
 
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_DESIGNER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         return makeResult(HttpStatus.OK, hairDesignerProfile);
     }
 
@@ -243,7 +255,7 @@ public class HairDesignerService {
         if (hairDesigner == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 세션이 만료됐습니다.");
 
-        if (hairDesigner.getDesignerFlag() == 1)
+        if (hairDesigner.getDesignerFlag() == 0)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 헤어 디자이너가 아닙니다.");
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesigner(member).orElse(null);
@@ -255,6 +267,15 @@ public class HairDesignerService {
                 , hairDesigner.getId() + "/profile.jpg");
 
         hairDesignerProfile.setImageUrl(imageUrl);
+        hairDesigner.setImageUrl(imageUrl);
+
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_DESIGNER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(hairDesigner), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         return makeResult(HttpStatus.OK, hairDesigner);
     }
 }

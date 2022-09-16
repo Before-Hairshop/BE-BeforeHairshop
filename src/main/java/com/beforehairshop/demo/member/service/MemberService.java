@@ -13,12 +13,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
@@ -53,6 +59,11 @@ public class MemberService {
         if (memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null) != null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 이미 존재합니다. 유저 당 하나의 프로필만 존재할 수 있습니다.");
 
+        if (memberProfileSaveRequestDto.getName() == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "닉네임을 입력하지 않았습니다.");
+
+        Member updatedMember = memberRepository.findById(member.getId()).orElse(null);
+        updatedMember.setName(memberProfileSaveRequestDto.getName());
 
         if (memberProfileSaveRequestDto.getFrontImage() == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 정면 사진이 입력되지 않았습니다.");
@@ -60,7 +71,14 @@ public class MemberService {
         String frontImageUrl = s3Uploader.upload(memberProfileSaveRequestDto.getFrontImage(), member.getId().toString() + "/profile/front-image.jpg");
 
         // member 의 image url 변경해준다.
-        member.setImageUrl(frontImageUrl);
+        updatedMember.setImageUrl(frontImageUrl);
+
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String sideImageUrl = null, backImageUrl = null;
 
@@ -70,7 +88,8 @@ public class MemberService {
         if (memberProfileSaveRequestDto.getBackImage() != null)
             backImageUrl = s3Uploader.upload(memberProfileSaveRequestDto.getBackImage(), member.getId().toString() + "/profile/back-image.jpg");
 
-        MemberProfile memberProfile = memberProfileSaveRequestDto.toEntity(member, frontImageUrl, sideImageUrl, backImageUrl);
+        MemberProfile memberProfile = memberProfileSaveRequestDto.toEntity(updatedMember, frontImageUrl, sideImageUrl, backImageUrl);
+
         memberProfileRepository.save(memberProfile);
 
         return makeResult(HttpStatus.OK, memberProfile);
@@ -92,6 +111,15 @@ public class MemberService {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다. 먼저 만들고 난 뒤 수정해야합니다.");
         }
 
+        Member updatedMember = memberRepository.findById(member.getId()).orElse(null);
+        if (updatedMember == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "유저의 세션이 만료되었거나 유효하지 않은 유저입니다.");
+
+        if (patchDto.getName() != null) {
+            memberProfile.setName(patchDto.getName());
+            updatedMember.setName(patchDto.getName());
+        }
+
         if (patchDto.getHairCondition() != null)
             memberProfile.setHairCondition(patchDto.getHairCondition());
 
@@ -105,9 +133,12 @@ public class MemberService {
             memberProfile.setDesiredHairstyleDescription(memberProfile.getDesiredHairstyleDescription());
 
 
-        if (patchDto.getFrontImage() != null)
-            memberProfile.setFrontImageUrl(s3Uploader.upload(patchDto.getFrontImage(), member.getId().toString() + "/profile/front-image.jpg"));
+        if (patchDto.getFrontImage() != null) {
+            String imageUrl = s3Uploader.upload(patchDto.getFrontImage(), member.getId().toString() + "/profile/front-image.jpg");
 
+            memberProfile.setFrontImageUrl(imageUrl);
+            updatedMember.setImageUrl(imageUrl);
+        }
         if (patchDto.getSideImage() != null)
             memberProfile.setSideImageUrl(s3Uploader.upload(patchDto.getSideImage(), member.getId().toString() + "/profile/side-image.jpg"));
 
@@ -128,8 +159,23 @@ public class MemberService {
         if (patchDto.getDetailAddress() != null)
             memberProfile.setDetailAddress(patchDto.getDetailAddress());
 
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        memberProfile.setMember(updatedMember);
 
         return makeResult(HttpStatus.OK, memberProfile);
+    }
+
+    public ResponseEntity<ResultDto> findMe(Member member) {
+        Member memberByDB = memberRepository.findById(member.getId()).orElse(null);
+        if (memberByDB == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 잘못된 세션 값으로 요청했습니다.");
+
+        return makeResult(HttpStatus.OK, memberByDB);
     }
 
 //    public ResponseEntity<ResultDto> saveMemberProfileImages(Member member, MemberProfileImageSaveRequestDto memberProfileImageSaveRequestDto, S3Uploader s3Uploader) throws IOException {

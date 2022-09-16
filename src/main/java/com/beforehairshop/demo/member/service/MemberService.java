@@ -13,12 +13,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
@@ -53,6 +60,18 @@ public class MemberService {
         if (memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null) != null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 이미 존재합니다. 유저 당 하나의 프로필만 존재할 수 있습니다.");
 
+        if (memberProfileSaveRequestDto.getNickname() == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "닉네임을 입력하지 않았습니다.");
+
+        Member updatedMember = memberRepository.findById(member.getId()).orElse(null);
+        updatedMember.setNickname(memberProfileSaveRequestDto.getNickname());
+
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         if (memberProfileSaveRequestDto.getFrontImage() == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 정면 사진이 입력되지 않았습니다.");

@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class MemberProfileSaveRequestDto {
 
+    private String nickname;
     private Integer hairCondition;
     private Integer hairTendency;
     private String desiredHairstyle;

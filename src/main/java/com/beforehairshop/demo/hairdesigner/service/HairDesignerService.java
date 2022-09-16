@@ -65,6 +65,7 @@ public class HairDesignerService {
 
         hairDesigner.setDesignerFlag(1);
         hairDesigner.setRole("ROLE_DESIGNER");
+        hairDesigner.setNickname(hairDesignerProfileSaveRequestDto.getName());
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
 

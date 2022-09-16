@@ -1,7 +1,5 @@
 package com.beforehairshop.demo.review.domain;
 
-import com.beforehairshop.demo.member.domain.Member;
-import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -18,31 +16,16 @@ import java.util.Date;
 @DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor
-public class Review {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ReviewImage {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member reviewer;
-
-    @OneToOne
-    @JoinColumn(name = "hair_designer_id")
-    private Member hairDesigner;
-
-    @Column(columnDefinition = "TINYINT")
-    private Integer totalRating;
-
-    @Column(columnDefinition = "TINYINT")
-    private Integer styleRating;
-
-    @Column(columnDefinition = "TINYINT")
-    private Integer serviceRating;
-
-    @Column(columnDefinition = "TEXT DEFAULT NULL")
-    private String content;
+    @JoinColumn(name = "review_id")
+    private Review review;
+    private String imageUrl;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
@@ -52,5 +35,4 @@ public class Review {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
-
 }

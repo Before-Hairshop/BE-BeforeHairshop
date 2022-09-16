@@ -54,6 +54,8 @@ public class MemberService {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 이미 존재합니다. 유저 당 하나의 프로필만 존재할 수 있습니다.");
 
 
+        if (memberProfileSaveRequestDto.getFrontImage() == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 정면 사진이 입력되지 않았습니다.");
 
         String frontImageUrl = s3Uploader.upload(memberProfileSaveRequestDto.getFrontImage(), member.getId().toString() + "/profile/front-image.jpg");
 

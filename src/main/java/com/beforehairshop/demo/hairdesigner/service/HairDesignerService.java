@@ -179,8 +179,12 @@ public class HairDesignerService {
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 디자이너 프로필이 없습니다.");
 
-        if (patchDto.getName() != null)
+        Member updatedMember = memberRepository.findById(hairDesigner.getId()).orElse(null);
+        if (patchDto.getName() != null) {
+
             hairDesignerProfile.setName(patchDto.getName());
+            updatedMember.setNickname(patchDto.getName());
+        }
 
         if (patchDto.getDescription() != null)
             hairDesignerProfile.setDescription(patchDto.getDescription());
@@ -235,6 +239,13 @@ public class HairDesignerService {
             );
         }
 
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         return makeResult(HttpStatus.OK, hairDesignerProfile);
     }
 
@@ -256,6 +267,15 @@ public class HairDesignerService {
                 , hairDesigner.getId() + "/profile.jpg");
 
         hairDesignerProfile.setImageUrl(imageUrl);
+        hairDesigner.setImageUrl(imageUrl);
+
+        // 닉네임 변경
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(hairDesigner), null, updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         return makeResult(HttpStatus.OK, hairDesigner);
     }
 }

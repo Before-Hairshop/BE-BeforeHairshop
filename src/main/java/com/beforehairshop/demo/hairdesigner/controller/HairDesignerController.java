@@ -51,7 +51,7 @@ public class HairDesignerController {
     }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 프로필 - 이미지 수정(프로필 생성 시에도 필요함)")
+    @Operation(summary = "헤어 디자이너 프로필 - 이미지 생성 및 수정(용도 2가지)")
     @PostMapping("image")
     public ResponseEntity<ResultDto> saveImage(@AuthenticationPrincipal PrincipalDetails principalDetails
             , MultipartFile image) throws IOException {

@@ -255,7 +255,7 @@ public class HairDesignerService {
         if (hairDesigner == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 세션이 만료됐습니다.");
 
-        if (hairDesigner.getDesignerFlag() == 1)
+        if (hairDesigner.getDesignerFlag() == 0)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 헤어 디자이너가 아닙니다.");
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesigner(member).orElse(null);

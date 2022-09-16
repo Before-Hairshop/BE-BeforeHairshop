@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface HairDesignerProfileRepository extends JpaRepository<HairDesignerProfile, BigInteger> {
     Optional<HairDesignerProfile> findByHairDesigner(Member hairDesigner);
+    Optional<HairDesignerProfile> findByHairDesignerAndStatus(Member hairDesigner, Integer status);
 
     @Query(value = "SELECT *, ( 6371 * acos (cos ( radians(?1) ) * cos( radians( h.latitude ) ) * cos( radians( h.longitude ) - radians(?2) ) + sin ( radians(?1) ) * sin( radians( h.latitude )))) AS distance " +
             "FROM hair_designer_profile h GROUP BY h.id HAVING distance <= 1.5 " +

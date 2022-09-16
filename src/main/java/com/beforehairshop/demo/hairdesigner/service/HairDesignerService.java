@@ -151,14 +151,21 @@ public class HairDesignerService {
     public ResponseEntity<ResultDto> findManyByLocation(Member member, Integer pageNumber) {
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, 1).orElse(null);
-        if (memberProfile == null)
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, 1).orElse(null);
+        if (memberProfile == null && hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저의 프로필 등록이 되어있지 않습니다.");
 
 
+        List<HairDesignerProfile> hairDesignerProfileList;
+        if (memberProfile != null) {
+            hairDesignerProfileList
+                    = hairDesignerProfileRepository.findManyByLocation(memberProfile.getLatitude(), memberProfile.getLongitude(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
+        }
+        else {
+            hairDesignerProfileList
+                    = hairDesignerProfileRepository.findManyByLocation(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
 
-        List<HairDesignerProfile> hairDesignerProfileList
-                = hairDesignerProfileRepository.findManyByLocation(memberProfile.getLatitude(), memberProfile.getLongitude(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
-
+        }
 
         return makeResult(HttpStatus.OK, hairDesignerProfileList);
 

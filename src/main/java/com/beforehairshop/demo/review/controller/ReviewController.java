@@ -31,7 +31,7 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 목록 조회")
     @GetMapping("list")
-    public ResponseEntity<ResultDto> findMany(@RequestParam(name = "hair_designer_id") BigInteger hairDesignerId
+    public ResponseEntity<ResultDto> findMany(@RequestParam(name = "hairDesignerId") BigInteger hairDesignerId
             , @PageableDefault(size = 5) Pageable pageable) {
         return reviewService.findManyByHairDesigner(hairDesignerId, pageable);
     }

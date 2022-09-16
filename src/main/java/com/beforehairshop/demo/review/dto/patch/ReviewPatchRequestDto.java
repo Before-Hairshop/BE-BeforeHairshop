@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.review.dto;
+package com.beforehairshop.demo.review.dto.patch;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,6 @@ public class ReviewPatchRequestDto {
     private Integer styleRating;
     private Integer serviceRating;
     private String content;
-    private String virtualImageUrl;
 
     private List<ReviewHashtagPatchRequestDto> hashtagList;
 

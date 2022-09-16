@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.review.dto;
+package com.beforehairshop.demo.review.dto.save;
 
 import com.beforehairshop.demo.review.domain.Review;
 import com.beforehairshop.demo.review.domain.ReviewHashtag;

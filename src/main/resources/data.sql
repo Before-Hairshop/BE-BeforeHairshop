@@ -1,19 +1,19 @@
 -- 유저 생성 (디자이너 7명)
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'aaaa@naver.com', 0, 'GOOGLE', 'google_1', 'ROLE_DESIGNER', '홍길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_2', 'ROLE_USER', '김길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_3', 'ROLE_USER', '정길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_4', 'ROLE_USER', '이길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_5', 'ROLE_USER', '박길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_6', 'ROLE_USER', '유길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_7', 'ROLE_USER', '창길동', 1);
-insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'bbbb@naver.com', 0, 'GOOGLE', 'google_8', 'ROLE_USER', '선길동', 1);
 
 -- 선릉 6명, 건대 2명

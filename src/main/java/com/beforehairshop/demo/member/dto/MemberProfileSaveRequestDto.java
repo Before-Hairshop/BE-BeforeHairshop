@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class MemberProfileSaveRequestDto {
 
-    private String nickname;
+    private String name;
     private Integer hairCondition;
     private Integer hairTendency;
     private String desiredHairstyle;
@@ -33,6 +33,7 @@ public class MemberProfileSaveRequestDto {
 
     public MemberProfile toEntity(Member member, String frontImageUrl, String sideImageUrl, String backImageUrl) {
         return MemberProfile.builder()
+                .name(name)
                 .member(member)
                 .hairCondition(hairCondition)
                 .hairTendency(hairTendency)

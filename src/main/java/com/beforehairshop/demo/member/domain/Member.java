@@ -31,8 +31,8 @@ public class Member {
     private String password;
     private String role; // ROLE_USER, ROLE_DESIGNER, ROLE_ADMIN
 
-    @Column(columnDefinition = "VARCHAR(250) DEFAULT 'tmp_name'")
-    private String nickname;
+    @Column(columnDefinition = "VARCHAR(250) DEFAULT '임시 USER'")
+    private String name;
 
     @Column(columnDefinition = "TEXT DEFAULT NULL")
     private String imageUrl;

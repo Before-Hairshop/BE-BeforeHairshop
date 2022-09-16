@@ -2,15 +2,14 @@ package com.beforehairshop.demo.member.dto;
 
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
-import com.beforehairshop.demo.response.ResultDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor
 public class MemberProfilePatchRequestDto {
+    private String name;
     private Integer hairCondition;
     private Integer hairTendency;
     private String desiredHairstyle;

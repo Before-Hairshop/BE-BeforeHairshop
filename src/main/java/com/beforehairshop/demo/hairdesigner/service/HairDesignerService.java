@@ -65,7 +65,7 @@ public class HairDesignerService {
 
         hairDesigner.setDesignerFlag(1);
         hairDesigner.setRole("ROLE_DESIGNER");
-        hairDesigner.setNickname(hairDesignerProfileSaveRequestDto.getName());
+        hairDesigner.setName(hairDesignerProfileSaveRequestDto.getName());
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
 
@@ -183,7 +183,7 @@ public class HairDesignerService {
         if (patchDto.getName() != null) {
 
             hairDesignerProfile.setName(patchDto.getName());
-            updatedMember.setNickname(patchDto.getName());
+            updatedMember.setName(patchDto.getName());
         }
 
         if (patchDto.getDescription() != null)
@@ -241,7 +241,7 @@ public class HairDesignerService {
 
         // 닉네임 변경
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_DESIGNER"));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -271,7 +271,7 @@ public class HairDesignerService {
 
         // 닉네임 변경
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_DESIGNER"));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(hairDesigner), null, updatedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);

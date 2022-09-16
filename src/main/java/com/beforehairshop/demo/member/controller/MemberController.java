@@ -26,11 +26,20 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 @RequestMapping("/api/v1/members")
 public class MemberController {
 
+    private final MemberService memberService;
+
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
+    @GetMapping("session")
+    @Operation(summary = "본인 정보 조회 API")
+    public ResponseEntity<ResultDto> findMeBySession(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return makeResult(HttpStatus.OK, principalDetails.getMember());
+    }
+
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
     @GetMapping("")
     @Operation(summary = "본인 정보 조회 API")
     public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return makeResult(HttpStatus.OK, principalDetails.getMember());
+        return memberService.findMe(principalDetails.getMember());
     }
 
 }

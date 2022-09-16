@@ -170,6 +170,14 @@ public class MemberService {
         return makeResult(HttpStatus.OK, memberProfile);
     }
 
+    public ResponseEntity<ResultDto> findMe(Member member) {
+        Member memberByDB = memberRepository.findById(member.getId()).orElse(null);
+        if (memberByDB == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 잘못된 세션 값으로 요청했습니다.");
+
+        return makeResult(HttpStatus.OK, memberByDB);
+    }
+
 //    public ResponseEntity<ResultDto> saveMemberProfileImages(Member member, MemberProfileImageSaveRequestDto memberProfileImageSaveRequestDto, S3Uploader s3Uploader) throws IOException {
 //        String frontImageUrl = s3Uploader.upload(memberProfileImageSaveRequestDto.getFrontImage(), member.getId().toString() + "/profile/front-image.jpg");
 //        String sideImageUrl = null, backImageUrl = null;

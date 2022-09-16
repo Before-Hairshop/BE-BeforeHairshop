@@ -53,7 +53,7 @@ public class ReviewController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "리뷰 수정(이미지 제거)")
+    @Operation(summary = "리뷰 수정(이미지 삭제)")
     @PatchMapping("image_remove")
     public ResponseEntity<ResultDto> removeImage(@RequestParam("reviewId") BigInteger reviewId
             , @RequestParam("deleteReviewImageIdList") List<BigInteger> deleteReviewImageIdList) {

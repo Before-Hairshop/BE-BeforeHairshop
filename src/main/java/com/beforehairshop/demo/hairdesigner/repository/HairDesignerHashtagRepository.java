@@ -8,5 +8,5 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface HairDesignerHashtagRepository extends JpaRepository<HairDesignerHashtag, BigInteger> {
-    List<HairDesignerHashtag> findAllByHairDesigner(Member hairDesigner);
+    List<HairDesignerHashtag> findAllByHairDesignerAndStatus(Member hairDesigner, Integer status);
 }

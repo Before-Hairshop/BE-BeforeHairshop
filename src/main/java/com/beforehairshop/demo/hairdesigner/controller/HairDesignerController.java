@@ -33,11 +33,19 @@ public class HairDesignerController {
 
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 상세 조회")
+    @Operation(summary = "헤어 디자이너 상세 조회(id)")
     @GetMapping()
     public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(value = "hairDesignerId", required = true) BigInteger hairDesignerId) {
         return hairDesignerService.findOne(principalDetails.getMember(), hairDesignerId);
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 상세 조회(name)")
+    @GetMapping()
+    public ResponseEntity<ResultDto> findAllByName(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(value = "name", required = true) String name) {
+        return hairDesignerService.findAllByName(principalDetails.getMember(), name);
     }
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
@@ -52,7 +60,7 @@ public class HairDesignerController {
      * 별점 기반, 리뷰 기반으로 헤어 디자이너 조회하는 API 추가해야 함.
      */
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 프로필 생성(이미지 제외)")
     @PostMapping()
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
@@ -76,6 +84,13 @@ public class HairDesignerController {
     public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail
             , @RequestBody HairDesignerProfilePatchRequestDto hairDesignerProfilePatchRequestDto) {
         return hairDesignerService.patchOne(principalDetail.getMember(), hairDesignerProfilePatchRequestDto);
+    }
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 프로필 제거(일반 유저로 변경)")
+    @PatchMapping("delete")
+    public ResponseEntity<ResultDto> deleteProfile(@AuthenticationPrincipal PrincipalDetails principalDetail) {
+        return hairDesignerService.deleteProfile(principalDetail.getMember());
     }
 
     /**

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface HairDesignerWorkingDayRepository extends JpaRepository<HairDesignerWorkingDay, BigInteger> {
-    List<HairDesignerWorkingDay> findAllByHairDesigner(Member hairDesigner);
+    List<HairDesignerWorkingDay> findAllByHairDesignerAndStatus(Member hairDesigner, Integer status);
 
 
 }

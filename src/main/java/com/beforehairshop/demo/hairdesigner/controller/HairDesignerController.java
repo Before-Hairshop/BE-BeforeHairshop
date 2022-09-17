@@ -90,7 +90,7 @@ public class HairDesignerController {
     }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 프로필 제거(일반 유저로 변경)")
+    @Operation(summary = "헤어 디자이너 프로필 제거(권한 변경 X)")
     @PatchMapping("delete")
     public ResponseEntity<ResultDto> deleteProfile(@AuthenticationPrincipal PrincipalDetails principalDetail) {
         return hairDesignerService.deleteProfile(principalDetail.getMember());

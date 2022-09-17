@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.member.service;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
+import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.S3Uploader;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
@@ -160,11 +161,8 @@ public class MemberService {
             memberProfile.setDetailAddress(patchDto.getDetailAddress());
 
         // 닉네임 변경
-        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(new PrincipalDetails(updatedMember), null, updatedAuthorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         memberProfile.setMember(updatedMember);
 
         return makeResult(HttpStatus.OK, memberProfile);
@@ -176,6 +174,36 @@ public class MemberService {
             return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 잘못된 세션 값으로 요청했습니다.");
 
         return makeResult(HttpStatus.OK, memberByDB);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> changeToDesigner(Member member) {
+        Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+
+        if (updatedMember == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었거나 삭제된 유저입니다.");
+
+        updatedMember.setDesignerFlag(1);
+        updatedMember.setRole("ROLE_DESIGNER");
+        updatedMember.setImageUrl(null);
+
+        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_DESIGNER");
+        return makeResult(HttpStatus.OK, updatedMember);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> changeToUser(Member member) {
+        Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+
+        if (updatedMember == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었거나 삭제된 유저입니다.");
+
+        updatedMember.setDesignerFlag(0);
+        updatedMember.setRole("ROLE_USER");
+        updatedMember.setImageUrl(null);
+
+        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
+        return makeResult(HttpStatus.OK, updatedMember);
     }
 
 //    public ResponseEntity<ResultDto> saveMemberProfileImages(Member member, MemberProfileImageSaveRequestDto memberProfileImageSaveRequestDto, S3Uploader s3Uploader) throws IOException {

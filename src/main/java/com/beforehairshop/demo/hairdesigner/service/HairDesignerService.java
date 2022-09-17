@@ -33,7 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -65,8 +65,6 @@ public class HairDesignerService {
         if (hairDesigner.getDesignerFlag() == 0)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 일반 유저입니다. 권한 변경을 먼저 해주시기 바랍니다.");
 
-        hairDesigner.setDesignerFlag(1);
-        hairDesigner.setRole("ROLE_DESIGNER");
         hairDesigner.setName(hairDesignerProfileSaveRequestDto.getName());
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
@@ -270,8 +268,9 @@ public class HairDesignerService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findAllByName(Member member, String name) {
-        List<HairDesignerProfile> hairDesignerProfile = hairDesignerProfileRepository.findAllByNameAndStatus(name, StatusKind.NORMAL.getId());
+    public ResponseEntity<ResultDto> findAllByName(Member member, String name, Pageable pageable) {
+        List<HairDesignerProfile> hairDesignerProfile = hairDesignerProfileRepository.findAllByNameAndStatus(name
+                , StatusKind.NORMAL.getId(), pageable);
 
         return makeResult(HttpStatus.OK, hairDesignerProfile);
     }

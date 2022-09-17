@@ -8,6 +8,8 @@ import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -33,16 +35,25 @@ public class HairDesignerController {
 
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 상세 조회")
-    @GetMapping()
+    @Operation(summary = "헤어 디자이너 상세 조회(id)")
+    @GetMapping("id")
     public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(value = "hairDesignerId", required = true) BigInteger hairDesignerId) {
         return hairDesignerService.findOne(principalDetails.getMember(), hairDesignerId);
     }
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
+    @Operation(summary = "(이름) 헤어 디자이너 List 조회 API (5명씩)")
+    @GetMapping("list_by_name")
+    public ResponseEntity<ResultDto> findAllByName(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(value = "name", required = true) String name
+            , @PageableDefault(size = 5) Pageable pageable) {
+        return hairDesignerService.findAllByName(principalDetails.getMember(), name, pageable);
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "위치 기반(1.5km 반경) - 헤어 디자이너 목록 조회")
-    @GetMapping("list-by-location")
+    @GetMapping("list_by_location")
     public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(value = "pageNumber", required = true) Integer pageNumber) {
         return hairDesignerService.findManyByLocation(principalDetails.getMember(), pageNumber);
@@ -52,11 +63,11 @@ public class HairDesignerController {
      * 별점 기반, 리뷰 기반으로 헤어 디자이너 조회하는 API 추가해야 함.
      */
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 프로필 생성(이미지 제외)")
     @PostMapping()
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestBody HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto, Authentication authentication) {
+            , @RequestBody HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
 
         return hairDesignerService.save(principalDetails.getMember(), hairDesignerProfileSaveRequestDto);
     }
@@ -76,6 +87,13 @@ public class HairDesignerController {
     public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail
             , @RequestBody HairDesignerProfilePatchRequestDto hairDesignerProfilePatchRequestDto) {
         return hairDesignerService.patchOne(principalDetail.getMember(), hairDesignerProfilePatchRequestDto);
+    }
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 프로필 제거(권한 변경 X)")
+    @PatchMapping("delete")
+    public ResponseEntity<ResultDto> deleteProfile(@AuthenticationPrincipal PrincipalDetails principalDetail) {
+        return hairDesignerService.deleteProfile(principalDetail.getMember());
     }
 
     /**

@@ -21,7 +21,7 @@ import java.io.IOException;
 import static com.beforehairshop.demo.response.ResultDto.*;
 
 @RestController
-@Tag(name = "유저 관련 Controller")
+@Tag(name = "모든 유저 관련 Controller")
 @AllArgsConstructor
 @RequestMapping("/api/v1/members")
 public class MemberController {
@@ -30,16 +30,32 @@ public class MemberController {
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
     @GetMapping("session")
-    @Operation(summary = "본인 정보 조회 API")
+    @Operation(summary = "본인 정보 조회 API (세션)")
     public ResponseEntity<ResultDto> findMeBySession(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return makeResult(HttpStatus.OK, principalDetails.getMember());
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
     @GetMapping("")
-    @Operation(summary = "본인 정보 조회 API")
+    @Operation(summary = "본인 정보 조회 API (DB)")
     public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.findMe(principalDetails.getMember());
     }
+
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PatchMapping("/change_to_designer")
+    @Operation(summary = "유저에서 디자이너로 권한 변경 API")
+    public ResponseEntity<ResultDto> changeToDesigner(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.changeToDesigner(principalDetails.getMember());
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
+    @PatchMapping("/change_to_user")
+    @Operation(summary = "디자이너에서 유저로 권한 변경 API")
+    public ResponseEntity<ResultDto> changeToUser(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.changeToUser(principalDetails.getMember());
+    }
+
+
 
 }

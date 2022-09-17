@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, BigInteger> {
-    List<Review> findAllByHairDesignerId(BigInteger hairDesignerId, Pageable pageable);
+    Optional<Review> findByIdAndStatus(BigInteger id, Integer status);
+    List<Review> findAllByHairDesignerIdAndStatus(BigInteger hairDesignerId, Integer Status, Pageable pageable);
 }

@@ -171,7 +171,7 @@ public class MemberService {
     public ResponseEntity<ResultDto> findMe(Member member) {
         Member memberByDB = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (memberByDB == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 잘못된 세션 값으로 요청했습니다.");
+            return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 유효하지 않은 유저이거나, 잘못된 세션 값으로 요청했습니다.");
 
         return makeResult(HttpStatus.OK, memberByDB);
     }
@@ -203,6 +203,23 @@ public class MemberService {
         updatedMember.setImageUrl(null);
 
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
+        return makeResult(HttpStatus.OK, updatedMember);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> validation(Member member, Integer hairDesignerFlag) {
+        Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.ABNORMAL.getId()).orElse(null);
+        if (updatedMember == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었거나, 이미 정상인 유저입니다.");
+
+        if (hairDesignerFlag != 1 && hairDesignerFlag != 0)
+            return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너 플래그 값은 0 혹은 1입니다.");
+
+        updatedMember.setStatus(StatusKind.NORMAL.getId());
+        updatedMember.setDesignerFlag(hairDesignerFlag);
+
+
+        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, hairDesignerFlag == 1 ? "ROLE_DESIGNER" : "ROLE_USER");
         return makeResult(HttpStatus.OK, updatedMember);
     }
 

@@ -22,7 +22,7 @@ public class HairDesignerProfile {
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "hair_designer_id")
     private Member hairDesigner;
 

@@ -40,7 +40,7 @@ public class HairDesignerController {
     @Operation(summary = "헤어 디자이너 상세 조회(id)")
     @GetMapping("id")
     public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(value = "hairDesignerId", required = true) BigInteger hairDesignerId) {
+            , @RequestParam(value = "hair_designer_id", required = true) BigInteger hairDesignerId) {
         return hairDesignerService.findOne(principalDetails.getMember(), hairDesignerId);
     }
 
@@ -57,7 +57,7 @@ public class HairDesignerController {
     @Operation(summary = "위치 기반(1.5km 반경) - 헤어 디자이너 목록 조회")
     @GetMapping("list_by_location")
     public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(value = "pageNumber", required = true) Integer pageNumber) {
+            , @RequestParam(value = "page_number", required = true) Integer pageNumber) {
         return hairDesignerService.findManyByLocation(principalDetails.getMember(), pageNumber);
     }
 

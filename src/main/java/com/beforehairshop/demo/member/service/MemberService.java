@@ -291,7 +291,7 @@ public class MemberService {
                     = MemberProfileDesiredHairstyleImage.builder()
                     .memberProfile(memberProfile)
                     .imageUrl(null)
-                    .status(1)
+                    .status(StatusKind.NORMAL.getId())
                     .build();
 
             imageEntity = memberProfileDesiredHairstyleImageRepository.save(imageEntity);

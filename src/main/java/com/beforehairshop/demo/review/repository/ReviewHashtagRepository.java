@@ -8,6 +8,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface ReviewHashtagRepository extends JpaRepository<ReviewHashtag, BigInteger> {
-    List<ReviewHashtag> findAllByReviewAndStatus(Review review, Integer status);
+    List<ReviewHashtag> findByReviewAndStatus(Review review, Integer status);
 
 }

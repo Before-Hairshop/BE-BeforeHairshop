@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.review.service;
 
-import com.beforehairshop.demo.aws.S3Uploader;
+import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
+import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.StatusKind;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
@@ -9,6 +10,7 @@ import com.beforehairshop.demo.review.domain.Review;
 import com.beforehairshop.demo.review.domain.ReviewHashtag;
 import com.beforehairshop.demo.review.domain.ReviewImage;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
+import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
 import com.beforehairshop.demo.review.repository.ReviewHashtagRepository;
 import com.beforehairshop.demo.review.repository.ReviewImageRepository;
@@ -19,9 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewHashtagRepository reviewHashtagRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final S3Uploader s3Uploader;
+
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member member, ReviewSaveRequestDto reviewSaveRequestDto) {
@@ -62,7 +62,15 @@ public class ReviewService {
     public ResponseEntity<ResultDto> findManyByHairDesigner(BigInteger hairDesignerId, Pageable pageable) {
         List<Review> reviewList = reviewRepository.findAllByHairDesignerIdAndStatus(hairDesignerId, StatusKind.NORMAL.getId(), pageable);
 
-        return makeResult(HttpStatus.OK, reviewList);
+        List<ReviewDetailResponseDto> reviewDetailResponseDtoList = new ArrayList<>();
+        for (Review review : reviewList) {
+            List<ReviewHashtag> hashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
+            List<ReviewImage> imageList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
+
+            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review, hashtagList, imageList));
+        }
+
+        return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);
     }
 
     @Transactional
@@ -85,7 +93,7 @@ public class ReviewService {
 
         if (reviewPatchRequestDto.getHashtagList() != null) {
             // review hash tag 삭제
-            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findAllByReviewAndStatus(review, StatusKind.NORMAL.getId());
+            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
             reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
 
             // review hash tag 생성
@@ -98,79 +106,79 @@ public class ReviewService {
         return makeResult(HttpStatus.OK, review);
     }
 
-//    @Transactional
-//    public ResponseEntity<ResultDto> saveImage(Member reviewer, ReviewImageSaveRequestDto reviewImageSaveRequestDto) throws IOException {
-//        System.out.println(reviewImageSaveRequestDto.getReviewId());
-//        Review review = reviewRepository.findById(reviewImageSaveRequestDto.getReviewId()).orElse(null);
-//
-//        List<ReviewImage> reviewImageList = new ArrayList<>();
-//
-//        for (ImageFile image : reviewImageSaveRequestDto.getImageList()) {
-//            ReviewImage reviewImage = ReviewImage.builder().imageUrl(null).review(review).build();
-//            reviewImage = reviewImageRepository.save(reviewImage);
-//            reviewImage = reviewImageRepository.findById(reviewImage.getId()).orElse(null);
-//
-//            String imageUrl = s3Uploader.upload(image.getImage(), "review/" + reviewImage.getId() + ".jpg");
-//            reviewImage.setImageUrl(imageUrl);
-//            reviewImage.setStatus(1);
-//
-//            reviewImageList.add(reviewImage);
-//        }
-//
-//        return makeResult(HttpStatus.OK, reviewImageList);
-//    }
-
     @Transactional
-    public ResponseEntity<ResultDto> saveImage(Member reviewer, BigInteger reviewId, MultipartFile[] files) throws IOException {
+    public ResponseEntity<ResultDto> saveImage(Member reviewer, BigInteger reviewId
+            , Integer reviewImageCount, AmazonS3Service amazonS3Service) {
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
+        if (!review.getReviewer().getId().equals(reviewer.getId()))
+            return makeResult(HttpStatus.BAD_REQUEST, "수정 권한이 없는 유저입니다.");
 
-        List<ReviewImage> reviewImageList = new ArrayList<>();
+        List<String> reviewImagePreSignedList = new ArrayList<>();
+        for (int i = 0; i < reviewImageCount; i++) {
+            ReviewImage reviewImage
+                    = ReviewImage.builder()
+                    .review(review)
+                    .imageUrl(null)
+                    .status(StatusKind.NORMAL.getId())
+                    .build();
 
-        for (MultipartFile image : files) {
-            ReviewImage reviewImage = ReviewImage.builder().imageUrl(null).review(review).build();
             reviewImage = reviewImageRepository.save(reviewImage);
-            reviewImage = reviewImageRepository.findByIdAndStatus(reviewImage.getId(), StatusKind.NORMAL.getId()).orElse(null);
+            String preSignedUrl = amazonS3Service.generatePreSignedUrl(
+                    CloudFrontUrlHandler.getReviewImageS3Path(review.getId(), reviewImage.getId())
+            );
 
-            String imageUrl = s3Uploader.upload(image, "review/" + reviewId + "/" + reviewImage.getId() + ".jpg");
-            reviewImage.setImageUrl(imageUrl);
-            reviewImage.setStatus(1);
+            reviewImagePreSignedList.add(preSignedUrl);
 
-            reviewImageList.add(reviewImage);
+            // image url 수정
+            reviewImage.setImageUrl(
+                    CloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId())
+            );
+
         }
 
-        return makeResult(HttpStatus.OK, reviewImageList);
-    }
-    @Transactional
-    public ResponseEntity<ResultDto> addImage(BigInteger reviewId, MultipartFile[] addImages) throws IOException {
-        Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
-
-        List<ReviewImage> reviewImageList = new ArrayList<>();
-        for(MultipartFile image : addImages) {
-            ReviewImage reviewImage = ReviewImage.builder().imageUrl(null).review(review).build();
-            reviewImage = reviewImageRepository.save(reviewImage);
-            reviewImage = reviewImageRepository.findByIdAndStatus(reviewImage.getId(), StatusKind.NORMAL.getId()).orElse(null);
-
-            String imageUrl = s3Uploader.upload(image, "review/" + review.getId() + "/" + reviewImage.getId() + ".jpg");
-            reviewImage.setImageUrl(imageUrl);
-            reviewImage.setStatus(1);
-
-            reviewImageList.add(reviewImage);
-        }
-
-        return makeResult(HttpStatus.OK, reviewImageList);
+        return makeResult(HttpStatus.OK, reviewImagePreSignedList);
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> removeImage(BigInteger reviewId, List<BigInteger> deleteReviewImageIdList) {
+    public ResponseEntity<ResultDto> patchImage(Member member, BigInteger reviewId
+            , String[] deleteImageUrlList, Integer reviewImageCount, AmazonS3Service amazonS3Service) {
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (!review.getReviewer().getId().equals(member.getId())) {
+            return makeResult(HttpStatus.BAD_REQUEST, "수정 권한이 없는 유저입니다.");
+        }
 
-        for (BigInteger deleteImageId : deleteReviewImageIdList) {
-            ReviewImage reviewImage = reviewImageRepository.findByIdAndStatus(deleteImageId, StatusKind.NORMAL.getId()).orElse(null);
-            if (!reviewImage.getReview().getId().equals(reviewId)) {
-                return makeResult(HttpStatus.BAD_REQUEST, "해당 리뷰에 대한 이미지를 삭제하는 요청이 아닙니다. 삭제 요청하는 이미지의 ID를 확인해주세요");
-            }
+        // 삭제할 이미지 삭제
+        for (int i = 0; i < deleteImageUrlList.length; i++) {
+            ReviewImage reviewImage
+                    = reviewImageRepository.findByImageUrlAndStatus(deleteImageUrlList[i], StatusKind.NORMAL.getId()).orElse(null);
+
+            if (reviewImage == null)
+                return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image 이다");
+
             reviewImageRepository.delete(reviewImage);
         }
 
-        return makeResult(HttpStatus.OK, "이미지 삭제 완료");
+        // 프론트엔드에서 요청한 이미지의 개수만큼 presigned url 을 만들어 리턴한다.
+        List<String> reviewImagePreSignedUrlList = new ArrayList<>();
+        for (int i = 0; i < reviewImageCount; i++) {
+            ReviewImage reviewImage = ReviewImage.builder()
+                    .review(review)
+                    .imageUrl(null)
+                    .status(StatusKind.NORMAL.getId())
+                    .build();
+
+            reviewImage = reviewImageRepository.save(reviewImage);
+            String preSignedUrl = amazonS3Service.generatePreSignedUrl(
+                    CloudFrontUrlHandler.getReviewImageS3Path(review.getId(), reviewImage.getId())
+            );
+
+            reviewImagePreSignedUrlList.add(preSignedUrl);
+
+            // image url 수정
+            reviewImage.setImageUrl(CloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId()));
+
+        }
+
+        return makeResult(HttpStatus.OK, reviewImagePreSignedUrlList);
     }
 }

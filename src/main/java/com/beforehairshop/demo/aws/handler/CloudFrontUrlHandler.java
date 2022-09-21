@@ -34,4 +34,12 @@ public class CloudFrontUrlHandler {
     public static String getProfileOfDesignerImageUrl(BigInteger memberId) {
         return CLOUD_FRONT_DOMAIN_NAME + "/designer_profile/" + memberId + "/profile.jpg";
     }
+
+    public static String getProfileOfUserDesiredStyleS3Path(BigInteger profileId, BigInteger imageId) {
+        return "hairstyle_wishlist/" + profileId + "/" + imageId + ".jpg";
+    }
+
+    public static String getProfileOfUserDesiredStyleImageUrl(BigInteger profileId, BigInteger imageId) {
+        return CLOUD_FRONT_DOMAIN_NAME + "/hairstyle_wishlist/" + profileId + "/" + imageId + ".jpg";
+    }
 }

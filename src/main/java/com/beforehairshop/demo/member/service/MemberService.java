@@ -4,8 +4,10 @@ import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyleImage;
 import com.beforehairshop.demo.member.dto.*;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
+import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleImageRepository;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.constant.StatusKind;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
@@ -28,6 +32,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
+    private final MemberProfileDesiredHairstyleImageRepository memberProfileDesiredHairstyleImageRepository;
     private final AmazonS3Service amazonS3Service;
 
     @Transactional
@@ -78,7 +83,10 @@ public class MemberService {
         if (memberProfile == null) {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다.");
         }
-        return makeResult(HttpStatus.OK, memberProfile);
+
+        List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList
+                = memberProfileDesiredHairstyleImageRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
+        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(memberProfile, desiredHairstyleImageList));
     }
 
     @Transactional
@@ -188,7 +196,7 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> saveMemberProfileImage(Member member, Integer frontImageFlag, Integer sideImageFlag, Integer backImageFlag
-            , AmazonS3Service amazonS3Service) {
+            , Integer desiredHairstyleImageCount, AmazonS3Service amazonS3Service) {
         if (frontImageFlag != 1)
             return makeResult(HttpStatus.BAD_REQUEST, "Front image 는 무조건 입력해야 합니다.");
 
@@ -217,11 +225,34 @@ public class MemberService {
 
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
 
-        return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl));
+
+        // 원하는 스타일 이미지 생성
+        List<String> desiredHairstyleImagePreSignedUrlList = new ArrayList<>();
+        for (int i = 0; i < desiredHairstyleImageCount; i++) {
+            MemberProfileDesiredHairstyleImage imageEntity
+                    = MemberProfileDesiredHairstyleImage.builder()
+                    .memberProfile(memberProfile)
+                    .imageUrl(null)
+                    .status(1)
+                    .build();
+
+            imageEntity = memberProfileDesiredHairstyleImageRepository.save(imageEntity);
+            String preSignedUrl = amazonS3Service.generatePreSignedUrl(
+                    CloudFrontUrlHandler.getProfileOfUserDesiredStyleS3Path(memberProfile.getId(), imageEntity.getId())
+            );
+
+            desiredHairstyleImagePreSignedUrlList.add(preSignedUrl);
+
+            // image Url 수정
+            imageEntity.setImageUrl(CloudFrontUrlHandler.getProfileOfUserDesiredStyleImageUrl(memberProfile.getId(), imageEntity.getId()));
+        }
+
+        return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl, desiredHairstyleImagePreSignedUrlList));
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> patchMyProfileImage(Member member, Integer frontImageFlag, Integer sideImageFlag, Integer backImageFlag, AmazonS3Service amazonS3Service) {
+    public ResponseEntity<ResultDto> patchMyProfileImage(Member member, Integer frontImageFlag, Integer sideImageFlag, Integer backImageFlag
+            , Integer addDesiredHairstyleImageCount, String[] deleteImageUrlList, AmazonS3Service amazonS3Service) {
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
 
         if (memberProfile == null)
@@ -242,6 +273,39 @@ public class MemberService {
             memberProfile.setBackImageUrl(CloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "back"));
         }
 
-        return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl));
+        // 원하는 스타일 이미지 중 삭제할 이미지 삭제
+        for (int i = 0; i < deleteImageUrlList.length; i++) {
+            MemberProfileDesiredHairstyleImage desiredHairstyleImage
+                    = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(deleteImageUrlList[i], StatusKind.NORMAL.getId()).orElse(null);
+
+            if (desiredHairstyleImage == null)
+                return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
+
+            memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
+        }
+
+        // 추가할 이미지의 pre signed url 만들어서 리턴해준다.
+        List<String> desiredHairstyleImagePreSignedUrlList = new ArrayList<>();
+        for (int i = 0; i < addDesiredHairstyleImageCount; i++) {
+            MemberProfileDesiredHairstyleImage imageEntity
+                    = MemberProfileDesiredHairstyleImage.builder()
+                    .memberProfile(memberProfile)
+                    .imageUrl(null)
+                    .status(1)
+                    .build();
+
+            imageEntity = memberProfileDesiredHairstyleImageRepository.save(imageEntity);
+            String preSignedUrl = amazonS3Service.generatePreSignedUrl(
+                    CloudFrontUrlHandler.getProfileOfUserDesiredStyleS3Path(memberProfile.getId(), imageEntity.getId())
+            );
+
+            desiredHairstyleImagePreSignedUrlList.add(preSignedUrl);
+
+            // image Url 수정
+            imageEntity.setImageUrl(CloudFrontUrlHandler.getProfileOfUserDesiredStyleImageUrl(memberProfile.getId(), imageEntity.getId()));
+        }
+
+        return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl
+                , desiredHairstyleImagePreSignedUrlList));
     }
 }

@@ -22,9 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @RestController
 @Tag(name = "헤어 디자이너 관련 Controller")

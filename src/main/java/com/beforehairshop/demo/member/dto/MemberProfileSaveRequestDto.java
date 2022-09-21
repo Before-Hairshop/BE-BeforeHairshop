@@ -16,6 +16,10 @@ public class MemberProfileSaveRequestDto {
     private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
+    private MultipartFile frontImage;
+    private MultipartFile sideImage;
+    private MultipartFile backImage;
+//
 //    private String frontImageUrl;
 //    private String sideImageUrl;
 //    private String backImageUrl;

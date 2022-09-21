@@ -24,7 +24,7 @@ public class MemberProfile {
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
 

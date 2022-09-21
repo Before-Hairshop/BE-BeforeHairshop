@@ -42,14 +42,6 @@ public class MemberController {
         return memberService.findMe(principalDetails.getMember());
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
-    @PatchMapping("validation")
-    @Operation(summary = "약관 동의 + 유저 타입 결정 API (해당 과정 거치면 유효한 유저가 된다) - 디자이너 플래그 : 1이면, 헤어 디자이너 & 0이면, 일반 유저")
-    public ResponseEntity<ResultDto> verifyNormal(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(name = "hairDesignerFlag") Integer hairDesignerFlag) {
-        return memberService.validation(principalDetails.getMember(), hairDesignerFlag);
-    }
-
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @PatchMapping("/change_to_designer")
     @Operation(summary = "유저에서 디자이너로 권한 변경 API")

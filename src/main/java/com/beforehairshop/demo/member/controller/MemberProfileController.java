@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/members/profiles")
 public class MemberProfileController {
     private final MemberService memberService;
-    private final S3Uploader s3Uploader;
     private final AmazonS3Service amazonS3Service;
 
 

@@ -1,16 +1,18 @@
 package com.beforehairshop.demo.hairdesigner.service;
 
-import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.S3Uploader;
+import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
+import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.StatusKind;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
-import com.beforehairshop.demo.hairdesigner.dto.HairDesignerDetailGetResponseDto;
+import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerDetailGetResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerProfileImageResponseDto;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
@@ -25,19 +27,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Pageable;
-import java.io.IOException;
+
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -242,29 +236,30 @@ public class HairDesignerService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> saveImage(Member member, MultipartFile image) throws IOException {
-        Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
-        if (hairDesigner == null)
+    public ResponseEntity<ResultDto> saveImage(Member member, AmazonS3Service amazonS3Service) {
+        if (member == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 세션이 만료됐습니다.");
+
+        Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
 
         if (hairDesigner.getDesignerFlag() == 0)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 헤어 디자이너가 아닙니다.");
 
-        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, 1).orElse(null);
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
 
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 헤어 디자이너 프로필이 없습니다.");
 
-        String imageUrl = s3Uploader.upload(image
-                , hairDesigner.getId() + "/profile.jpg");
+        // presigned url 생성
+        String preSignedUrl = amazonS3Service.generatePreSignedUrl(CloudFrontUrlHandler.getProfileOfDesignerS3Path(hairDesigner.getId()));
 
-        hairDesignerProfile.setImageUrl(imageUrl);
-        hairDesigner.setImageUrl(imageUrl);
+        hairDesignerProfile.setImageUrl(CloudFrontUrlHandler.getProfileOfDesignerImageUrl(hairDesigner.getId()));
+        hairDesigner.setImageUrl(CloudFrontUrlHandler.getProfileOfDesignerImageUrl(hairDesigner.getId()));
 
         // 권한 변경 X (image url 변경)
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(hairDesigner, "ROLE_DESIGNER");
 
-        return makeResult(HttpStatus.OK, hairDesigner);
+        return makeResult(HttpStatus.OK, new HairDesignerProfileImageResponseDto(preSignedUrl));
     }
 
     @Transactional
@@ -294,4 +289,13 @@ public class HairDesignerService {
         return makeResult(HttpStatus.OK, designer);
     }
 
+    @Transactional
+    public ResponseEntity<ResultDto> patchImage(Member member, AmazonS3Service amazonS3Service) {
+        if (member == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었습니다.");
+
+        String preSignedUrl = amazonS3Service.generatePreSignedUrl(CloudFrontUrlHandler.getProfileOfDesignerS3Path(member.getId()));
+
+        return makeResult(HttpStatus.OK, new HairDesignerProfileImageResponseDto(preSignedUrl));
+    }
 }

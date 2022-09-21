@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.member.handler;
+package com.beforehairshop.demo.aws.handler;
 
 import java.math.BigInteger;
 
@@ -25,5 +25,13 @@ public class CloudFrontUrlHandler {
             return CLOUD_FRONT_DOMAIN_NAME + "/profile/" + memberId + "/back_image.jpg";
         }
 
+    }
+
+    public static String getProfileOfDesignerS3Path(BigInteger memberId) {
+        return "designer_profile/" + memberId + "/profile.jpg";
+    }
+
+    public static String getProfileOfDesignerImageUrl(BigInteger memberId) {
+        return CLOUD_FRONT_DOMAIN_NAME + "/designer_profile/" + memberId + "/profile.jpg";
     }
 }

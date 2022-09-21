@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.hairdesigner.dto;
+package com.beforehairshop.demo.hairdesigner.dto.response;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;

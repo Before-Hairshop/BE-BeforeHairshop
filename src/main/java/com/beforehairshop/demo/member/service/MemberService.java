@@ -5,7 +5,7 @@ import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.dto.*;
-import com.beforehairshop.demo.member.handler.CloudFrontUrlHandler;
+import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.constant.StatusKind;

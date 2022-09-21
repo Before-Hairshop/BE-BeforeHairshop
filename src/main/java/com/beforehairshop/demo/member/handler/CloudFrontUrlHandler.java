@@ -16,6 +16,7 @@ public class CloudFrontUrlHandler {
     }
 
     public static String getProfileOfUserImageUrl(BigInteger memberId, String type) {
+
         if (type.equals("front")) {
             return CLOUD_FRONT_DOMAIN_NAME + "/profile/" + memberId + "/front_image.jpg";
         } else if (type.equals("side")) {
@@ -25,5 +26,4 @@ public class CloudFrontUrlHandler {
         }
 
     }
-
 }

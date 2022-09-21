@@ -1,8 +1,6 @@
 package com.beforehairshop.demo.member.service;
 
-import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
-import com.beforehairshop.demo.aws.S3Uploader;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
@@ -16,18 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
@@ -67,6 +57,9 @@ public class MemberService {
             return makeResult(HttpStatus.BAD_REQUEST, "닉네임을 입력하지 않았습니다.");
 
         Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+        if (updatedMember == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 유효한 유저가 아닙니다.");
+
         updatedMember.setName(memberProfileSaveRequestDto.getName());
 
         // 닉네임 변경

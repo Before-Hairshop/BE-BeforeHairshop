@@ -1,17 +1,16 @@
 package com.beforehairshop.demo.review.service;
 
-import com.beforehairshop.demo.aws.S3Uploader;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.StatusKind;
 import com.beforehairshop.demo.member.domain.Member;
-import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyleImage;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.domain.Review;
 import com.beforehairshop.demo.review.domain.ReviewHashtag;
 import com.beforehairshop.demo.review.domain.ReviewImage;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
+import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
 import com.beforehairshop.demo.review.repository.ReviewHashtagRepository;
 import com.beforehairshop.demo.review.repository.ReviewImageRepository;
@@ -22,9 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +62,15 @@ public class ReviewService {
     public ResponseEntity<ResultDto> findManyByHairDesigner(BigInteger hairDesignerId, Pageable pageable) {
         List<Review> reviewList = reviewRepository.findAllByHairDesignerIdAndStatus(hairDesignerId, StatusKind.NORMAL.getId(), pageable);
 
-        return makeResult(HttpStatus.OK, reviewList);
+        List<ReviewDetailResponseDto> reviewDetailResponseDtoList = new ArrayList<>();
+        for (Review review : reviewList) {
+            List<ReviewHashtag> hashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
+            List<ReviewImage> imageList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
+
+            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review, hashtagList, imageList));
+        }
+
+        return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);
     }
 
     @Transactional
@@ -88,7 +93,7 @@ public class ReviewService {
 
         if (reviewPatchRequestDto.getHashtagList() != null) {
             // review hash tag 삭제
-            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findAllByReviewAndStatus(review, StatusKind.NORMAL.getId());
+            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
             reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
 
             // review hash tag 생성

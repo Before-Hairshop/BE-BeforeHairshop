@@ -4,11 +4,9 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class MemberProfilePatchRequestDto {
     private String name;
@@ -17,6 +15,10 @@ public class MemberProfilePatchRequestDto {
     private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
+    private MultipartFile frontImage;
+    private MultipartFile sideImage;
+    private MultipartFile backImage;
+
     private Integer payableAmount;
     private String zipCode;
     private String zipAddress;
@@ -24,7 +26,26 @@ public class MemberProfilePatchRequestDto {
     private Float longitude;
     private String detailAddress;
 
+    public MemberProfile toEntity(Member member, String frontImageUrl, String sideImageUrl, String backImageUrl) {
+        return MemberProfile.builder()
+                .member(member)
+                .hairCondition(hairCondition)
+                .hairTendency(hairTendency)
+                .desiredHairstyle(desiredHairstyle)
+                .desiredHairstyleDescription(desiredHairstyleDescription)
+                .frontImageUrl(frontImageUrl)
+                .sideImageUrl(sideImageUrl)
+                .backImageUrl(backImageUrl)
+                .payableAmount(payableAmount)
+                .zipCode(zipCode)
+                .zipAddress(zipAddress)
+                .latitude(latitude)
+                .longitude(longitude)
+                .detailAddress(detailAddress)
+                .status(1)
+                .build();
 
+    }
 
 
 }

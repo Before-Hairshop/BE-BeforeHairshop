@@ -14,10 +14,12 @@ import java.net.URL;
 @Slf4j
 @RequiredArgsConstructor
 public class AmazonS3Service {
+
     @Value("${cloud.aws.s3.bucket}")
-    private final String S3BucketName;
+    private String S3BucketName;
 
     private final AmazonS3Client amazonS3Client;
+
 
     public String generatePreSignedUrl(String objectPath) {
 

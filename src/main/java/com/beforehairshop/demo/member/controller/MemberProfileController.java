@@ -32,7 +32,7 @@ public class MemberProfileController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    @Operation(summary = "유저-본인 프로필 저장 API(이미지 제외)")
+    @Operation(summary = "유저-본인 프로필 저장 API(본인 이미지 & 원하는 스타일 이미지 제외)")
     @PostMapping("")
     public ResponseEntity<ResultDto> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestBody MemberProfileSaveRequestDto memberProfileSaveRequestDto) {
@@ -41,14 +41,16 @@ public class MemberProfileController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    @Operation(summary = "유저-본인 프로필 저장 API(이미지)")
+    @Operation(summary = "유저-본인 프로필 저장 API(본인 이미지)")
     @PostMapping("image")
     public ResponseEntity<ResultDto> saveMemberProfileImage(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "front_image_flag") Integer frontImageFlag
             , @RequestParam(name = "side_image_flag") Integer sideImageFlag
-            , @RequestParam(name = "back_image_flag") Integer backImageFlag) {
+            , @RequestParam(name = "back_image_flag") Integer backImageFlag
+            , @RequestParam(name = "desired_hairstyle_image_count") Integer desiredHairstyleImageCount) {
 
-        return memberService.saveMemberProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag, amazonS3Service);
+        return memberService.saveMemberProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag
+                , desiredHairstyleImageCount, amazonS3Service);
     }
 
 
@@ -66,7 +68,10 @@ public class MemberProfileController {
     public ResponseEntity<ResultDto> patchMyProfileImage(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "front_image_flag") Integer frontImageFlag
             , @RequestParam(name = "side_image_flag") Integer sideImageFlag
-            , @RequestParam(name = "back_image_flag") Integer backImageFlag) {
-        return memberService.patchMyProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag, amazonS3Service);
+            , @RequestParam(name = "back_image_flag") Integer backImageFlag
+            , @RequestParam(name = "add_desired_hairstyle_image_count") Integer addDesiredHairstyleImageCount
+            , String[] deleteImageUrlList) {
+        return memberService.patchMyProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag
+                , addDesiredHairstyleImageCount, deleteImageUrlList,  amazonS3Service);
     }
 }

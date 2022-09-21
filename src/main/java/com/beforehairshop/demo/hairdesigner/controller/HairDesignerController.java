@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.hairdesigner.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
+import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.service.HairDesignerService;
@@ -32,6 +33,7 @@ import java.util.List;
 public class HairDesignerController {
 
     private final HairDesignerService hairDesignerService;
+    private final AmazonS3Service amazonS3Service;
 
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
@@ -73,11 +75,10 @@ public class HairDesignerController {
     }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-    @Operation(summary = "헤어 디자이너 프로필 - 이미지 생성 및 수정(용도 2가지)")
+    @Operation(summary = "헤어 디자이너 프로필 생성(이미지)")
     @PostMapping("image")
-    public ResponseEntity<ResultDto> saveImage(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , MultipartFile image) throws IOException {
-        return hairDesignerService.saveImage(principalDetails.getMember(), image);
+    public ResponseEntity<ResultDto> saveImage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return hairDesignerService.saveImage(principalDetails.getMember(), amazonS3Service);
     }
 
 
@@ -87,6 +88,13 @@ public class HairDesignerController {
     public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetail
             , @RequestBody HairDesignerProfilePatchRequestDto hairDesignerProfilePatchRequestDto) {
         return hairDesignerService.patchOne(principalDetail.getMember(), hairDesignerProfilePatchRequestDto);
+    }
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "헤어 디자이너 프로필 수정(이미지)")
+    @PatchMapping("image")
+    public ResponseEntity<ResultDto> patchImage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return hairDesignerService.patchImage(principalDetails.getMember(), amazonS3Service);
     }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")

@@ -83,7 +83,10 @@ public class MemberService {
         if (memberProfile == null) {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다.");
         }
-        return makeResult(HttpStatus.OK, memberProfile);
+
+        List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList
+                = memberProfileDesiredHairstyleImageRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
+        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(memberProfile, desiredHairstyleImageList));
     }
 
     @Transactional

@@ -244,18 +244,4 @@ public class MemberService {
 
         return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl));
     }
-
-
-//    public ResponseEntity<ResultDto> saveMemberProfileImages(Member member, MemberProfileImageSaveRequestDto memberProfileImageSaveRequestDto, S3Uploader s3Uploader) throws IOException {
-//        String frontImageUrl = s3Uploader.upload(memberProfileImageSaveRequestDto.getFrontImage(), member.getId().toString() + "/profile/front-image.jpg");
-//        String sideImageUrl = null, backImageUrl = null;
-//
-//        if (memberProfileImageSaveRequestDto.getSideImage() != null)
-//            sideImageUrl = s3Uploader.upload(memberProfileImageSaveRequestDto.getSideImage(), member.getId().toString() + "/profile/side-image.jpg");
-//
-//        if (memberProfileImageSaveRequestDto.getBackImage() != null)
-//            backImageUrl = s3Uploader.upload(memberProfileImageSaveRequestDto.getBackImage(), member.getId().toString() + "/profile/back-image.jpg");
-//
-//        return makeResult(HttpStatus.OK, new MemberProfileImageSaveResponseDto(frontImageUrl, sideImageUrl, backImageUrl));
-//    }
 }

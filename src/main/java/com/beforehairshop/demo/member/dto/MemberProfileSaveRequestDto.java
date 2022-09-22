@@ -2,9 +2,12 @@ package com.beforehairshop.demo.member.dto;
 
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -13,7 +16,6 @@ public class MemberProfileSaveRequestDto {
     private String name;
     private Integer hairCondition;
     private Integer hairTendency;
-    private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
 //    private String frontImageUrl;
@@ -27,13 +29,14 @@ public class MemberProfileSaveRequestDto {
     private Float longitude;
     private String detailAddress;
 
+    private List<DesiredHairstyleSaveRequestDto> desiredHairstyleList;
+
     public MemberProfile toEntity(Member member, String frontImageUrl, String sideImageUrl, String backImageUrl) {
         return MemberProfile.builder()
                 .name(name)
                 .member(member)
                 .hairCondition(hairCondition)
                 .hairTendency(hairTendency)
-                .desiredHairstyle(desiredHairstyle)
                 .desiredHairstyleDescription(desiredHairstyleDescription)
                 .frontImageUrl(frontImageUrl)
                 .sideImageUrl(sideImageUrl)
@@ -48,4 +51,5 @@ public class MemberProfileSaveRequestDto {
                 .build();
 
     }
+
 }

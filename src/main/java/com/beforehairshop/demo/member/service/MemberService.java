@@ -4,10 +4,12 @@ import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyle;
 import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyleImage;
 import com.beforehairshop.demo.member.dto.*;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleImageRepository;
+import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleRepository;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.constant.StatusKind;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
@@ -32,8 +35,9 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
+    private final MemberProfileDesiredHairstyleRepository memberProfileDesiredHairstyleRepository;
+
     private final MemberProfileDesiredHairstyleImageRepository memberProfileDesiredHairstyleImageRepository;
-    private final AmazonS3Service amazonS3Service;
 
     @Transactional
     public BigInteger save(MemberSaveRequestDto requestDto) {
@@ -74,6 +78,18 @@ public class MemberService {
 
         memberProfileRepository.save(memberProfile);
 
+        /**
+         * 유저가 원하는 헤어 스타일들에 대한 row 저장!
+         */
+        if (memberProfileSaveRequestDto.getDesiredHairstyleList() != null) {
+            memberProfileDesiredHairstyleRepository.saveAll(
+                    memberProfileSaveRequestDto.getDesiredHairstyleList()
+                            .stream()
+                            .map(desiredHairstyleSaveRequestDto -> desiredHairstyleSaveRequestDto.toEntity(memberProfile))
+                            .collect(Collectors.toList())
+            );
+        }
+
         return makeResult(HttpStatus.OK, memberProfile);
     }
 
@@ -84,9 +100,12 @@ public class MemberService {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다.");
         }
 
+        List<MemberProfileDesiredHairstyle> desiredHairstyleList
+                = memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
+
         List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList
                 = memberProfileDesiredHairstyleImageRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
-        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(memberProfile, desiredHairstyleImageList));
+        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(memberProfile, desiredHairstyleList, desiredHairstyleImageList));
     }
 
     @Transactional
@@ -111,9 +130,6 @@ public class MemberService {
         if (patchDto.getHairTendency() != null)
             memberProfile.setHairTendency(patchDto.getHairTendency());
 
-        if (patchDto.getDesiredHairstyle() != null)
-            memberProfile.setDesiredHairstyle(patchDto.getDesiredHairstyle());
-
         if (patchDto.getDesiredHairstyleDescription() != null)
             memberProfile.setDesiredHairstyleDescription(memberProfile.getDesiredHairstyleDescription());
 
@@ -129,6 +145,10 @@ public class MemberService {
 
         if (patchDto.getDetailAddress() != null)
             memberProfile.setDetailAddress(patchDto.getDetailAddress());
+
+        if (patchDto.getDesiredHairstyleList() != null) {
+
+        }
 
         // 닉네임 변경
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
@@ -307,5 +327,14 @@ public class MemberService {
 
         return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl
                 , desiredHairstyleImagePreSignedUrlList));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findManyProfileByLocation(Member member, Integer pageNumber) {
+        Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+        if (hairDesigner == null || hairDesigner.getDesignerFlag() != 1)
+            return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너가 아니거나, 저장된 유저가 아닙니다.");
+
+        return null;
     }
 }

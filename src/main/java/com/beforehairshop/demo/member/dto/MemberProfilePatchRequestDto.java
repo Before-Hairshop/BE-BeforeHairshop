@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +16,6 @@ public class MemberProfilePatchRequestDto {
     private String name;
     private Integer hairCondition;
     private Integer hairTendency;
-    private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
     private Integer payableAmount;
@@ -24,6 +25,7 @@ public class MemberProfilePatchRequestDto {
     private Float longitude;
     private String detailAddress;
 
+    private List<String> desiredHairstyleList;
 
 
 

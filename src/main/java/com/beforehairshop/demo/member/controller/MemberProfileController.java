@@ -31,6 +31,15 @@ public class MemberProfileController {
         return memberService.findMyProfile(principalDetails.getMember());
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_DESIGNER', 'ROLE_ADMIN')")
+    @Operation(summary = "(위치 기반 1.5km) 위치 기반 유저들의 프로필 목록 조회 - 헤어 디자이너만 열람 가능")
+    @GetMapping("/list_by_location")
+    public ResponseEntity<ResultDto> findManyProfileByLocation(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "page_number") Integer pageNumber) {
+        return memberService.findManyProfileByLocation(principalDetails.getMember()
+                , pageNumber);
+    }
+
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @Operation(summary = "유저-본인 프로필 저장 API(본인 이미지 & 원하는 스타일 이미지 제외)")
     @PostMapping("")

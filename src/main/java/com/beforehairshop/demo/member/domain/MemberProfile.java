@@ -36,7 +36,6 @@ public class MemberProfile {
     @Column(columnDefinition = "TINYINT")
     private Integer hairTendency;
 
-    private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
     @Column(columnDefinition = "TEXT")

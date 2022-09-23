@@ -1,4 +1,4 @@
--- 유저 생성 (디자이너 7명)
+-- 유저 생성 (디자이너 8명)
 insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (1, 'aaaa@naver.com', 0, 'GOOGLE', 'google_1', 'ROLE_DESIGNER', '홍길동', 1);
 insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
@@ -34,12 +34,23 @@ values (7, '창길동', '펌 장인이에요', '<창>살롱', 06211, '건대입�
 insert into hair_designer_profile (hair_designer_id, name, description, hair_shop_name, zip_code, zip_address, latitude, longitude, detail_address, phone_number, status)
 values (8, '선길동', '펌 장인이에요', '<선>살롱', 06211, '선릉', 37.5032909, 127.0498323, '건물 1층', '010-1111-2222', 1);
 
--- -- 유저 생성 (일반 3명)
--- insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
--- values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_6', 'ROLE_USER', '보규', 1);
--- insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
--- values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_7', 'ROLE_USER', '나영', 1);
--- insert into member (designer_flag, email, premium_flag, provider, username, role, nickname, status)
--- values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_8', 'ROLE_USER', '경모', 1);
+-- 유저 생성 (일반 3명)
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
+values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_9', 'ROLE_USER', '보규', 1);
+insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
+values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_10', 'ROLE_USER', '나영', 1);
 
+insert into member_profile (member_id, hair_condition, hair_tendency, desired_hairstyle_description, front_image_url, side_image_url, back_image_url, payable_amount, zip_code, zip_address, latitude, longitude, detail_address, status)
+values (9, 3, 3, '잘 잘라주셨으면 좋겠습니다 ㅠㅠ', null, null, null, 30000, 00551, '서울특별시 강남구 선릉역 주변', 37.5032909, 127.0498323, '2층 105호', 1);
 
+insert into member_profile (member_id, hair_condition, hair_tendency, desired_hairstyle_description, front_image_url, side_image_url, back_image_url, payable_amount, zip_code, zip_address, latitude, longitude, detail_address, status)
+values (10, 3, 3, '잘 잘라주셨으면 좋겠습니다 ㅠㅠ', null, null, null, 15000, 00552, '서울특별시 강남구 선릉역 주변', 37.5044935, 127.0476808, '3층 305호', 1);
+
+insert into member_profile_desired_hairstyle (member_profile_id, desired_hairstyle, status)
+values (1, '바버컷', 1);
+
+insert into member_profile_desired_hairstyle (member_profile_id, desired_hairstyle, status)
+values (1, '2022 아이유 컷', 1);
+
+insert into member_profile_desired_hairstyle (member_profile_id, desired_hairstyle, status)
+values (2, '2011 임재범 컷', 1);

@@ -3,10 +3,18 @@ package com.beforehairshop.demo.member.repository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberProfileRepository extends JpaRepository<MemberProfile, BigInteger> {
     Optional<MemberProfile> findByMemberAndStatus(Member member, Integer status);
+
+    @Query(value = "SELECT *, ( 6371 * acos (cos ( radians(?1) ) * cos( radians( m.latitude ) ) * cos( radians( m.longitude ) - radians(?2) ) + sin ( radians(?1) ) * sin( radians( m.latitude )))) AS distance " +
+            "FROM member_profile m WHERE m.status = ?4 GROUP BY m.id HAVING distance <= 1.5 " +
+            "ORDER BY distance asc LIMIT 5 OFFSET ?3 ;",
+            nativeQuery = true)
+    List<MemberProfile> findManyByLocationAndStatus(Float designer_latitude, Float designer_longitude,  int pageOffset, Integer status);
 }

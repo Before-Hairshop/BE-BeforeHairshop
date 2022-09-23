@@ -2,6 +2,9 @@ package com.beforehairshop.demo.member.service;
 
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
+import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyle;
@@ -38,6 +41,8 @@ public class MemberService {
     private final MemberProfileDesiredHairstyleRepository memberProfileDesiredHairstyleRepository;
 
     private final MemberProfileDesiredHairstyleImageRepository memberProfileDesiredHairstyleImageRepository;
+
+    private final HairDesignerProfileRepository hairDesignerProfileRepository;
 
     @Transactional
     public BigInteger save(MemberSaveRequestDto requestDto) {
@@ -339,11 +344,25 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findManyProfileByLocation(Member member, Integer pageNumber) {
-        Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+    public ResponseEntity<ResultDto> findManyProfileByLocation(Member designer, Integer pageNumber) {
+        Member hairDesigner = memberRepository.findByIdAndStatus(designer.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesigner == null || hairDesigner.getDesignerFlag() != 1)
             return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너가 아니거나, 저장된 유저가 아닙니다.");
 
-        return null;
+        HairDesignerProfile hairDesignerProfile
+                = hairDesignerProfileRepository.findByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId()).orElse(null);
+
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너가 프로필이 없습니다.");
+
+        List<MemberProfile> memberProfileList
+                = memberProfileRepository.findManyByLocationAndStatus(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude()
+                , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
+
+        List<MemberProfileListResponseDto> memberProfileListResponseDtoList = memberProfileList.stream()
+                .map(memberProfile -> new MemberProfileListResponseDto(memberProfile, memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId())))
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, memberProfileListResponseDtoList);
     }
 }

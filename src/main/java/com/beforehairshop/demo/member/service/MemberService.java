@@ -147,7 +147,16 @@ public class MemberService {
             memberProfile.setDetailAddress(patchDto.getDetailAddress());
 
         if (patchDto.getDesiredHairstyleList() != null) {
+            memberProfileDesiredHairstyleRepository.deleteAllInBatch(
+                    memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId())
+            );
 
+            memberProfileDesiredHairstyleRepository.saveAll(
+                    patchDto.getDesiredHairstyleList()
+                            .stream()
+                            .map(desiredHairstylePatchRequestDto -> desiredHairstylePatchRequestDto.toEntity(memberProfile))
+                            .collect(Collectors.toList())
+            );
         }
 
         // 닉네임 변경

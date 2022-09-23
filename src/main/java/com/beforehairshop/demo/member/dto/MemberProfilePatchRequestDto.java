@@ -25,7 +25,7 @@ public class MemberProfilePatchRequestDto {
     private Float longitude;
     private String detailAddress;
 
-    private List<String> desiredHairstyleList;
+    private List<DesiredHairstylePatchRequestDto> desiredHairstyleList;
 
 
 

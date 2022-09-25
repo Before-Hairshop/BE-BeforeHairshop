@@ -38,8 +38,8 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk:1.12.305'
 
 	// data source
-	runtimeOnly 'mysql:mysql-connector-java'
-	// runtimeOnly 'com.h2database:h2'
+	// runtimeOnly 'mysql:mysql-connector-java'
+	runtimeOnly 'com.h2database:h2'
 
 	// JWT
 	implementation 'com.auth0:java-jwt:3.19.2'

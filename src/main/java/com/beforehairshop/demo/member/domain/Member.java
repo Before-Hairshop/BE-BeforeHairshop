@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.member.domain;
 
+import com.beforehairshop.demo.recommend.domain.Recommend;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -51,5 +53,11 @@ public class Member {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+    @OneToMany
+    private Set<Recommend> recommendSet;
+
+    @OneToMany
+    private Set<Recommend> recommendedSet;
 
 }

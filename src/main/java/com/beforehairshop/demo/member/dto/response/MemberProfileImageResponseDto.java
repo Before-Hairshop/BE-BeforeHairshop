@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.member.dto;
+package com.beforehairshop.demo.member.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

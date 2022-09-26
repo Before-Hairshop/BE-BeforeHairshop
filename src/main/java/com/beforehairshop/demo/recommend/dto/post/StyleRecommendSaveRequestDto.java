@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class StyleRecommendSaveRequestDto {
     private String hairstyle;
     private String reason;
-    private String price;
+    private Integer price;
 
     public StyleRecommend toEntity(Recommend recommend) {
         return StyleRecommend.builder()

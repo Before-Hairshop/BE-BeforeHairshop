@@ -1,6 +1,5 @@
 package com.beforehairshop.demo.recommend.dto.response;
 
-import com.beforehairshop.demo.recommend.domain.Recommend;
 import com.beforehairshop.demo.recommend.domain.StyleRecommend;
 import com.beforehairshop.demo.recommend.domain.StyleRecommendImage;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecommendDetailResponseDto {
-    private Recommend recommend;
-    private List<StyleRecommendDetailResponseDto> styleRecommendDetailResponseDtoList;
+public class StyleRecommendDetailResponseDto {
+    private StyleRecommend styleRecommend;
+    private List<StyleRecommendImage> styleRecommendImageList;
 }

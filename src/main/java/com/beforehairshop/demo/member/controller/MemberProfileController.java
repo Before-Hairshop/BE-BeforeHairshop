@@ -1,10 +1,9 @@
 package com.beforehairshop.demo.member.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
-import com.beforehairshop.demo.aws.S3Uploader;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
-import com.beforehairshop.demo.member.dto.MemberProfilePatchRequestDto;
-import com.beforehairshop.demo.member.dto.MemberProfileSaveRequestDto;
+import com.beforehairshop.demo.member.dto.patch.MemberProfilePatchRequestDto;
+import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
 import com.beforehairshop.demo.member.service.MemberService;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;

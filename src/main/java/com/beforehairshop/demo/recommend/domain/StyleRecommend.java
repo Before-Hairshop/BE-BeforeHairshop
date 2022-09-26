@@ -29,7 +29,7 @@ public class StyleRecommend {
 
     private String hairstyle;
     private String reason;
-    private String price;
+    private Integer price;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;

@@ -1,12 +1,13 @@
-package com.beforehairshop.demo.member.dto;
+package com.beforehairshop.demo.member.dto.post;
 
+import com.beforehairshop.demo.constant.StatusKind;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
-import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyle;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -28,6 +29,9 @@ public class MemberProfileSaveRequestDto {
     private Float latitude;
     private Float longitude;
     private String detailAddress;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private Date treatmentDate;
+    private String phoneNumber;
 
     private List<DesiredHairstyleSaveRequestDto> desiredHairstyleList;
 
@@ -47,7 +51,9 @@ public class MemberProfileSaveRequestDto {
                 .latitude(latitude)
                 .longitude(longitude)
                 .detailAddress(detailAddress)
-                .status(1)
+                .treatmentDate(treatmentDate)
+                .phoneNumber(phoneNumber)
+                .status(StatusKind.NORMAL.getId())
                 .build();
 
     }

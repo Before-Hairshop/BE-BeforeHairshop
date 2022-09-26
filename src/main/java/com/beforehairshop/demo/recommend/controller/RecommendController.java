@@ -2,6 +2,7 @@ package com.beforehairshop.demo.recommend.controller;
 
 import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
+import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendSaveRequestDto;
 import com.beforehairshop.demo.recommend.service.RecommendService;
 import com.beforehairshop.demo.response.ResultDto;
@@ -40,6 +41,25 @@ public class RecommendController {
             , @RequestParam(name = "style_recommend_id") BigInteger styleRecommendId
             , @RequestParam(name = "image_count") Integer imageCount) {
         return recommendService.saveImage(principalDetails.getMember(), styleRecommendId, imageCount, amazonS3Service);
+    }
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "스타일 추천서 수정 (이미지 제외)")
+    @PatchMapping("")
+    public ResponseEntity<ResultDto> patch(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "recommend_id") BigInteger recommendId
+            , @RequestBody RecommendPatchRequestDto recommendPatchRequestDto) {
+        return recommendService.patch(principalDetails.getMember(), recommendId, recommendPatchRequestDto);
+    }
+
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "스타일 추천서 수정 (이미지 제외)")
+    @PatchMapping("image")
+    public ResponseEntity<ResultDto> patchImage(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "style_recommend_id") BigInteger styleRecommendId
+            , @RequestParam(name = "add_image_count") Integer addImageCount
+            , String[] deleteImageUrl) {
+        return recommendService.patchImage(principalDetails.getMember(), styleRecommendId, addImageCount, deleteImageUrl, amazonS3Service);
     }
 
 }

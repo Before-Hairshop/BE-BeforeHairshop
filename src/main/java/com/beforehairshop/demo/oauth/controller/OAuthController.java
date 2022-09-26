@@ -1,22 +1,10 @@
 package com.beforehairshop.demo.oauth.controller;
 
-import com.beforehairshop.demo.member.dto.MemberSaveRequestDto;
 import com.beforehairshop.demo.member.service.MemberService;
-import com.beforehairshop.demo.oauth.dto.OAuthDto;
-import com.beforehairshop.demo.oauth.helper.constants.SocialLoginType;
 import com.beforehairshop.demo.oauth.service.OAuthService;
-import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigInteger;
-
-import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @RestController
 @CrossOrigin

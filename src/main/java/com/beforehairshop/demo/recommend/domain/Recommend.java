@@ -26,15 +26,16 @@ public class Recommend {
     private BigInteger id;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommender_id")
     private Member recommender;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommended_person_id")
     private Member recommendedPerson;
 
     private String greeting;
+    private Date treatmentDate;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RecommendSaveRequestDto {
     private String greeting;
+    private Date treatmentDate;
     private List<StyleRecommendSaveRequestDto> styleRecommendSaveRequestDtoList;
 
     public Recommend toEntity(Member recommender, Member recommendedPerson) {
@@ -21,6 +23,7 @@ public class RecommendSaveRequestDto {
                 .recommender(recommender)
                 .recommendedPerson(recommendedPerson)
                 .greeting(greeting)
+                .treatmentDate(treatmentDate)
                 .status(StatusKind.NORMAL.getId())
                 .build();
     }

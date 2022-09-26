@@ -9,8 +9,17 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyle;
 import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyleImage;
-import com.beforehairshop.demo.member.dto.*;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
+import com.beforehairshop.demo.member.dto.MemberDto;
+import com.beforehairshop.demo.member.dto.MemberProfileDesiredHairstyleDto;
+import com.beforehairshop.demo.member.dto.MemberProfileDesiredHairstyleImageDto;
+import com.beforehairshop.demo.member.dto.MemberProfileDto;
+import com.beforehairshop.demo.member.dto.patch.MemberProfilePatchRequestDto;
+import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
+import com.beforehairshop.demo.member.dto.post.MemberSaveRequestDto;
+import com.beforehairshop.demo.member.dto.response.MemberProfileDetailResponseDto;
+import com.beforehairshop.demo.member.dto.response.MemberProfileImageResponseDto;
+import com.beforehairshop.demo.member.dto.response.MemberProfileListResponseDto;
 import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleImageRepository;
 import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleRepository;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
@@ -95,7 +104,7 @@ public class MemberService {
             );
         }
 
-        return makeResult(HttpStatus.OK, memberProfile);
+        return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
     }
 
     @Transactional
@@ -110,7 +119,16 @@ public class MemberService {
 
         List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList
                 = memberProfileDesiredHairstyleImageRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
-        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(memberProfile, desiredHairstyleList, desiredHairstyleImageList));
+
+        List<MemberProfileDesiredHairstyleDto> memberProfileDesiredHairstyleDtoList = desiredHairstyleList.stream()
+                .map(memberProfileDesiredHairstyle -> new MemberProfileDesiredHairstyleDto(memberProfileDesiredHairstyle))
+                .collect(Collectors.toList());
+
+        List<MemberProfileDesiredHairstyleImageDto> memberProfileDesiredHairstyleImageDtoList = desiredHairstyleImageList.stream()
+                .map(memberProfileDesiredHairstyleImage -> new MemberProfileDesiredHairstyleImageDto(memberProfileDesiredHairstyleImage))
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(new MemberProfileDto(memberProfile), memberProfileDesiredHairstyleDtoList, memberProfileDesiredHairstyleImageDtoList));
     }
 
     @Transactional
@@ -151,6 +169,12 @@ public class MemberService {
         if (patchDto.getDetailAddress() != null)
             memberProfile.setDetailAddress(patchDto.getDetailAddress());
 
+        if (patchDto.getTreatmentDate() != null)
+            memberProfile.setTreatmentDate(patchDto.getTreatmentDate());
+
+        if (patchDto.getPhoneNumber() != null)
+            memberProfile.setPhoneNumber(patchDto.getPhoneNumber());
+
         if (patchDto.getDesiredHairstyleList() != null) {
             memberProfileDesiredHairstyleRepository.deleteAllInBatch(
                     memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId())
@@ -169,15 +193,16 @@ public class MemberService {
 
         memberProfile.setMember(updatedMember);
 
-        return makeResult(HttpStatus.OK, memberProfile);
+        return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
     }
 
+    @Transactional
     public ResponseEntity<ResultDto> findMe(Member member) {
         Member memberByDB = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (memberByDB == null)
             return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 유효하지 않은 유저이거나, 잘못된 세션 값으로 요청했습니다.");
 
-        return makeResult(HttpStatus.OK, memberByDB);
+        return makeResult(HttpStatus.OK, new MemberDto(memberByDB));
     }
 
     @Transactional
@@ -192,7 +217,7 @@ public class MemberService {
         updatedMember.setImageUrl(null);
 
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_DESIGNER");
-        return makeResult(HttpStatus.OK, updatedMember);
+        return makeResult(HttpStatus.OK, new MemberDto(updatedMember));
     }
 
     @Transactional
@@ -207,7 +232,7 @@ public class MemberService {
         updatedMember.setImageUrl(null);
 
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
-        return makeResult(HttpStatus.OK, updatedMember);
+        return makeResult(HttpStatus.OK, new MemberDto(updatedMember));
     }
 
     @Transactional
@@ -224,7 +249,7 @@ public class MemberService {
 
 
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, hairDesignerFlag == 1 ? "ROLE_DESIGNER" : "ROLE_USER");
-        return makeResult(HttpStatus.OK, updatedMember);
+        return makeResult(HttpStatus.OK, new MemberDto(updatedMember));
     }
 
 
@@ -360,7 +385,10 @@ public class MemberService {
                 , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
 
         List<MemberProfileListResponseDto> memberProfileListResponseDtoList = memberProfileList.stream()
-                .map(memberProfile -> new MemberProfileListResponseDto(memberProfile, memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId())))
+                .map(memberProfile -> new MemberProfileListResponseDto(new MemberProfileDto(memberProfile)
+                        , memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId()).stream()
+                        .map(memberProfileDesiredHairstyle -> new MemberProfileDesiredHairstyleDto(memberProfileDesiredHairstyle))
+                        .collect(Collectors.toList())))
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, memberProfileListResponseDtoList);

@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.member.dto;
+package com.beforehairshop.demo.member.dto.patch;
 
 import com.beforehairshop.demo.constant.StatusKind;
 import com.beforehairshop.demo.member.domain.MemberProfile;

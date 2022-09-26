@@ -1,6 +1,5 @@
 package com.beforehairshop.demo.member.domain;
 
-import com.beforehairshop.demo.member.dto.MemberProfilePatchRequestDto;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -53,6 +52,10 @@ public class MemberProfile {
     private Float latitude;
     private Float longitude;
     private String detailAddress;
+
+    private String phoneNumber;
+    private Date treatmentDate;
+
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
 

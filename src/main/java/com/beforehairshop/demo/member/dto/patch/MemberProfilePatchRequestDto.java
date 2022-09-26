@@ -1,12 +1,10 @@
-package com.beforehairshop.demo.member.dto;
+package com.beforehairshop.demo.member.dto.patch;
 
-import com.beforehairshop.demo.member.domain.Member;
-import com.beforehairshop.demo.member.domain.MemberProfile;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -24,6 +22,8 @@ public class MemberProfilePatchRequestDto {
     private Float latitude;
     private Float longitude;
     private String detailAddress;
+    private Date treatmentDate;
+    private String phoneNumber;
 
     private List<DesiredHairstylePatchRequestDto> desiredHairstyleList;
 

@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.member.dto;
+package com.beforehairshop.demo.member.dto.post;
 
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;

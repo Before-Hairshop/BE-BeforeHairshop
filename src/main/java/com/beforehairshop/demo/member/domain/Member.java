@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -54,10 +55,10 @@ public class Member {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
-    @OneToMany
-    private Set<Recommend> recommendSet;
+    @OneToMany(mappedBy = "recommender", fetch = FetchType.LAZY)
+    private Set<Recommend> recommendSet = new HashSet<>();
 
-    @OneToMany
-    private Set<Recommend> recommendedSet;
+    @OneToMany(mappedBy = "recommendedPerson", fetch = FetchType.LAZY)
+    private Set<Recommend> recommendedSet = new HashSet<>();
 
 }

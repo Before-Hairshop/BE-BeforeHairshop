@@ -9,6 +9,10 @@ import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerHashtagDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerPriceDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileDto;
+import com.beforehairshop.demo.hairdesigner.dto.HairDesignerWorkingDayDto;
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerDetailGetResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
@@ -20,6 +24,7 @@ import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileReposi
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerWorkingDayRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
@@ -111,7 +116,7 @@ public class HairDesignerService {
         // 권한 변경()
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(hairDesigner, "ROLE_DESIGNER");
 
-        return makeResult(HttpStatus.OK, hairDesignerProfile);
+        return makeResult(HttpStatus.OK, new HairDesignerProfileDto(hairDesignerProfile));
     }
 
     @Transactional
@@ -122,18 +127,32 @@ public class HairDesignerService {
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
 
-        List<HairDesignerHashtag> hairDesignerHashtagList = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
-        List<HairDesignerWorkingDay> hairDesignerWorkingDayList = hairDesignerWorkingDayRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
-        List<HairDesignerPrice> hairDesignerPriceList = hairDesignerPriceRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
+        //List<HairDesignerHashtag> hairDesignerHashtagList = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
+        List<HairDesignerHashtagDto> hairDesignerHashtagDtoList
+                = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId())
+                .stream()
+                .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
+                .collect(Collectors.toList());
+        List<HairDesignerWorkingDayDto> hairDesignerWorkingDayDtoList
+                = hairDesignerWorkingDayRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId())
+                .stream()
+                .map(hairDesignerWorkingDay -> new HairDesignerWorkingDayDto(hairDesignerWorkingDay))
+                .collect(Collectors.toList());
+
+        List<HairDesignerPriceDto> hairDesignerPriceDtoList
+                = hairDesignerPriceRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId())
+                .stream()
+                .map(hairDesignerPrice -> new HairDesignerPriceDto(hairDesignerPrice))
+                .collect(Collectors.toList());
 
         /**
          * 별점, 리뷰 정보 가져오는 부분 추가해야 함!
          */
 
-        return makeResult(HttpStatus.OK, new HairDesignerDetailGetResponseDto(hairDesignerProfile
-                , hairDesignerHashtagList
-                , hairDesignerWorkingDayList
-                , hairDesignerPriceList));
+        return makeResult(HttpStatus.OK, new HairDesignerDetailGetResponseDto(new HairDesignerProfileDto(hairDesignerProfile)
+                , hairDesignerHashtagDtoList
+                , hairDesignerWorkingDayDtoList
+                , hairDesignerPriceDtoList));
     }
 
     @Transactional
@@ -158,7 +177,7 @@ public class HairDesignerService {
 
         }
 
-        return makeResult(HttpStatus.OK, hairDesignerProfileList);
+        return makeResult(HttpStatus.OK, hairDesignerProfileList.stream().map(hairDesignerProfile1 -> new HairDesignerProfileDto(hairDesignerProfile1)).collect(Collectors.toList()));
 
     }
 
@@ -232,7 +251,7 @@ public class HairDesignerService {
         // 닉네임 변경
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_DESIGNER");
 
-        return makeResult(HttpStatus.OK, hairDesignerProfile);
+        return makeResult(HttpStatus.OK, new HairDesignerProfileDto(hairDesignerProfile));
     }
 
     @Transactional
@@ -264,10 +283,10 @@ public class HairDesignerService {
 
     @Transactional
     public ResponseEntity<ResultDto> findAllByName(Member member, String name, Pageable pageable) {
-        List<HairDesignerProfile> hairDesignerProfile = hairDesignerProfileRepository.findAllByNameAndStatus(name
+        List<HairDesignerProfile> hairDesignerProfileList = hairDesignerProfileRepository.findAllByNameAndStatus(name
                 , StatusKind.NORMAL.getId(), pageable);
 
-        return makeResult(HttpStatus.OK, hairDesignerProfile);
+        return makeResult(HttpStatus.OK, hairDesignerProfileList.stream().map(hairDesignerProfile -> new HairDesignerProfileDto(hairDesignerProfile)).collect(Collectors.toList()));
     }
 
     @Transactional
@@ -286,7 +305,7 @@ public class HairDesignerService {
         // 권한 변경 X (image url 변경)
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(designer, "ROLE_DESIGNER");
 
-        return makeResult(HttpStatus.OK, designer);
+        return makeResult(HttpStatus.OK, new MemberDto(designer));
     }
 
     @Transactional

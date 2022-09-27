@@ -1,4 +1,4 @@
-package com.beforehairshop.demo.constant;
+package com.beforehairshop.demo.constant.member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

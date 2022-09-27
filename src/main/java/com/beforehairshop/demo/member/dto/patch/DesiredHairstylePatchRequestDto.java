@@ -1,6 +1,6 @@
 package com.beforehairshop.demo.member.dto.patch;
 
-import com.beforehairshop.demo.constant.StatusKind;
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyle;
 import lombok.AllArgsConstructor;

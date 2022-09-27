@@ -1,6 +1,6 @@
 package com.beforehairshop.demo.member.dto.post;
 
-import com.beforehairshop.demo.constant.StatusKind;
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.fasterxml.jackson.annotation.JsonFormat;

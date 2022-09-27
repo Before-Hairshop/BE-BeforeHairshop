@@ -82,4 +82,18 @@ public class MemberProfileController {
         return memberService.patchMyProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag
                 , addDesiredHairstyleImageCount, deleteImageUrlList,  amazonS3Service);
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "유저 프로필 매칭 활성화 API")
+    @PatchMapping("/activate_matching")
+    public ResponseEntity<ResultDto> patchMyProfileActivateMatchingFlag(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.patchMyProfileActivateMatchingFlag(principalDetails.getMember());
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "유저 프로필 매칭 활성화 API")
+    @PatchMapping("/deactivate_matching")
+    public ResponseEntity<ResultDto> patchMyProfileDeactivateMatchingFlag(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.patchMyProfileDeactivateMatchingFlag(principalDetails.getMember());
+    }
 }

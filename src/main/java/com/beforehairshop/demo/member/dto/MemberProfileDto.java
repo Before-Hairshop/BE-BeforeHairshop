@@ -33,6 +33,7 @@ public class MemberProfileDto {
     private String detailAddress;
     private String phoneNumber;
     private Date treatmentDate;
+    private Integer matchingActivationFlag;
     private Date createDate;
     private Date updateDate;
     private int status;
@@ -56,6 +57,7 @@ public class MemberProfileDto {
                 .detailAddress(memberProfile.getDetailAddress())
                 .phoneNumber(memberProfile.getPhoneNumber())
                 .treatmentDate(memberProfile.getTreatmentDate())
+                .matchingActivationFlag(memberProfile.getMatchingActivationFlag())
                 .createDate(memberProfile.getCreateDate())
                 .updateDate(memberProfile.getUpdateDate())
                 .status(memberProfile.getStatus())

@@ -1,10 +1,9 @@
 package com.beforehairshop.demo.recommend.service;
 
-import com.amazonaws.services.mediatailor.model.HttpPackageConfiguration;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
-import com.beforehairshop.demo.constant.StatusKind;
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;

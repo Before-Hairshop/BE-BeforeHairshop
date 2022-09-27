@@ -2,6 +2,7 @@ package com.beforehairshop.demo.member.service;
 
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
+import com.beforehairshop.demo.constant.member.profile.MatchingFlagKind;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
@@ -24,7 +25,7 @@ import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleIm
 import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleRepository;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
-import com.beforehairshop.demo.constant.StatusKind;
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -392,5 +393,33 @@ public class MemberService {
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, memberProfileListResponseDtoList);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> patchMyProfileActivateMatchingFlag(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.NOT_FOUND, "세션 만료");
+
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        if (memberProfile == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저에게는 프로필 등록되어 있지 않음.");
+
+        memberProfile.setMatchingActivationFlag(MatchingFlagKind.ACTIVATION_CODE.getId());
+
+        return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> patchMyProfileDeactivateMatchingFlag(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.NOT_FOUND, "세션 만료");
+
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        if (memberProfile == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저에게는 프로필 등록되어 있지 않음.");
+
+        memberProfile.setMatchingActivationFlag(MatchingFlagKind.DEACTIVATION_CODE.getId());
+
+        return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
     }
 }

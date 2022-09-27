@@ -56,6 +56,9 @@ public class MemberProfile {
     private String phoneNumber;
     private Date treatmentDate;
 
+    @Column(columnDefinition = "TINYINT DEFAULT 1")
+    private Integer matchingActivationFlag;
+
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
 

@@ -1,6 +1,6 @@
 package com.beforehairshop.demo.recommend.dto.post;
 
-import com.beforehairshop.demo.constant.StatusKind;
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.recommend.domain.Recommend;
 import com.beforehairshop.demo.recommend.domain.StyleRecommend;
 import lombok.AllArgsConstructor;

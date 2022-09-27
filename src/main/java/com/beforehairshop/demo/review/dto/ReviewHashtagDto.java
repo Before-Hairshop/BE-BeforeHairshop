@@ -24,13 +24,11 @@ public class ReviewHashtagDto {
     private int status;
 
     public ReviewHashtagDto(ReviewHashtag reviewHashtag) {
-        ReviewHashtagDto.builder()
-                .id(reviewHashtag.getId())
-                .reviewId(reviewHashtag.getReview().getId())
-                .hashtag(reviewHashtag.getHashtag())
-                .createDate(reviewHashtag.getCreateDate())
-                .updateDate(reviewHashtag.getUpdateDate())
-                .status(reviewHashtag.getStatus())
-                .build();
+        this.id = reviewHashtag.getId();
+        this.reviewId =reviewHashtag.getReview().getId();
+        this.hashtag = reviewHashtag.getHashtag();
+        this.createDate = reviewHashtag.getCreateDate();
+        this.updateDate = reviewHashtag.getUpdateDate();
+        this.status = reviewHashtag.getStatus();
     }
 }

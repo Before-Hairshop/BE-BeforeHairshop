@@ -24,13 +24,11 @@ public class ReviewImageDto {
     private int status;
 
     public ReviewImageDto(ReviewImage reviewImage) {
-        ReviewImageDto.builder()
-                .id(reviewImage.getId())
-                .reviewId(reviewImage.getReview().getId())
-                .imageUrl(reviewImage.getImageUrl())
-                .createDate(reviewImage.getCreateDate())
-                .updateDate(reviewImage.getUpdateDate())
-                .status(reviewImage.getStatus())
-                .build();
+        this.id = reviewImage.getId();
+        this.reviewId = reviewImage.getReview().getId();
+        this.imageUrl = reviewImage.getImageUrl();
+        this.createDate = reviewImage.getCreateDate();
+        this.updateDate = reviewImage.getUpdateDate();
+        this.status = reviewImage.getStatus();
     }
 }

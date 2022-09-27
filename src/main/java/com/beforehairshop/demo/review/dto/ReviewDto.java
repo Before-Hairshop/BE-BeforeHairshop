@@ -28,17 +28,15 @@ public class ReviewDto {
     private int status;
 
     public ReviewDto(Review review) {
-        ReviewDto.builder()
-                .id(review.getId())
-                .reviewerId(review.getReviewer().getId())
-                .hairDesignerId(review.getHairDesigner().getId())
-                .totalRating(review.getTotalRating())
-                .styleRating(review.getStyleRating())
-                .serviceRating(review.getServiceRating())
-                .content(review.getContent())
-                .createDate(review.getCreateDate())
-                .updateDate(review.getUpdateDate())
-                .status(review.getStatus())
-                .build();
+        this.id = review.getId();
+        this.reviewerId = review.getReviewer().getId();
+        this.hairDesignerId = review.getHairDesigner().getId();
+        this.totalRating = review.getTotalRating();
+        this.styleRating = review.getStyleRating();
+        this.serviceRating = review.getServiceRating();
+        this.content = review.getContent();
+        this.createDate = review.getCreateDate();
+        this.updateDate = review.getUpdateDate();
+        this.status = review.getStatus();
     }
 }

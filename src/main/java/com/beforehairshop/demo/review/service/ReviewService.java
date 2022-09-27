@@ -9,6 +9,9 @@ import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.domain.Review;
 import com.beforehairshop.demo.review.domain.ReviewHashtag;
 import com.beforehairshop.demo.review.domain.ReviewImage;
+import com.beforehairshop.demo.review.dto.ReviewDto;
+import com.beforehairshop.demo.review.dto.ReviewHashtagDto;
+import com.beforehairshop.demo.review.dto.ReviewImageDto;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
@@ -55,7 +58,7 @@ public class ReviewService {
                 .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
                 .collect(Collectors.toList()));
 
-        return makeResult(HttpStatus.OK, review);
+        return makeResult(HttpStatus.OK, new ReviewDto(review));
     }
 
     @Transactional
@@ -64,10 +67,17 @@ public class ReviewService {
 
         List<ReviewDetailResponseDto> reviewDetailResponseDtoList = new ArrayList<>();
         for (Review review : reviewList) {
-            List<ReviewHashtag> hashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
-            List<ReviewImage> imageList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
+            List<ReviewHashtagDto> hashtagDtoList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
+                    .stream()
+                    .map(reviewHashtag -> new ReviewHashtagDto(reviewHashtag))
+                    .collect(Collectors.toList());
 
-            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review, hashtagList, imageList));
+            List<ReviewImageDto> imageDtoList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
+                    .stream()
+                    .map(reviewImage -> new ReviewImageDto(reviewImage))
+                    .collect(Collectors.toList());
+
+            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(new ReviewDto(review), hashtagDtoList, imageDtoList));
         }
 
         return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);
@@ -103,7 +113,7 @@ public class ReviewService {
                     .collect(Collectors.toList()));
         }
 
-        return makeResult(HttpStatus.OK, review);
+        return makeResult(HttpStatus.OK, new ReviewDto(review));
     }
 
     @Transactional

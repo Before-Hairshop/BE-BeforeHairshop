@@ -26,15 +26,13 @@ public class StyleRecommendDto {
     private int status;
 
     public StyleRecommendDto(StyleRecommend styleRecommend) {
-        StyleRecommendDto.builder()
-                .id(styleRecommend.getId())
-                .recommendId(styleRecommend.getRecommend().getId())
-                .hairstyle(styleRecommend.getHairstyle())
-                .reason(styleRecommend.getReason())
-                .price(styleRecommend.getPrice())
-                .createDate(styleRecommend.getCreateDate())
-                .updateDate(styleRecommend.getUpdateDate())
-                .status(styleRecommend.getStatus())
-                .build();
+        this.id = styleRecommend.getId();
+        this.recommendId = styleRecommend.getRecommend().getId();
+        this.hairstyle = styleRecommend.getHairstyle();
+        this.reason = styleRecommend.getReason();
+        this.price = styleRecommend.getPrice();
+        this.createDate = styleRecommend.getCreateDate();
+        this.updateDate = styleRecommend.getUpdateDate();
+        this.status = styleRecommend.getStatus();
     }
 }

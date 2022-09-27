@@ -23,13 +23,11 @@ public class MemberProfileDesiredHairstyleDto {
     private int status;
 
     public MemberProfileDesiredHairstyleDto(MemberProfileDesiredHairstyle memberProfileDesiredHairstyle) {
-        MemberProfileDesiredHairstyleDto.builder()
-                .id(memberProfileDesiredHairstyle.getId())
-                .memberProfileId(memberProfileDesiredHairstyle.getMemberProfile().getId())
-                .desiredHairstyle(memberProfileDesiredHairstyle.getDesiredHairstyle())
-                .createDate(memberProfileDesiredHairstyle.getCreateDate())
-                .updateDate(memberProfileDesiredHairstyle.getUpdateDate())
-                .status(memberProfileDesiredHairstyle.getStatus())
-                .build();
+        this.id = memberProfileDesiredHairstyle.getId();
+        this.memberProfileId = memberProfileDesiredHairstyle.getMemberProfile().getId();
+        this.desiredHairstyle = memberProfileDesiredHairstyle.getDesiredHairstyle();
+        this.createDate = memberProfileDesiredHairstyle.getCreateDate();
+        this.updateDate = memberProfileDesiredHairstyle.getUpdateDate();
+        this.status = memberProfileDesiredHairstyle.getStatus();
     }
 }

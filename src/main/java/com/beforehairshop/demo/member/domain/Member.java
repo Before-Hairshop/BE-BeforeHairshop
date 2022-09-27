@@ -1,5 +1,7 @@
 package com.beforehairshop.demo.member.domain;
 
+import com.beforehairshop.demo.member.dto.MemberDto;
+import com.beforehairshop.demo.member.dto.MemberProfileDto;
 import com.beforehairshop.demo.recommend.domain.Recommend;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;

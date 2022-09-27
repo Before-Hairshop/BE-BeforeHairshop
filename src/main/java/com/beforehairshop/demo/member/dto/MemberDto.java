@@ -1,23 +1,29 @@
 package com.beforehairshop.demo.member.dto;
 
 import com.beforehairshop.demo.member.domain.Member;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 import java.util.Date;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberDto {
-    private final BigInteger id;
-    private final String email;
-    private final String socialLoginType; // KAKAO, GOOGLE...
-    private final String name;
-    private final String imageUrl;
-    private final int designerFlag;
-    private final int premiumFlag;
-    private final Date createDate;
-    private final Date updateDate;
-    private final int status;
+    private BigInteger id;
+    private String email;
+    private String socialLoginType; // KAKAO, GOOGLE...
+    private String name;
+    private String imageUrl;
+    private int designerFlag;
+    private int premiumFlag;
+    private Date createDate;
+    private Date updateDate;
+    private int status;
 
     public MemberDto(Member member) {
         this.id = member.getId();

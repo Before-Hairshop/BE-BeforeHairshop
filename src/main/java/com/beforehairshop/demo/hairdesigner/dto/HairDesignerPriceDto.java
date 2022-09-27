@@ -26,15 +26,13 @@ public class HairDesignerPriceDto {
     private int status;
 
     public HairDesignerPriceDto(HairDesignerPrice hairDesignerPrice) {
-        HairDesignerPriceDto.builder()
-                .id(hairDesignerPrice.getId())
-                .hairDesignerId(hairDesignerPrice.getHairDesigner().getId())
-                .hairCategory(hairDesignerPrice.getHairCategory())
-                .hairStyleName(hairDesignerPrice.getHairStyleName())
-                .price(hairDesignerPrice.getPrice())
-                .createDate(hairDesignerPrice.getCreateDate())
-                .updateDate(hairDesignerPrice.getUpdateDate())
-                .status(hairDesignerPrice.getStatus())
-                .build();
+        this.id = hairDesignerPrice.getId();
+        this.hairDesignerId = hairDesignerPrice.getHairDesigner().getId();
+        this.hairCategory = hairDesignerPrice.getHairCategory();
+        this.hairStyleName = hairDesignerPrice.getHairStyleName();
+        this.price = hairDesignerPrice.getPrice();
+        this.createDate = hairDesignerPrice.getCreateDate();
+        this.updateDate = hairDesignerPrice.getUpdateDate();
+        this.status = hairDesignerPrice.getStatus();
     }
 }

@@ -39,28 +39,53 @@ public class MemberProfileDto {
     private int status;
 
     public MemberProfileDto(MemberProfile memberProfile) {
-        MemberProfileDto.builder()
-                .id(memberProfile.getId())
-                .memberId(memberProfile.getMember().getId())
-                .name(memberProfile.getName())
-                .hairCondition(memberProfile.getHairCondition())
-                .hairTendency(memberProfile.getHairTendency())
-                .desiredHairstyleDescription(memberProfile.getDesiredHairstyleDescription())
-                .frontImageUrl(memberProfile.getFrontImageUrl())
-                .sideImageUrl(memberProfile.getSideImageUrl())
-                .backImageUrl(memberProfile.getBackImageUrl())
-                .payableAmount(memberProfile.getPayableAmount())
-                .zipCode(memberProfile.getZipCode())
-                .zipAddress(memberProfile.getZipAddress())
-                .latitude(memberProfile.getLatitude())
-                .longitude(memberProfile.getLongitude())
-                .detailAddress(memberProfile.getDetailAddress())
-                .phoneNumber(memberProfile.getPhoneNumber())
-                .treatmentDate(memberProfile.getTreatmentDate())
-                .matchingActivationFlag(memberProfile.getMatchingActivationFlag())
-                .createDate(memberProfile.getCreateDate())
-                .updateDate(memberProfile.getUpdateDate())
-                .status(memberProfile.getStatus())
-                .build();
+        this.id = memberProfile.getId();
+        this.memberId = memberProfile.getMember().getId();
+        this.name = memberProfile.getName();
+        this.hairCondition = memberProfile.getHairCondition();
+        this.hairTendency = memberProfile.getHairTendency();
+        this.desiredHairstyleDescription = memberProfile.getDesiredHairstyleDescription();
+        this.frontImageUrl = memberProfile.getFrontImageUrl();
+        this.sideImageUrl = memberProfile.getSideImageUrl();
+        this.backImageUrl = memberProfile.getBackImageUrl();
+        this.payableAmount = memberProfile.getPayableAmount();
+        this.zipCode = memberProfile.getZipCode();
+        this.zipAddress = memberProfile.getZipAddress();
+        this.latitude = memberProfile.getLatitude();
+        this.longitude = memberProfile.getLongitude();
+        this.detailAddress = memberProfile.getDetailAddress();
+        this.phoneNumber = memberProfile.getPhoneNumber();
+        this.treatmentDate = memberProfile.getTreatmentDate();
+        this.matchingActivationFlag = memberProfile.getMatchingActivationFlag();
+        this.createDate = memberProfile.getCreateDate();
+        this.updateDate = memberProfile.getUpdateDate();
+        this.status = memberProfile.getStatus();
+
     }
+
+//    public static MemberProfileDto toDto(MemberProfile memberProfile) {
+//        return MemberProfileDto.builder()
+//                .id(memberProfile.getId())
+//                .memberId(memberProfile.getMember().getId())
+//                .name(memberProfile.getName())
+//                .hairCondition(memberProfile.getHairCondition())
+//                .hairTendency(memberProfile.getHairTendency())
+//                .desiredHairstyleDescription(memberProfile.getDesiredHairstyleDescription())
+//                .frontImageUrl(memberProfile.getFrontImageUrl())
+//                .sideImageUrl(memberProfile.getSideImageUrl())
+//                .backImageUrl(memberProfile.getBackImageUrl())
+//                .payableAmount(memberProfile.getPayableAmount())
+//                .zipCode(memberProfile.getZipCode())
+//                .zipAddress(memberProfile.getZipAddress())
+//                .latitude(memberProfile.getLatitude())
+//                .longitude(memberProfile.getLongitude())
+//                .detailAddress(memberProfile.getDetailAddress())
+//                .phoneNumber(memberProfile.getPhoneNumber())
+//                .treatmentDate(memberProfile.getTreatmentDate())
+//                .matchingActivationFlag(memberProfile.getMatchingActivationFlag())
+//                .createDate(memberProfile.getCreateDate())
+//                .updateDate(memberProfile.getUpdateDate())
+//                .status(memberProfile.getStatus())
+//                .build();
+//    }
 }

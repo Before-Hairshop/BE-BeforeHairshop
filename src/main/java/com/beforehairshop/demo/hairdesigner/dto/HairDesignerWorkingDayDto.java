@@ -27,15 +27,13 @@ public class HairDesignerWorkingDayDto {
     private int status;
 
     public HairDesignerWorkingDayDto(HairDesignerWorkingDay hairDesignerWorkingDay) {
-        HairDesignerWorkingDayDto.builder()
-                .id(hairDesignerWorkingDay.getId())
-                .hairDesignerId(hairDesignerWorkingDay.getHairDesigner().getId())
-                .workingDay(hairDesignerWorkingDay.getWorkingDay())
-                .startTime(hairDesignerWorkingDay.getStartTime())
-                .endTime(hairDesignerWorkingDay.getEndTime())
-                .createDate(hairDesignerWorkingDay.getCreateDate())
-                .updateDate(hairDesignerWorkingDay.getUpdateDate())
-                .status(hairDesignerWorkingDay.getStatus())
-                .build();
+        this.id = hairDesignerWorkingDay.getId();
+        this.hairDesignerId = hairDesignerWorkingDay.getHairDesigner().getId();
+        this.workingDay = hairDesignerWorkingDay.getWorkingDay();
+        this.startTime = hairDesignerWorkingDay.getStartTime();
+        this.endTime = hairDesignerWorkingDay.getEndTime();
+        this.createDate = hairDesignerWorkingDay.getCreateDate();
+        this.updateDate = hairDesignerWorkingDay.getUpdateDate();
+        this.status = hairDesignerWorkingDay.getStatus();
     }
 }

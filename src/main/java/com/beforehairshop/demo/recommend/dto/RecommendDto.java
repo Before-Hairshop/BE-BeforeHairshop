@@ -26,16 +26,14 @@ public class RecommendDto {
     private int status;
 
     public RecommendDto(Recommend recommend) {
-        RecommendDto.builder()
-                .id(recommend.getId())
-                .recommenderId(recommend.getRecommender().getId())
-                .recommendedPersonId(recommend.getRecommendedPerson().getId())
-                .greeting(recommend.getGreeting())
-                .treatmentDate(recommend.getTreatmentDate())
-                .createDate(recommend.getCreateDate())
-                .updateDate(recommend.getUpdateDate())
-                .status(recommend.getStatus())
-                .build();
+        this.id = recommend.getId();
+        this.recommenderId = recommend.getRecommender().getId();
+        this.recommendedPersonId = recommend.getRecommendedPerson().getId();
+        this.greeting = recommend.getGreeting();
+        this.treatmentDate = recommend.getTreatmentDate();
+        this.createDate = recommend.getCreateDate();
+        this.updateDate = recommend.getUpdateDate();
+        this.status = recommend.getStatus();
     }
 
 }

@@ -92,6 +92,7 @@ public class MemberService {
         MemberProfile memberProfile = memberProfileSaveRequestDto.toEntity(updatedMember, null, null, null);
 
         memberProfileRepository.save(memberProfile);
+        System.out.println(memberProfile.getDetailAddress() + memberProfile.getHairCondition() + memberProfile.getHairTendency());
 
         /**
          * 유저가 원하는 헤어 스타일들에 대한 row 저장!
@@ -198,7 +199,7 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findMe(Member member) {
+    public ResponseEntity<ResultDto> findMeByDB(Member member) {
         Member memberByDB = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (memberByDB == null)
             return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 유효하지 않은 유저이거나, 잘못된 세션 값으로 요청했습니다.");
@@ -260,7 +261,6 @@ public class MemberService {
         if (frontImageFlag != 1)
             return makeResult(HttpStatus.BAD_REQUEST, "Front image 는 무조건 입력해야 합니다.");
 
-        Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null)
@@ -271,7 +271,6 @@ public class MemberService {
         );
 
         memberProfile.setFrontImageUrl(CloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "front"));
-        updatedMember.setImageUrl(CloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "front"));
 
         String sidePreSignedUrl = null, backPreSignedUrl = null;
         if (sideImageFlag == 1) {
@@ -283,6 +282,9 @@ public class MemberService {
             memberProfile.setBackImageUrl(CloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "back"));
         }
 
+        Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+
+        updatedMember.setImageUrl(CloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "front"));
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
 
 
@@ -387,7 +389,8 @@ public class MemberService {
 
         List<MemberProfileListResponseDto> memberProfileListResponseDtoList = memberProfileList.stream()
                 .map(memberProfile -> new MemberProfileListResponseDto(new MemberProfileDto(memberProfile)
-                        , memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId()).stream()
+                        , memberProfileDesiredHairstyleRepository.findByMemberProfileAndStatus(memberProfile,
+                                StatusKind.NORMAL.getId()).stream()
                         .map(memberProfileDesiredHairstyle -> new MemberProfileDesiredHairstyleDto(memberProfileDesiredHairstyle))
                         .collect(Collectors.toList())))
                 .collect(Collectors.toList());
@@ -421,5 +424,13 @@ public class MemberService {
         memberProfile.setMatchingActivationFlag(MatchingFlagKind.DEACTIVATION_CODE.getId());
 
         return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findMeBySession(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.NOT_FOUND, "세션 만료");
+
+        return makeResult(HttpStatus.OK, new MemberDto(member));
     }
 }

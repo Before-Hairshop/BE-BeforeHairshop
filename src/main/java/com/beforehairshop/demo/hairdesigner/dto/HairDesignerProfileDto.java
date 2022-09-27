@@ -32,22 +32,20 @@ public class HairDesignerProfileDto {
     private int status;
 
     public HairDesignerProfileDto(HairDesignerProfile hairDesignerProfile) {
-        HairDesignerProfileDto.builder()
-                .id(hairDesignerProfile.getId())
-                .hairDesignerId(hairDesignerProfile.getHairDesigner().getId())
-                .imageUrl(hairDesignerProfile.getImageUrl())
-                .name(hairDesignerProfile.getName())
-                .description(hairDesignerProfile.getDescription())
-                .hairShopName(hairDesignerProfile.getHairShopName())
-                .zipCode(hairDesignerProfile.getZipCode())
-                .zipAddress(hairDesignerProfile.getZipAddress())
-                .latitude(hairDesignerProfile.getLatitude())
-                .longitude(hairDesignerProfile.getLongitude())
-                .detailAddress(hairDesignerProfile.getDetailAddress())
-                .phoneNumber(hairDesignerProfile.getPhoneNumber())
-                .createDate(hairDesignerProfile.getCreateDate())
-                .updateDate(hairDesignerProfile.getUpdateDate())
-                .status(hairDesignerProfile.getStatus())
-                .build();
+        this.id = hairDesignerProfile.getId();
+        this.hairDesignerId = hairDesignerProfile.getHairDesigner().getId();
+        this.imageUrl = hairDesignerProfile.getImageUrl();
+        this.name = hairDesignerProfile.getName();
+        this.description = hairDesignerProfile.getDescription();
+        this.hairShopName = hairDesignerProfile.getHairShopName();
+        this.zipCode = hairDesignerProfile.getZipCode();
+        this.zipAddress = hairDesignerProfile.getZipAddress();
+        this.latitude = hairDesignerProfile.getLatitude();
+        this.longitude = hairDesignerProfile.getLongitude();
+        this.detailAddress = hairDesignerProfile.getDetailAddress();
+        this.phoneNumber = hairDesignerProfile.getPhoneNumber();
+        this.createDate = hairDesignerProfile.getCreateDate();
+        this.updateDate = hairDesignerProfile.getUpdateDate();
+        this.status = hairDesignerProfile.getStatus();
     }
 }

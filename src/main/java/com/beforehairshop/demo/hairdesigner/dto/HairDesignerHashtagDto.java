@@ -24,13 +24,11 @@ public class HairDesignerHashtagDto {
     private int status;
 
     public HairDesignerHashtagDto(HairDesignerHashtag hairDesignerHashtag) {
-        HairDesignerHashtagDto.builder()
-                .id(hairDesignerHashtag.getId())
-                .hairDesignerId(hairDesignerHashtag.getHairDesigner().getId())
-                .tag(hairDesignerHashtag.getTag())
-                .createDate(hairDesignerHashtag.getCreateDate())
-                .updateDate(hairDesignerHashtag.getUpdateDate())
-                .status(hairDesignerHashtag.getStatus())
-                .build();
+        this.id = hairDesignerHashtag.getId();
+        this.hairDesignerId = hairDesignerHashtag.getHairDesigner().getId();
+        this.tag = hairDesignerHashtag.getTag();
+        this.createDate = hairDesignerHashtag.getCreateDate();
+        this.updateDate = hairDesignerHashtag.getUpdateDate();
+        this.status = hairDesignerHashtag.getStatus();
     }
 }

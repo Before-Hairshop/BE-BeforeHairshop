@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.member.domain;
 
+import com.beforehairshop.demo.member.dto.MemberProfileDto;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -67,7 +68,5 @@ public class MemberProfile {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
-
-
 
 }

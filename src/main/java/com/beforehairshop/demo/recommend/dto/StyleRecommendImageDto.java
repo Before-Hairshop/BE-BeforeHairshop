@@ -25,13 +25,11 @@ public class StyleRecommendImageDto {
 
 
     public StyleRecommendImageDto(StyleRecommendImage styleRecommendImage) {
-        StyleRecommendImageDto.builder()
-                .id(styleRecommendImage.getId())
-                .styleRecommendId(styleRecommendImage.getStyleRecommend().getId())
-                .imageUrl(styleRecommendImage.getImageUrl())
-                .createDate(styleRecommendImage.getCreateDate())
-                .updateDate(styleRecommendImage.getUpdateDate())
-                .status(styleRecommendImage.getStatus())
-                .build();
+        this.id = styleRecommendImage.getId();
+        this.styleRecommendId = styleRecommendImage.getStyleRecommend().getId();
+        this.imageUrl = styleRecommendImage.getImageUrl();
+        this.createDate = styleRecommendImage.getCreateDate();
+        this.updateDate = styleRecommendImage.getUpdateDate();
+        this.status = styleRecommendImage.getStatus();
     }
 }

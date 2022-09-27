@@ -6,13 +6,10 @@ import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import static com.beforehairshop.demo.response.ResultDto.*;
 
 @RestController
 @Tag(name = "모든 유저 관련 Controller")
@@ -26,14 +23,14 @@ public class MemberController {
     @GetMapping("session")
     @Operation(summary = "본인 정보 조회 API (세션)")
     public ResponseEntity<ResultDto> findMeBySession(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return makeResult(HttpStatus.OK, principalDetails.getMember());
+        return memberService.findMeBySession(principalDetails.getMember());
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
     @GetMapping("")
     @Operation(summary = "본인 정보 조회 API (DB)")
     public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return memberService.findMe(principalDetails.getMember());
+        return memberService.findMeByDB(principalDetails.getMember());
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")

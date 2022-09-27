@@ -12,6 +12,8 @@ import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.recommend.domain.Recommend;
 import com.beforehairshop.demo.recommend.domain.StyleRecommend;
 import com.beforehairshop.demo.recommend.domain.StyleRecommendImage;
+import com.beforehairshop.demo.recommend.dto.RecommendDto;
+import com.beforehairshop.demo.recommend.dto.StyleRecommendDto;
 import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendSaveRequestDto;
 import com.beforehairshop.demo.recommend.dto.response.RecommendDetailResponseDto;
@@ -75,11 +77,11 @@ public class RecommendService {
         List<StyleRecommendDetailResponseDto> styleRecommendDetailResponseDtoList = new ArrayList<>();
         for (int i = 0; i < styleRecommendList.size(); i++) {
             styleRecommendDetailResponseDtoList.add(new StyleRecommendDetailResponseDto(
-                    styleRecommendList.get(i), null
+                    new StyleRecommendDto(styleRecommendList.get(i)), null
             ));
         }
 
-        return makeResult(HttpStatus.OK, new RecommendDetailResponseDto(recommend, styleRecommendDetailResponseDtoList));
+        return makeResult(HttpStatus.OK, new RecommendDetailResponseDto(new RecommendDto(recommend), styleRecommendDetailResponseDtoList));
     }
 
     @Transactional
@@ -126,7 +128,6 @@ public class RecommendService {
         if (recommend != null && patchDto.getGreeting() != null)
             recommend.setGreeting(patchDto.getGreeting());
 
-        List<StyleRecommend> styleRecommendList = styleRecommendRepository.findByRecommendAndStatus(recommend, StatusKind.NORMAL.getId());
 
 
         for (int i = 0; i < patchDto.getStyleRecommendPatchRequestDtoList().size(); i++) {
@@ -156,7 +157,7 @@ public class RecommendService {
 //            ));
 //        }
 
-        return makeResult(HttpStatus.OK, recommend);
+        return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
 
     @Transactional

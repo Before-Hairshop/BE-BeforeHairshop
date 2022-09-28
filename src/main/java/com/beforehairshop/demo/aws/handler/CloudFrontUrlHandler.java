@@ -68,11 +68,11 @@ public class CloudFrontUrlHandler {
     /**
      *  <h2>스타일 추천서 이미지 관련 경로</h2>
      */
-    public static String getStyleRecommendImageS3Path(BigInteger styleRecommendId, BigInteger styleRecommendImageId) {
+    public static String getRecommendImageS3Path(BigInteger styleRecommendId, BigInteger styleRecommendImageId) {
         return "recommend/" + styleRecommendId + "/" + styleRecommendImageId + ".png";
     }
 
-    public static String getStyleRecommendImageUrl(BigInteger styleRecommendId, BigInteger styleRecommendImageId) {
+    public static String getRecommendImageUrl(BigInteger styleRecommendId, BigInteger styleRecommendImageId) {
         return CLOUD_FRONT_DOMAIN_NAME + "/recommend/" + styleRecommendId + "/" + styleRecommendImageId + ".png";
     }
 }

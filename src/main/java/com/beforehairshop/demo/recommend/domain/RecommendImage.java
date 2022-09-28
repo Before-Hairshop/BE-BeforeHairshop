@@ -23,7 +23,7 @@ public class RecommendImage {
     private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "style_recommend_id")
+    @JoinColumn(name = "recommend_id")
     private Recommend recommend;
     private String imageUrl;
 

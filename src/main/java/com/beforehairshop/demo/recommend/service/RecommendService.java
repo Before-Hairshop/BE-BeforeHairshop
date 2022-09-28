@@ -1,6 +1,5 @@
 package com.beforehairshop.demo.recommend.service;
 
-import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
@@ -52,7 +51,9 @@ public class RecommendService {
             return makeResult(HttpStatus.BAD_REQUEST, "추천하는 사람 혹은 추천받는 사람의 member entity 가 null 입니다.");
 
 
-        Recommend recommend = recommendRepository.save(recommendSaveRequestDto.toEntity(recommender, memberProfile.getMember()));
+        Recommend recommend = recommendRepository.save(
+                recommendSaveRequestDto.toEntity(recommender, memberProfile.getMember())
+        );
 
 //        List<StyleRecommend> styleRecommendList = styleRecommendRepository.saveAll(
 //                recommendSaveRequestDto.getStyleRecommendSaveRequestDtoList()
@@ -64,8 +65,8 @@ public class RecommendService {
         updatedRecommender.getRecommendSet().add(recommend);
         updatedRecommendedPerson.getRecommendedSet().add(recommend);
 
-        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedRecommender, "ROLE_DESIGNER");
-        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedRecommendedPerson, "ROLE_USER");
+//        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedRecommender, "ROLE_DESIGNER");
+//        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedRecommendedPerson, "ROLE_USER");
 
 //        List<StyleRecommendDetailResponseDto> styleRecommendDetailResponseDtoList = new ArrayList<>();
 //        for (int i = 0; i < styleRecommendList.size(); i++) {
@@ -100,12 +101,12 @@ public class RecommendService {
 
             recommendImagePreSignedUrlList.add(
                     amazonS3Service.generatePreSignedUrl(
-                        CloudFrontUrlHandler.getStyleRecommendImageS3Path(recommendId, recommendImage.getId())
+                        CloudFrontUrlHandler.getRecommendImageS3Path(recommendId, recommendImage.getId())
                     )
             );
 
             recommendImage.setImageUrl(
-                    CloudFrontUrlHandler.getStyleRecommendImageUrl(recommendId, recommendImage.getId())
+                    CloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
             );
         }
 
@@ -183,12 +184,12 @@ public class RecommendService {
 
             addImagePreSignedUrlList.add(
                     amazonS3Service.generatePreSignedUrl(
-                            CloudFrontUrlHandler.getStyleRecommendImageS3Path(recommendId, recommendImage.getId())
+                            CloudFrontUrlHandler.getRecommendImageS3Path(recommendId, recommendImage.getId())
                     )
             );
 
             recommendImage.setImageUrl(
-                    CloudFrontUrlHandler.getStyleRecommendImageUrl(recommendId, recommendImage.getId())
+                    CloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
             );
         }
 

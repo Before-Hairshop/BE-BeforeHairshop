@@ -9,6 +9,9 @@ import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +27,22 @@ public class RecommendController {
 
     private final RecommendService recommendService;
     private final AmazonS3Service amazonS3Service;
+
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
+    @Operation(summary = "스타일 추천서 한 개 조회")
+    @GetMapping("")
+    public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "recommend_id") BigInteger recommendId) {
+        return recommendService.findOne(principalDetails.getMember(), recommendId);
+    }
+
+//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//    @Operation(summary = "(위치 순서) 추천받은 스타일 추천서 조회 API")
+//    @GetMapping("list_by_location")
+//    public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
+//            , @PageableDefault(size = 5) Pageable pageable) {
+//        return recommendService.findManyByMe(principalDetails.getMember(), pageable);
+//    }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
     @Operation(summary = "스타일 추천서 생성 (이미지 제외)")
@@ -56,10 +75,11 @@ public class RecommendController {
     @Operation(summary = "스타일 추천서 수정 (이미지 제외)")
     @PatchMapping("image")
     public ResponseEntity<ResultDto> patchImage(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(name = "style_recommend_id") BigInteger styleRecommendId
+            , @RequestParam(name = "recommend_id") BigInteger styleRecommendId
             , @RequestParam(name = "add_image_count") Integer addImageCount
             , String[] deleteImageUrl) {
         return recommendService.patchImage(principalDetails.getMember(), styleRecommendId, addImageCount, deleteImageUrl, amazonS3Service);
     }
+
 
 }

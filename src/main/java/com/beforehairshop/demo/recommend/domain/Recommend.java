@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.recommend.domain;
 
+import com.beforehairshop.demo.constant.recommend.RecommendStatusKind;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import lombok.*;
@@ -69,5 +70,13 @@ public class Recommend {
 
         if (patchDto.getPrice() != null)
             this.price = patchDto.getPrice();
+    }
+
+    public void acceptRecommend() {
+        this.recommendStatus = RecommendStatusKind.ACCEPT.getId();
+    }
+
+    public void rejectRecommend() {
+        this.recommendStatus = RecommendStatusKind.REJECT.getId();
     }
 }

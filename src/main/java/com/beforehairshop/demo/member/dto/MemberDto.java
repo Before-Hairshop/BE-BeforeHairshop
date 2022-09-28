@@ -16,6 +16,7 @@ import java.util.Date;
 public class MemberDto {
     private BigInteger id;
     private String email;
+    private String role;
     private String socialLoginType; // KAKAO, GOOGLE...
     private String name;
     private String imageUrl;
@@ -28,6 +29,7 @@ public class MemberDto {
     public MemberDto(Member member) {
         this.id = member.getId();
         this.email = member.getEmail();
+        this.role = member.getRole();
         this.socialLoginType = member.getProvider();
         this.name = member.getName();
         this.imageUrl = member.getImageUrl();

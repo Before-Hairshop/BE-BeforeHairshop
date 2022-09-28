@@ -78,9 +78,9 @@ public class MemberProfileController {
             , @RequestParam(name = "side_image_flag") Integer sideImageFlag
             , @RequestParam(name = "back_image_flag") Integer backImageFlag
             , @RequestParam(name = "add_desired_hairstyle_image_count") Integer addDesiredHairstyleImageCount
-            , String[] deleteImageUrlList) {
+            , String[] deleteDesiredImageUrlList) {
         return memberService.patchMyProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag
-                , addDesiredHairstyleImageCount, deleteImageUrlList,  amazonS3Service);
+                , addDesiredHairstyleImageCount, deleteDesiredImageUrlList,  amazonS3Service);
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")

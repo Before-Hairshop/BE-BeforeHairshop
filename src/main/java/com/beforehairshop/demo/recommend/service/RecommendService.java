@@ -16,6 +16,7 @@ import com.beforehairshop.demo.recommend.repository.RecommendImageRepository;
 import com.beforehairshop.demo.recommend.repository.RecommendRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
@@ -194,5 +196,60 @@ public class RecommendService {
         }
 
         return makeResult(HttpStatus.OK, addImagePreSignedUrlList);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> acceptRecommend(Member member, BigInteger recommendId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
+        if (recommend == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
+
+        recommend.acceptRecommend();
+
+        return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> rejectRecommend(Member member, BigInteger recommendId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
+        if (recommend == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
+
+        recommend.rejectRecommend();
+
+        return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findOne(Member member, BigInteger recommendId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
+        if (recommend == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
+
+        return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+
+    @Transactional
+    public ResponseEntity<ResultDto> findManyByMe(Member member, Pageable pageable) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        List<Recommend> recommendList = recommendRepository.findByRecommendedPersonAndStatus(member, StatusKind.NORMAL.getId(), pageable);
+
+        List<RecommendDto> recommendDtoList = recommendList.stream()
+                .map(RecommendDto::new)
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, recommendDtoList);
     }
 }

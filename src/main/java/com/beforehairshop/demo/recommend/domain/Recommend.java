@@ -21,7 +21,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Recommend {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 

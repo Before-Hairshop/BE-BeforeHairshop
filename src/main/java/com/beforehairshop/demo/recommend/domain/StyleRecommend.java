@@ -19,7 +19,7 @@ import java.util.Date;
 public class StyleRecommend {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
@@ -27,9 +27,13 @@ public class StyleRecommend {
     @JoinColumn(name = "recommend_id")
     private Recommend recommend;
 
+    private String greeting;
+    private Date treatmentDate;
+
     private String hairstyle;
     private String reason;
     private Integer price;
+
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;

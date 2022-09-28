@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class ReviewImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 

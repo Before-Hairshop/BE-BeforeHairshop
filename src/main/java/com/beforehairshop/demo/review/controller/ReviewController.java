@@ -41,9 +41,10 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 수정(이미지 제외)")
     @PatchMapping("")
-    public ResponseEntity<ResultDto> patchOne(@RequestParam("review_id") BigInteger reviewId
+    public ResponseEntity<ResultDto> patchOne(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam("review_id") BigInteger reviewId
             , @RequestBody ReviewPatchRequestDto reviewPatchRequestDto) {
-        return reviewService.patchOne(reviewId, reviewPatchRequestDto);
+        return reviewService.patchOne(principalDetails.getMember(), reviewId, reviewPatchRequestDto);
     }
 
 

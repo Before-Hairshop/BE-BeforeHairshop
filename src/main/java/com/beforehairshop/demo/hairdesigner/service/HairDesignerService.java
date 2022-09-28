@@ -54,6 +54,9 @@ public class HairDesignerService {
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member member, HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesigner == null)
             return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
@@ -118,6 +121,9 @@ public class HairDesignerService {
 
     @Transactional
     public ResponseEntity<ResultDto> findOne(Member member, BigInteger hairDesignerId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member designer = memberRepository.findByIdAndStatus(hairDesignerId, StatusKind.NORMAL.getId()).orElse(null);
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId()).orElse(null);
@@ -154,6 +160,8 @@ public class HairDesignerService {
 
     @Transactional
     public ResponseEntity<ResultDto> findManyByLocation(Member member, Integer pageNumber) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
@@ -181,6 +189,9 @@ public class HairDesignerService {
     @Transactional
     public ResponseEntity<ResultDto> patchOne(Member hairDesigner
             , HairDesignerProfilePatchRequestDto patchDto) {
+        if (hairDesigner == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(hairDesigner, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 디자이너 프로필이 없습니다.");
@@ -254,7 +265,7 @@ public class HairDesignerService {
     @Transactional
     public ResponseEntity<ResultDto> saveImage(Member member, AmazonS3Service amazonS3Service) {
         if (member == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 세션이 만료됐습니다.");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
 
@@ -280,6 +291,9 @@ public class HairDesignerService {
 
     @Transactional
     public ResponseEntity<ResultDto> findAllByName(Member member, String name, Pageable pageable) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         List<HairDesignerProfile> hairDesignerProfileList = hairDesignerProfileRepository.findAllByNameAndStatus(name
                 , StatusKind.NORMAL.getId(), pageable);
 
@@ -288,6 +302,9 @@ public class HairDesignerService {
 
     @Transactional
     public ResponseEntity<ResultDto> deleteProfile(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member designer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (designer == null)
             return makeResult(HttpStatus.BAD_REQUEST, "유저의 세션이 만료되었거나, 잘못된 유저 정보입니다.");
@@ -308,7 +325,7 @@ public class HairDesignerService {
     @Transactional
     public ResponseEntity<ResultDto> patchImage(Member member, AmazonS3Service amazonS3Service) {
         if (member == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었습니다.");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         String preSignedUrl = amazonS3Service.generatePreSignedUrl(CloudFrontUrlHandler.getProfileOfDesignerS3Path(member.getId()));
 

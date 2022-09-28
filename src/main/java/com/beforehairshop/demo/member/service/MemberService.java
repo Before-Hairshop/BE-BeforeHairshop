@@ -73,6 +73,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> saveMemberProfile(Member member, MemberProfileSaveRequestDto memberProfileSaveRequestDto) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         // 이미 존재한다면, bad request 처리해준다.
         if (memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null) != null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 이미 존재합니다. 유저 당 하나의 프로필만 존재할 수 있습니다.");
@@ -111,6 +114,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> findMyProfile(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null) {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다.");
@@ -135,6 +141,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> patchMyProfile(Member member, MemberProfilePatchRequestDto patchDto) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null) {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다. 먼저 만들고 난 뒤 수정해야합니다.");
@@ -200,6 +209,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> findMeByDB(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member memberByDB = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (memberByDB == null)
             return makeResult(HttpStatus.BAD_REQUEST, "DB에 존재하지 않는 유저이거나, 유효하지 않은 유저이거나, 잘못된 세션 값으로 요청했습니다.");
@@ -209,6 +221,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> changeToDesigner(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
 
         if (updatedMember == null)
@@ -224,6 +239,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> changeToUser(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
 
         if (updatedMember == null)
@@ -239,6 +257,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> validation(Member member, Integer hairDesignerFlag) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.ABNORMAL.getId()).orElse(null);
         if (updatedMember == null)
             return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었거나, 이미 정상인 유저입니다.");
@@ -258,6 +279,9 @@ public class MemberService {
     @Transactional
     public ResponseEntity<ResultDto> saveMemberProfileImage(Member member, Integer frontImageFlag, Integer sideImageFlag, Integer backImageFlag
             , Integer desiredHairstyleImageCount, AmazonS3Service amazonS3Service) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         if (frontImageFlag != 1)
             return makeResult(HttpStatus.BAD_REQUEST, "Front image 는 무조건 입력해야 합니다.");
 
@@ -315,6 +339,9 @@ public class MemberService {
     @Transactional
     public ResponseEntity<ResultDto> patchMyProfileImage(Member member, Integer frontImageFlag, Integer sideImageFlag, Integer backImageFlag
             , Integer addDesiredHairstyleImageCount, String[] deleteImageUrlList, AmazonS3Service amazonS3Service) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
 
         if (memberProfile == null)
@@ -373,6 +400,9 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> findManyProfileByLocation(Member designer, Integer pageNumber) {
+        if (designer == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member hairDesigner = memberRepository.findByIdAndStatus(designer.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesigner == null || hairDesigner.getDesignerFlag() != 1)
             return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너가 아니거나, 저장된 유저가 아닙니다.");
@@ -401,7 +431,7 @@ public class MemberService {
     @Transactional
     public ResponseEntity<ResultDto> patchMyProfileActivateMatchingFlag(Member member) {
         if (member == null)
-            return makeResult(HttpStatus.NOT_FOUND, "세션 만료");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null)
@@ -415,7 +445,7 @@ public class MemberService {
     @Transactional
     public ResponseEntity<ResultDto> patchMyProfileDeactivateMatchingFlag(Member member) {
         if (member == null)
-            return makeResult(HttpStatus.NOT_FOUND, "세션 만료");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null)
@@ -429,7 +459,7 @@ public class MemberService {
     @Transactional
     public ResponseEntity<ResultDto> findMeBySession(Member member) {
         if (member == null)
-            return makeResult(HttpStatus.NOT_FOUND, "세션 만료");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         return makeResult(HttpStatus.OK, new MemberDto(member));
     }

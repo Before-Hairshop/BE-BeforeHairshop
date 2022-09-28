@@ -46,17 +46,17 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) {
+        if (recommender == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "당신의 세션이 만료되었습니다.");
+
         MemberProfile memberProfile = memberProfileRepository.findById(memberProfileId).orElse(null);
         if (memberProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "추천을 보낼 유저가 유효하지 않습니다.");
 
-        if (recommender == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "당신의 세션이 만료되었습니다.");
-
         Member updatedRecommender = memberRepository.findByIdAndStatus(recommender.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member recommendedPerson = memberRepository.findByIdAndStatus(memberProfile.getMember().getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (updatedRecommender == null || recommendedPerson == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "추천하는 사람과 추천받는 사람의 member entity 가 null 입니다.");
+            return makeResult(HttpStatus.BAD_REQUEST, "추천하는 사람 혹은 추천받는 사람의 member entity 가 null 입니다.");
 
 
         Recommend recommend = recommendRepository.save(recommendSaveRequestDto.toEntity(recommender, memberProfile.getMember()));
@@ -86,7 +86,7 @@ public class RecommendService {
     @Transactional
     public ResponseEntity<ResultDto> saveImage(Member member, BigInteger styleRecommendId, Integer imageCount, AmazonS3Service amazonS3Service) {
         if (member == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "사용자 세션이 만료되었습니다.");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "사용자 세션이 만료되었습니다.");
 
         StyleRecommend styleRecommend = styleRecommendRepository.findByIdAndStatus(styleRecommendId, StatusKind.NORMAL.getId()).orElse(null);
 
@@ -121,10 +121,13 @@ public class RecommendService {
     @Transactional
     public ResponseEntity<ResultDto> patch(Member member, BigInteger recommendId, RecommendPatchRequestDto patchDto) {
         if (member == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었습니다.");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션이 만료되었습니다.");
 
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend != null && patchDto.getGreeting() != null)
+        if (recommend == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서가 없습니다.");
+
+        if (patchDto.getGreeting() != null)
             recommend.setGreeting(patchDto.getGreeting());
 
 
@@ -161,6 +164,13 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> patchImage(Member designer, BigInteger styleRecommendId, Integer addImageCount, String[] deleteImageUrl, AmazonS3Service amazonS3Service) {
-        return null;
+        if (designer == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        StyleRecommend styleRecommend = styleRecommendRepository.findByIdAndStatus(styleRecommendId, StatusKind.NORMAL.getId()).orElse(null);
+        if (styleRecommend == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 ID를 가지는 스타일 추천서는 없습니다.");
+
+
     }
 }

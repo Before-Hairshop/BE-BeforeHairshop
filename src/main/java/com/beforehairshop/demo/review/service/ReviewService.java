@@ -43,6 +43,9 @@ public class ReviewService {
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member member, ReviewSaveRequestDto reviewSaveRequestDto) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Member reviewer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member hairDesigner = memberRepository.findByIdAndStatus(reviewSaveRequestDto.getHairDesignerId(), StatusKind.NORMAL.getId()).orElse(null);
 
@@ -84,7 +87,10 @@ public class ReviewService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> patchOne(BigInteger reviewId, ReviewPatchRequestDto reviewPatchRequestDto) {
+    public ResponseEntity<ResultDto> patchOne(Member member, BigInteger reviewId, ReviewPatchRequestDto reviewPatchRequestDto) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
         if (review == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id를 가지는 리뷰는 없습니다.");
@@ -119,6 +125,10 @@ public class ReviewService {
     @Transactional
     public ResponseEntity<ResultDto> saveImage(Member reviewer, BigInteger reviewId
             , Integer reviewImageCount, AmazonS3Service amazonS3Service) {
+
+        if (reviewer == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
         if (!review.getReviewer().getId().equals(reviewer.getId()))
             return makeResult(HttpStatus.BAD_REQUEST, "수정 권한이 없는 유저입니다.");
@@ -152,6 +162,9 @@ public class ReviewService {
     @Transactional
     public ResponseEntity<ResultDto> patchImage(Member member, BigInteger reviewId
             , String[] deleteImageUrlList, Integer reviewImageCount, AmazonS3Service amazonS3Service) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
         Review review = reviewRepository.findById(reviewId).orElse(null);
         if (!review.getReviewer().getId().equals(member.getId())) {
             return makeResult(HttpStatus.BAD_REQUEST, "수정 권한이 없는 유저입니다.");

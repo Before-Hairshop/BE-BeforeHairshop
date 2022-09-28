@@ -1,8 +1,7 @@
 package com.beforehairshop.demo.recommend.domain;
 
-import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.member.domain.Member;
-import com.beforehairshop.demo.member.domain.MemberProfile;
+import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -13,7 +12,6 @@ import java.util.Date;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @DynamicInsert
 @DynamicUpdate
@@ -21,10 +19,14 @@ import java.util.Date;
 @AllArgsConstructor
 public class Recommend {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
+//    @ManyToOne
+//    @JoinColumn(name = "recommend_id")
+//    private Recommend recommend;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommender_id")
@@ -37,6 +39,13 @@ public class Recommend {
     private String greeting;
     private Date treatmentDate;
 
+    private String hairstyle;
+    private String reason;
+    private Integer price;
+
+    @Column(columnDefinition = "TINYINT DEFAULT 1")
+    private Integer recommendStatus; // 수락(2), 대기중(1), 거절(0)
+
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;
 
@@ -45,4 +54,18 @@ public class Recommend {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+    public void patchEntity(RecommendPatchRequestDto patchDto) {
+        if (patchDto.getGreeting() != null)
+            this.greeting = patchDto.getGreeting();
+
+        if (patchDto.getHairstyle() != null)
+            this.hairstyle = patchDto.getHairstyle();
+
+        if (patchDto.getReason() != null)
+            this.reason = patchDto.getReason();
+
+        if (patchDto.getPrice() != null)
+            this.price = patchDto.getPrice();
+    }
 }

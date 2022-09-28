@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -16,7 +15,11 @@ import java.util.List;
 public class RecommendSaveRequestDto {
     private String greeting;
     private Date treatmentDate;
-    private List<StyleRecommendSaveRequestDto> styleRecommendSaveRequestDtoList;
+    private String hairstyle;
+    private String reason;
+    private Integer price;
+
+    private Integer recommendStatus;
 
     public Recommend toEntity(Member recommender, Member recommendedPerson) {
         return Recommend.builder()
@@ -24,6 +27,10 @@ public class RecommendSaveRequestDto {
                 .recommendedPerson(recommendedPerson)
                 .greeting(greeting)
                 .treatmentDate(treatmentDate)
+                .hairstyle(hairstyle)
+                .reason(reason)
+                .price(price)
+                .recommendStatus(recommendStatus)
                 .status(StatusKind.NORMAL.getId())
                 .build();
     }

@@ -11,5 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RecommendPatchRequestDto {
     private String greeting;
-    private List<StyleRecommendPatchRequestDto> styleRecommendPatchRequestDtoList;
+    private String hairstyle;
+    private String reason;
+    private Integer price;
 }

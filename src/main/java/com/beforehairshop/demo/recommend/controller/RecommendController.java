@@ -38,9 +38,9 @@ public class RecommendController {
     @Operation(summary = "스타일 추천서 생성 (이미지)")
     @PostMapping("image")
     public ResponseEntity<ResultDto> saveImage(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(name = "style_recommend_id") BigInteger styleRecommendId
+            , @RequestParam(name = "recommend_id") BigInteger recommendId
             , @RequestParam(name = "image_count") Integer imageCount) {
-        return recommendService.saveImage(principalDetails.getMember(), styleRecommendId, imageCount, amazonS3Service);
+        return recommendService.saveImage(principalDetails.getMember(), recommendId, imageCount, amazonS3Service);
     }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")

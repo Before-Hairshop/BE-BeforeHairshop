@@ -1,7 +1,5 @@
 package com.beforehairshop.demo.member.domain;
 
-import com.beforehairshop.demo.member.dto.MemberDto;
-import com.beforehairshop.demo.member.dto.MemberProfileDto;
 import com.beforehairshop.demo.recommend.domain.Recommend;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -22,7 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 

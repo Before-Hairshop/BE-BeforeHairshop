@@ -16,24 +16,16 @@ import java.util.Date;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-public class StyleRecommend {
-
+public class RecommendImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "recommend_id")
+    @JoinColumn(name = "style_recommend_id")
     private Recommend recommend;
-
-    private String greeting;
-    private Date treatmentDate;
-
-    private String hairstyle;
-    private String reason;
-    private Integer price;
-
+    private String imageUrl;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createDate;

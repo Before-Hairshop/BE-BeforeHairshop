@@ -18,7 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class MemberProfileDesiredHairstyle {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 

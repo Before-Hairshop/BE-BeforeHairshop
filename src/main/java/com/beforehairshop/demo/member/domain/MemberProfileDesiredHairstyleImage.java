@@ -19,7 +19,7 @@ import java.util.Date;
 public class MemberProfileDesiredHairstyleImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 

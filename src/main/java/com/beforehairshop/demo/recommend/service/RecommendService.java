@@ -3,6 +3,7 @@ package com.beforehairshop.demo.recommend.service;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
@@ -240,11 +241,17 @@ public class RecommendService {
 
 
     @Transactional
-    public ResponseEntity<ResultDto> findManyByMe(Member member, Pageable pageable) {
+    public ResponseEntity<ResultDto> findManyByMe(Member member, Integer pageNumber) {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        List<Recommend> recommendList = recommendRepository.findByRecommendedPersonAndStatus(member, StatusKind.NORMAL.getId(), pageable);
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        if (memberProfile == null)
+            return makeResult(HttpStatus.NOT_FOUND, "프로필이 등록되어 있지 않습니다.");
+
+        // 위치 순서로 3km 이내의 헤어
+        List<Recommend> recommendList = recommendRepository.findByRecommendedPersonAndStatusAndSortingByLocation(member.getId(), memberProfile.getLatitude(), memberProfile.getLongitude()
+                , StatusKind.NORMAL.getId(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
 
         List<RecommendDto> recommendDtoList = recommendList.stream()
                 .map(RecommendDto::new)

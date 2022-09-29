@@ -36,13 +36,13 @@ public class RecommendController {
         return recommendService.findOne(principalDetails.getMember(), recommendId);
     }
 
-//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-//    @Operation(summary = "(위치 순서) 추천받은 스타일 추천서 조회 API")
-//    @GetMapping("list_by_location")
-//    public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
-//            , @PageableDefault(size = 5) Pageable pageable) {
-//        return recommendService.findManyByMe(principalDetails.getMember(), pageable);
-//    }
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "(위치 순서 : 10km 안) 추천받은 스타일 추천서 조회 API")
+    @GetMapping("list_by_location")
+    public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "page_number") Integer pageNumber) {
+        return recommendService.findManyByMe(principalDetails.getMember(), pageNumber);
+    }
 
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
     @Operation(summary = "스타일 추천서 생성 (이미지 제외)")

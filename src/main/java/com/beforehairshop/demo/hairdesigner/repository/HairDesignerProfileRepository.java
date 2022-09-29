@@ -17,7 +17,7 @@ public interface HairDesignerProfileRepository extends JpaRepository<HairDesigne
     List<HairDesignerProfile> findAllByNameAndStatus(String name, Integer status, Pageable pageable);
 
     @Query(value = "SELECT *, ( 6371 * acos (cos ( radians(?1) ) * cos( radians( h.latitude ) ) * cos( radians( h.longitude ) - radians(?2) ) + sin ( radians(?1) ) * sin( radians( h.latitude )))) AS distance " +
-            "FROM hair_designer_profile h WHERE h.status = ?4 GROUP BY h.id HAVING distance <= 1.5 " +
+            "FROM hair_designer_profile h WHERE h.status = ?4 GROUP BY h.id HAVING distance <= 10 " +
             "ORDER BY distance asc LIMIT 5 OFFSET ?3 ;",
             nativeQuery = true)
     List<HairDesignerProfile> findManyByLocationAndStatus(Float member_latitude, Float member_longitude, int pageOffset, Integer status);

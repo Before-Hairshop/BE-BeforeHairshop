@@ -15,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Tag(name = "일반 유저 프로필 관련 Controller")
+@Tag(name = "일반 고객 프로필 관련 Controller")
 @AllArgsConstructor
 @RequestMapping("/api/v1/members/profiles")
 public class MemberProfileController {
@@ -91,7 +91,7 @@ public class MemberProfileController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "유저 프로필 매칭 활성화 API")
+    @Operation(summary = "유저 프로필 매칭 비활성화 API")
     @PatchMapping("/deactivate_matching")
     public ResponseEntity<ResultDto> patchMyProfileDeactivateMatchingFlag(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.patchMyProfileDeactivateMatchingFlag(principalDetails.getMember());

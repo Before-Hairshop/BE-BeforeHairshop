@@ -51,7 +51,7 @@ public class HairDesignerController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "위치 기반(1.5km 반경) - 헤어 디자이너 목록 조회")
+    @Operation(summary = "(위치 순서 : 10km 안) - 헤어 디자이너 목록 조회")
     @GetMapping("list_by_location")
     public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(value = "page_number", required = true) Integer pageNumber) {

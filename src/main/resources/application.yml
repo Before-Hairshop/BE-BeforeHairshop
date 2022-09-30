@@ -16,6 +16,7 @@ spring:
     import:
       - application-oauth.yml
       - application-aws.yml
+      - application-redis.yml
 
   jpa:
     open-in-view: 'false'

@@ -149,6 +149,7 @@ secrets.yml
 # ===== OAuth Secret Key =====
 application-oauth.yml
 application-aws.yml
+application-redis.yml
 
 # ==================== Springboot ====================
 secret/

@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import java.util.Set;
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class Member implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;

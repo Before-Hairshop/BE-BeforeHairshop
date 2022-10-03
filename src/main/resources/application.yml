@@ -14,31 +14,9 @@ server:
 spring:
   config:
     import:
-      - application-oauth.yml
-      - application-aws.yml
-      - application-redis.yml
-
-  jpa:
-    open-in-view: 'false'
-    database-platform: org.hibernate.dialect.MySQL57Dialect
-    defer-datasource-initialization: 'true'
-    show-sql: 'true'
-    hibernate:
-      ddl-auto: update # create or update
-
-  datasource:
-    username: bo
-    url: jdbc:h2:mem:bhDB;MODE=MYSQL;DB_CLOSE_DELAY=-1;
-
-  h2:
-    console:
-      enabled: 'true'
-      path: /h2-console
-
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      - oauth.yml
+      - aws.yml
+      - redis.yml
 
   profiles:
-    default: default
+    default: local

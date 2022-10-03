@@ -38,7 +38,7 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk:1.12.305'
 
 	// data source
-	// runtimeOnly 'mysql:mysql-connector-java'
+	runtimeOnly 'mysql:mysql-connector-java'
 	runtimeOnly 'com.h2database:h2'
 
 	// spring에서 redis에 대한 의존성

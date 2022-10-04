@@ -16,7 +16,6 @@ spring:
     import:
       - oauth.yml
       - aws.yml
-      - redis.yml
 
   profiles:
     default: local

@@ -28,7 +28,7 @@ public class AmazonS3Service {
         try {
             GeneratePresignedUrlRequest generatePresignedUrlRequest =
                     new GeneratePresignedUrlRequest(S3BucketName, objectPath)
-                            .withMethod(HttpMethod.GET);
+                            .withMethod(HttpMethod.PUT);
             URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
             preSignedURL = url.toString();
 

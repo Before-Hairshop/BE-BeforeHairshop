@@ -95,7 +95,6 @@ public class MemberService {
         MemberProfile memberProfile = memberProfileSaveRequestDto.toEntity(updatedMember, null, null, null);
 
         memberProfileRepository.save(memberProfile);
-        System.out.println(memberProfile.getDetailAddress() + memberProfile.getHairCondition() + memberProfile.getHairTendency());
 
         /**
          * 유저가 원하는 헤어 스타일들에 대한 row 저장!
@@ -176,9 +175,6 @@ public class MemberService {
             memberProfile.setLatitude(patchDto.getLatitude());
             memberProfile.setLongitude(patchDto.getLongitude());
         }
-
-        if (patchDto.getDetailAddress() != null)
-            memberProfile.setDetailAddress(patchDto.getDetailAddress());
 
         if (patchDto.getTreatmentDate() != null)
             memberProfile.setTreatmentDate(patchDto.getTreatmentDate());

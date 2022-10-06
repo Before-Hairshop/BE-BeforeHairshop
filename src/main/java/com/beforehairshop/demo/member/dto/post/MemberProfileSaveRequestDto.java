@@ -28,7 +28,6 @@ public class MemberProfileSaveRequestDto {
     private String zipAddress;
     private Float latitude;
     private Float longitude;
-    private String detailAddress;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date treatmentDate;
     private String phoneNumber;
@@ -50,7 +49,6 @@ public class MemberProfileSaveRequestDto {
                 .zipAddress(zipAddress)
                 .latitude(latitude)
                 .longitude(longitude)
-                .detailAddress(detailAddress)
                 .treatmentDate(treatmentDate)
                 .phoneNumber(phoneNumber)
                 .status(StatusKind.NORMAL.getId())

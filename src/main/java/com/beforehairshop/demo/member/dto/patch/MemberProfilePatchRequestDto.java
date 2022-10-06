@@ -21,7 +21,6 @@ public class MemberProfilePatchRequestDto {
     private String zipAddress;
     private Float latitude;
     private Float longitude;
-    private String detailAddress;
     private Date treatmentDate;
     private String phoneNumber;
 

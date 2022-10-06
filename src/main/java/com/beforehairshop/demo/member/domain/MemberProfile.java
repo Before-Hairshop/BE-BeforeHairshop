@@ -52,7 +52,7 @@ public class MemberProfile {
     private String zipAddress;
     private Float latitude;
     private Float longitude;
-    private String detailAddress;
+    // private String detailAddress;
 
     private String phoneNumber;
     private Date treatmentDate;

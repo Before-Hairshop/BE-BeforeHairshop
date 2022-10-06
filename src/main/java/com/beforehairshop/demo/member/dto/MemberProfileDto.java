@@ -30,7 +30,6 @@ public class MemberProfileDto {
     private String zipAddress;
     private Float latitude;
     private Float longitude;
-    private String detailAddress;
     private String phoneNumber;
     private Date treatmentDate;
     private Integer matchingActivationFlag;
@@ -53,7 +52,6 @@ public class MemberProfileDto {
         this.zipAddress = memberProfile.getZipAddress();
         this.latitude = memberProfile.getLatitude();
         this.longitude = memberProfile.getLongitude();
-        this.detailAddress = memberProfile.getDetailAddress();
         this.phoneNumber = memberProfile.getPhoneNumber();
         this.treatmentDate = memberProfile.getTreatmentDate();
         this.matchingActivationFlag = memberProfile.getMatchingActivationFlag();

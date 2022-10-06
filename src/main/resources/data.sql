@@ -40,17 +40,8 @@ values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_9', 'ROLE_USER', '보규', 1);
 insert into member (designer_flag, email, premium_flag, provider, username, role, name, status)
 values (0, 'bbbb@naver.com', 0, 'GOOGLE', 'google_10', 'ROLE_USER', '나영', 1);
 
-insert into member_profile (member_id, hair_condition, hair_tendency, desired_hairstyle_description, front_image_url, side_image_url, back_image_url, payable_amount, zip_code, zip_address, latitude, longitude, status)
-values (9, 3, 3, '잘 잘라주셨으면 좋겠습니다 ㅠㅠ', null, null, null, 30000, 00551, '서울특별시 강남구 선릉역 주변', 37.5032909, 127.0498323, 1);
+insert into member_profile (member_id, hair_condition, hair_tendency, desired_hairstyle, desired_hairstyle_description, front_image_url, side_image_url, back_image_url, payable_amount, zip_code, zip_address, latitude, longitude, status)
+values (9, 3, 3, '울프컷','잘 잘라주셨으면 좋겠습니다 ㅠㅠ', null, null, null, 30000, 00551, '서울특별시 강남구 선릉역 주변', 37.5032909, 127.0498323, 1);
 
-insert into member_profile (member_id, hair_condition, hair_tendency, desired_hairstyle_description, front_image_url, side_image_url, back_image_url, payable_amount, zip_code, zip_address, latitude, longitude, status)
-values (10, 3, 3, '잘 잘라주셨으면 좋겠습니다 ㅠㅠ', null, null, null, 15000, 00552, '서울특별시 강남구 선릉역 주변', 37.5044935, 127.0476808, 1);
-
-insert into member_profile_desired_hairstyle (member_profile_id, desired_hairstyle, status)
-values (1, '바버컷', 1);
-
-insert into member_profile_desired_hairstyle (member_profile_id, desired_hairstyle, status)
-values (1, '2022 아이유 컷', 1);
-
-insert into member_profile_desired_hairstyle (member_profile_id, desired_hairstyle, status)
-values (2, '2011 임재범 컷', 1);
+insert into member_profile (member_id, hair_condition, hair_tendency, desired_hairstyle, desired_hairstyle_description, front_image_url, side_image_url, back_image_url, payable_amount, zip_code, zip_address, latitude, longitude, status)
+values (10, 3, 3, '투블럭컷', '잘 잘라주셨으면 좋겠습니다 ㅠㅠ', null, null, null, 15000, 00552, '서울특별시 강남구 선릉역 주변', 37.5044935, 127.0476808, 1);

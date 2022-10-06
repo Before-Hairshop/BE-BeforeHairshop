@@ -14,6 +14,7 @@ public class MemberProfilePatchRequestDto {
     private String name;
     private Integer hairCondition;
     private Integer hairTendency;
+    private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
     private Integer payableAmount;
@@ -23,8 +24,6 @@ public class MemberProfilePatchRequestDto {
     private Float longitude;
     private Date treatmentDate;
     private String phoneNumber;
-
-    private List<DesiredHairstylePatchRequestDto> desiredHairstyleList;
 
 
 

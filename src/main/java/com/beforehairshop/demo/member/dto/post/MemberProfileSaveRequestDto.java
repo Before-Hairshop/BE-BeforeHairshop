@@ -17,6 +17,7 @@ public class MemberProfileSaveRequestDto {
     private String name;
     private Integer hairCondition;
     private Integer hairTendency;
+    private String desiredHairstyle;
     private String desiredHairstyleDescription;
 
 //    private String frontImageUrl;
@@ -32,7 +33,6 @@ public class MemberProfileSaveRequestDto {
     private Date treatmentDate;
     private String phoneNumber;
 
-    private List<DesiredHairstyleSaveRequestDto> desiredHairstyleList;
 
     public MemberProfile toEntity(Member member, String frontImageUrl, String sideImageUrl, String backImageUrl) {
         return MemberProfile.builder()
@@ -40,6 +40,7 @@ public class MemberProfileSaveRequestDto {
                 .member(member)
                 .hairCondition(hairCondition)
                 .hairTendency(hairTendency)
+                .desiredHairstyle(desiredHairstyle)
                 .desiredHairstyleDescription(desiredHairstyleDescription)
                 .frontImageUrl(frontImageUrl)
                 .sideImageUrl(sideImageUrl)

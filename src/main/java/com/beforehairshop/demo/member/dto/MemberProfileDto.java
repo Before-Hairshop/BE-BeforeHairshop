@@ -21,6 +21,7 @@ public class MemberProfileDto {
     private String name;
     private Integer hairCondition;
     private Integer hairTendency;
+    private String desiredHairstyle;
     private String desiredHairstyleDescription;
     private String frontImageUrl;
     private String sideImageUrl;
@@ -43,6 +44,7 @@ public class MemberProfileDto {
         this.name = memberProfile.getName();
         this.hairCondition = memberProfile.getHairCondition();
         this.hairTendency = memberProfile.getHairTendency();
+        this.desiredHairstyle = memberProfile.getDesiredHairstyle();
         this.desiredHairstyleDescription = memberProfile.getDesiredHairstyleDescription();
         this.frontImageUrl = memberProfile.getFrontImageUrl();
         this.sideImageUrl = memberProfile.getSideImageUrl();

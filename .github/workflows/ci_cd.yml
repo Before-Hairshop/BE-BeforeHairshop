@@ -126,7 +126,7 @@ jobs:
         port: 22
         script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker rm $(docker ps -a -q)
+            sudo docker rm -f $(docker ps -aq)
             sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
@@ -143,7 +143,7 @@ jobs:
         port: 22
         script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker rm $(docker ps -a -q)
+            sudo docker rm -f $(docker ps -aq)
             sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f

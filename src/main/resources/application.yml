@@ -12,10 +12,5 @@ server:
       force: true
 
 spring:
-  config:
-    import:
-      - oauth.yml
-      - aws.yml
-
   profiles:
     default: local

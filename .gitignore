@@ -147,9 +147,11 @@ secrets.yml
 *.jpg
 
 # ===== OAuth Secret Key =====
-oauth.yml
-aws.yml
-redis.yml
+oauth-prod.yml
+aws-prod.yml
+
+oauth-local.yml
+aws-local.yml
 
 application-local.yml
 application-dev.yml

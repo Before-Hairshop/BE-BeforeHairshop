@@ -125,6 +125,7 @@ jobs:
         password: ${{ secrets.EC2_IN_A_PASSWORD }}
         port: 22
         script: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker rm $(docker ps -a -q)
             sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
@@ -141,6 +142,7 @@ jobs:
         password: ${{ secrets.EC2_IN_C_PASSWORD }}
         port: 22
         script: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker rm $(docker ps -a -q)
             sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod

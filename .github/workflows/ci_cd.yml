@@ -103,16 +103,16 @@ jobs:
       if: contains(github.ref, 'main')
       run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}/bh-prod .
-          docker push ${{ secrets.DOCKER_REPO }}/bh-prod
+          docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}:bh-prod .
+          docker push ${{ secrets.DOCKER_REPO }}:bh-prod
 
     # ## docker build & push to develop
     # - name: Docker build & push to dev
     #   if: contains(github.ref, 'develop')
     #   run: |
     #       docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-    #       docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}/bh-dev .
-    #       docker push ${{ secrets.DOCKER_REPO }}/bh-dev
+    #       docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}:bh-dev .
+    #       docker push ${{ secrets.DOCKER_REPO }}:bh-dev
 
     ## deploy to prod (ap-northeast-2a)
     - name: Deploy to prod (ap-northeast-2a)
@@ -126,7 +126,7 @@ jobs:
         port: 22
         script: |
             sudo docker rm -f $(docker ps -qa)
-            sudo docker pull ${{ secrets.DOCKER_REPO }}/bh-prod 
+            sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
             docker image prune -f
 
     ## deploy to prod (ap-northeast-2c)
@@ -141,7 +141,7 @@ jobs:
         port: 22
         script: |
             sudo docker rm -f $(docker ps -qa)
-            sudo docker pull ${{ secrets.DOCKER_REPO }}/bh-prod
+            sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
 
     # ## deploy to develop
@@ -157,7 +157,7 @@ jobs:
     #     #key: ${{ secrets.PRIVATE_KEY }}
     #     script: |
     #         sudo docker rm -f $(docker ps -qa)
-    #         sudo docker pull ${{ secrets.DOCKER_REPO }}/bh-dev
+    #         sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
     #         docker-compose up -d
     #         docker image prune -f
     

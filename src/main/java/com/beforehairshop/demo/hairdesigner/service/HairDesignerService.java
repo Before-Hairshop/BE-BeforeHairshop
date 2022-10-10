@@ -26,6 +26,7 @@ import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
+import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class HairDesignerService {
     private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
-    private final S3Uploader s3Uploader;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member member, HairDesignerProfileSaveRequestDto hairDesignerProfileSaveRequestDto) {
@@ -126,6 +127,8 @@ public class HairDesignerService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         Member designer = memberRepository.findByIdAndStatus(hairDesignerId, StatusKind.NORMAL.getId()).orElse(null);
+        if (designer == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 ID를 가지는 디자이너는 없다.");
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
@@ -152,8 +155,10 @@ public class HairDesignerService {
         /**
          * 별점, 리뷰 정보 가져오는 부분 추가해야 함!
          */
+        Float averageStarRating = reviewRepository.calculateByHairDesignerIdAndStatus(designer.getId(), StatusKind.NORMAL.getId());
 
         return makeResult(HttpStatus.OK, new HairDesignerDetailGetResponseDto(new HairDesignerProfileDto(hairDesignerProfile)
+                , averageStarRating
                 , hairDesignerHashtagDtoList
                 , hairDesignerWorkingDayDtoList
                 , hairDesignerPriceDtoList));
@@ -183,7 +188,20 @@ public class HairDesignerService {
 
         }
 
-        return makeResult(HttpStatus.OK, hairDesignerProfileList.stream().map(hairDesignerProfile1 -> new HairDesignerProfileDto(hairDesignerProfile1)).collect(Collectors.toList()));
+        List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList
+                = hairDesignerProfileList.stream()
+                .map(hairDesignerProfile1 -> new HairDesignerProfileAndHashtagDto(
+                        new HairDesignerProfileDto(hairDesignerProfile1),
+                        reviewRepository.calculateByHairDesignerIdAndStatus(hairDesignerProfile.getHairDesigner().getId(), StatusKind.NORMAL.getId()),
+                        hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(
+                                hairDesignerProfile1.getHairDesigner(), StatusKind.NORMAL.getId())
+                                .stream()
+                                .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, hairDesignerProfileAndHashtagDtoList);
 
     }
 
@@ -300,6 +318,7 @@ public class HairDesignerService {
 
         List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList = hairDesignerProfileList.stream()
                 .map(hairDesignerProfile -> new HairDesignerProfileAndHashtagDto(new HairDesignerProfileDto(hairDesignerProfile)
+                        , reviewRepository.calculateByHairDesignerIdAndStatus(hairDesignerProfile.getHairDesigner().getId(), StatusKind.NORMAL.getId())
                         , hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(hairDesignerProfile.getHairDesigner(), StatusKind.NORMAL.getId()).stream()
                         .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
                         .collect(Collectors.toList())))
@@ -321,7 +340,7 @@ public class HairDesignerService {
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저에겐 헤어 디자이너 프로필이 존재하지 않습니다.");
 
-        hairDesignerProfile.setStatus(StatusKind.DELETE.getId());
+        hairDesignerProfileRepository.delete(hairDesignerProfile);
         designer.setImageUrl(null);
 
         // 권한 변경 X (image url 변경)

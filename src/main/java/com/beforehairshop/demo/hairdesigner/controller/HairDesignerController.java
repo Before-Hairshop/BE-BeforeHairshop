@@ -58,10 +58,6 @@ public class HairDesignerController {
         return hairDesignerService.findManyByLocation(principalDetails.getMember(), pageNumber);
     }
 
-    /**
-     * 별점 기반, 리뷰 기반으로 헤어 디자이너 조회하는 API 추가해야 함.
-     */
-
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 프로필 생성(이미지 제외)")
     @PostMapping()

@@ -3,9 +3,15 @@ package com.beforehairshop.demo.member.service;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.profile.MatchingFlagKind;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerWorkingDayRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.domain.MemberProfileDesiredHairstyleImage;
@@ -47,6 +53,9 @@ public class MemberService {
     private final MemberProfileDesiredHairstyleImageRepository memberProfileDesiredHairstyleImageRepository;
 
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
+    private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
+    private final HairDesignerPriceRepository hairDesignerPriceRepository;
+    private final HairDesignerWorkingDayRepository hairDesignerWorkingDayRepository;
 
     @Transactional
     public BigInteger save(MemberSaveRequestDto requestDto) {
@@ -192,6 +201,13 @@ public class MemberService {
         if (updatedMember == null)
             return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었거나 삭제된 유저입니다.");
 
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(
+                member, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
+        if (memberProfile != null)
+            memberProfile.setStatus(StatusKind.DELETE.getId());
+
         updatedMember.setDesignerFlag(1);
         updatedMember.setRole("ROLE_DESIGNER");
         updatedMember.setImageUrl(null);
@@ -209,6 +225,19 @@ public class MemberService {
 
         if (updatedMember == null)
             return makeResult(HttpStatus.BAD_REQUEST, "세션이 만료되었거나 삭제된 유저입니다.");
+
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
+                member, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
+        if (hairDesignerProfile != null)
+            hairDesignerProfile.setStatus(StatusKind.DELETE.getId());
+
+        hairDesignerWorkingDayRepository.deleteAll(hairDesignerWorkingDayRepository.findAllByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()));
+
+        hairDesignerHashtagRepository.deleteAll(hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()));
+
+        hairDesignerPriceRepository.deleteAll(hairDesignerPriceRepository.findAllByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()));
 
         updatedMember.setDesignerFlag(0);
         updatedMember.setRole("ROLE_USER");

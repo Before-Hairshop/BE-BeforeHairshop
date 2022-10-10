@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class HairDesignerProfileAndHashtagDto {
     private HairDesignerProfileDto hairDesignerProfileDto;
+    private Float averageStarRating;
     private List<HairDesignerHashtagDto> hairDesignerHashtagDtoList;
 }

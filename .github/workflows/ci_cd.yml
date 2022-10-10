@@ -40,7 +40,7 @@ jobs:
       run: |
         cd ./src/main/resources
         touch ./application.yml
-        echo "${{ secrets.APPLICATION_IN_PROD }}" > ./application.yml
+        echo "${{secrets.APPLICATION_IN_PROD}}" > ./application.yml
       shell: bash    
 
     # ## create application.yml (in dev)
@@ -49,7 +49,7 @@ jobs:
     #   run: |
     #     cd ./src/main/resources
     #     touch ./application.yml
-    #     echo "${{ secrets.APPLICATION_IN_DEV }}" > ./application.yml
+    #     echo "${{secrets.APPLICATION_IN_DEV}}" > ./application.yml
     #   shell: bash        
 
     # ## create application-dev.yml
@@ -58,7 +58,7 @@ jobs:
     #   run: |
     #     cd ./src/main/resources
     #     touch ./application-dev.yml
-    #     echo "${{ secrets.APPLICATION_DEV }}" > ./application-dev.yml
+    #     echo "${{secrets.APPLICATION_DEV}}" > ./application-dev.yml
     #   shell: bash
 
     ## create application-prod.yml
@@ -67,7 +67,7 @@ jobs:
       run: |
         cd ./src/main/resources
         touch ./application-prod.yml
-        echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
+        echo "${{secrets.APPLICATION_PROD}}" > ./application-prod.yml
       shell: bash
 
     ## create aws.yml
@@ -75,7 +75,7 @@ jobs:
       run: |
         cd ./src/main/resources
         touch ./aws-prod.yml
-        echo "${{ secrets.AWS_PROD }}" > ./aws-prod.yml
+        echo "${{secrets.AWS_PROD}}" > ./aws-prod.yml
       shell: bash
 
     ## create oauth.yml
@@ -83,7 +83,7 @@ jobs:
       run: |
         cd ./src/main/resources
         touch ./oauth-prod.yml
-        echo "${{ secrets.OAUTH_PROD }}" > ./oauth-prod.yml
+        echo "${{secrets.OAUTH_PROD}}" > ./oauth-prod.yml
       shell: bash
 
     # ## Build 

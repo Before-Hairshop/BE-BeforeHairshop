@@ -233,8 +233,13 @@ public class MemberService {
         updatedMember.setStatus(StatusKind.NORMAL.getId());
         updatedMember.setDesignerFlag(hairDesignerFlag);
 
+        String userRole = null;
+        if (hairDesignerFlag.equals(1))
+            userRole = "ROLE_DESIGNER";
+        else
+            userRole = "ROLE_USER";
 
-        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, hairDesignerFlag == 1 ? "ROLE_DESIGNER" : "ROLE_USER");
+        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, userRole);
         return makeResult(HttpStatus.OK, new MemberDto(updatedMember));
     }
 

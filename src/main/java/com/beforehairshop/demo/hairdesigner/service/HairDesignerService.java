@@ -13,6 +13,7 @@ import com.beforehairshop.demo.hairdesigner.dto.HairDesignerWorkingDayDto;
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerDetailGetResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerProfileAndHashtagDto;
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerProfileImageResponseDto;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
@@ -297,7 +298,14 @@ public class HairDesignerService {
         List<HairDesignerProfile> hairDesignerProfileList = hairDesignerProfileRepository.findAllByNameAndStatus(name
                 , StatusKind.NORMAL.getId(), pageable);
 
-        return makeResult(HttpStatus.OK, hairDesignerProfileList.stream().map(hairDesignerProfile -> new HairDesignerProfileDto(hairDesignerProfile)).collect(Collectors.toList()));
+        List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList = hairDesignerProfileList.stream()
+                .map(hairDesignerProfile -> new HairDesignerProfileAndHashtagDto(new HairDesignerProfileDto(hairDesignerProfile)
+                        , hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(hairDesignerProfile.getHairDesigner(), StatusKind.NORMAL.getId()).stream()
+                        .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
+                        .collect(Collectors.toList())))
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, hairDesignerProfileAndHashtagDtoList);
     }
 
     @Transactional

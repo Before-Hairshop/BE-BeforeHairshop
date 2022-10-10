@@ -239,6 +239,8 @@ public class MemberService {
         else
             userRole = "ROLE_USER";
 
+        updatedMember.setRole(userRole);
+
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, userRole);
         return makeResult(HttpStatus.OK, new MemberDto(updatedMember));
     }

@@ -127,7 +127,7 @@ jobs:
         script: |
             sudo docker rm -f $(docker ps -aq)
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
+            docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
 
@@ -144,7 +144,7 @@ jobs:
         script: |
             sudo docker rm -f $(docker ps -aq)
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
+            docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
 

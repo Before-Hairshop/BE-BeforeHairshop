@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.member.domain;
 
 import com.beforehairshop.demo.member.dto.MemberProfileDto;
+import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -9,6 +10,8 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -70,4 +73,32 @@ public class MemberProfile {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
+    @OneToMany(mappedBy = "memberProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MemberProfileDesiredHairstyleImage> memberProfileDesiredHairstyleImageSet = new HashSet<>();
+
+    public void addDesiredHairstyleImage(MemberProfileDesiredHairstyleImage desiredHairstyleImage) {
+        this.memberProfileDesiredHairstyleImageSet.add(desiredHairstyleImage);
+        desiredHairstyleImage.setMemberProfile(this);
+    }
+
+    public MemberProfile(Member member, MemberProfileSaveRequestDto saveRequestDto, String frontImageUrl, String sideImageUrl, String backImageUrl, Integer status) {
+        this.member = member;
+        this.name = saveRequestDto.getName();
+        this.hairCondition = saveRequestDto.getHairCondition();
+        this.hairTendency = saveRequestDto.getHairTendency();
+        this.desiredHairstyle = saveRequestDto.getDesiredHairstyle();
+        this.desiredHairstyleDescription = saveRequestDto.getDesiredHairstyleDescription();
+        this.frontImageUrl = frontImageUrl;
+        this.sideImageUrl = sideImageUrl;
+        this.backImageUrl = backImageUrl;
+        this.payableAmount = saveRequestDto.getPayableAmount();
+        this.zipCode = saveRequestDto.getZipCode();
+        this.zipAddress = saveRequestDto.getZipAddress();
+        this.latitude = saveRequestDto.getLatitude();
+        this.longitude = saveRequestDto.getLongitude();
+        this.phoneNumber = saveRequestDto.getPhoneNumber();
+        this.treatmentDate = saveRequestDto.getTreatmentDate();
+        this.matchingActivationFlag = 1;
+        this.status = status;
+    }
 }

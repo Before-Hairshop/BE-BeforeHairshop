@@ -106,7 +106,7 @@ public class MemberService {
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null) {
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다.");
+            return makeResult(HttpStatus.OK, null);
         }
 
         List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList
@@ -114,7 +114,7 @@ public class MemberService {
 
 
         List<MemberProfileDesiredHairstyleImageDto> memberProfileDesiredHairstyleImageDtoList = desiredHairstyleImageList.stream()
-                .map(memberProfileDesiredHairstyleImage -> new MemberProfileDesiredHairstyleImageDto(memberProfileDesiredHairstyleImage))
+                .map(MemberProfileDesiredHairstyleImageDto::new)
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(new MemberProfileDto(memberProfile), memberProfileDesiredHairstyleImageDtoList));
@@ -321,6 +321,8 @@ public class MemberService {
 
             // image Url 수정
             imageEntity.setImageUrl(CloudFrontUrlHandler.getProfileOfUserDesiredStyleImageUrl(memberProfile.getId(), imageEntity.getId()));
+
+            memberProfile.getMemberProfileDesiredHairstyleImageSet().add(imageEntity);
         }
 
         return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl, desiredHairstyleImagePreSignedUrlList));
@@ -361,6 +363,7 @@ public class MemberService {
                 return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
 
             memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
+            memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
         }
 
         // 추가할 이미지의 pre signed url 만들어서 리턴해준다.
@@ -382,6 +385,7 @@ public class MemberService {
 
             // image Url 수정
             imageEntity.setImageUrl(CloudFrontUrlHandler.getProfileOfUserDesiredStyleImageUrl(memberProfile.getId(), imageEntity.getId()));
+            memberProfile.getMemberProfileDesiredHairstyleImageSet().add(imageEntity);
         }
 
         return makeResult(HttpStatus.OK, new MemberProfileImageResponseDto(frontPreSignedUrl, sidePreSignedUrl, backPreSignedUrl
@@ -408,7 +412,7 @@ public class MemberService {
                 , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
 
         List<MemberProfileDto> memberProfileListResponseDtoList = memberProfileList.stream()
-                .map(memberProfile -> new MemberProfileDto(memberProfile))
+                .map(MemberProfileDto::new)
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, memberProfileListResponseDtoList);
@@ -448,5 +452,18 @@ public class MemberService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         return makeResult(HttpStatus.OK, new MemberDto(member));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> deleteMyProfile(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        if (memberProfile == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저에게는 프로필 등록되어 있지 않음.");
+
+        memberProfileRepository.delete(memberProfile);
+        return makeResult(HttpStatus.OK, "유저 프로필 삭제 완료");
     }
 }

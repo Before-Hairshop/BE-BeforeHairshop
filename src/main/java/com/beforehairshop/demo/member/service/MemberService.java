@@ -3,10 +3,7 @@ package com.beforehairshop.demo.member.service;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.profile.MatchingFlagKind;
-import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
-import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
-import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerHashtagRepository;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerPriceRepository;
@@ -231,13 +228,7 @@ public class MemberService {
         ).orElse(null);
 
         if (hairDesignerProfile != null)
-            hairDesignerProfile.setStatus(StatusKind.DELETE.getId());
-
-        hairDesignerWorkingDayRepository.deleteAll(hairDesignerWorkingDayRepository.findAllByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()));
-
-        hairDesignerHashtagRepository.deleteAll(hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()));
-
-        hairDesignerPriceRepository.deleteAll(hairDesignerPriceRepository.findAllByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()));
+            hairDesignerProfileRepository.delete(hairDesignerProfile);
 
         updatedMember.setDesignerFlag(0);
         updatedMember.setRole("ROLE_USER");

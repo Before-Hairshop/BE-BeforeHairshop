@@ -1,10 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.domain;
 
-import com.beforehairshop.demo.member.domain.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -25,8 +21,8 @@ public class HairDesignerHashtag {
     private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "hair_designer_id")
-    private Member hairDesigner;
+    @JoinColumn(name = "hair_designer_profile_id")
+    private HairDesignerProfile hairDesignerProfile;
 
     private String tag;
 
@@ -37,5 +33,15 @@ public class HairDesignerHashtag {
     private Date updateDate;
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private int status;
+    private Integer status;
+
+    public HairDesignerHashtag(HairDesignerProfile hairDesignerProfile, String tag, Integer status) {
+        this.hairDesignerProfile = hairDesignerProfile;
+        this.tag = tag;
+        this.status = status;
+    }
+
+    public void setHairDesignerProfile(HairDesignerProfile hairDesignerProfile) {
+        this.hairDesignerProfile = hairDesignerProfile;
+    }
 }

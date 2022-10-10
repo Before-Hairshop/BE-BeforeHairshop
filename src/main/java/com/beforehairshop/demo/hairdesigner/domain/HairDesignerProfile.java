@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.hairdesigner.domain;
 
+import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -46,4 +49,51 @@ public class HairDesignerProfile {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
+
+    @OneToMany(mappedBy = "hairDesignerProfile"
+            , cascade = CascadeType.ALL
+            , orphanRemoval = true)
+    Set<HairDesignerPrice> hairDesignerPriceSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "hairDesignerProfile"
+            , cascade = CascadeType.ALL
+            , orphanRemoval = true)
+    Set<HairDesignerHashtag> hairDesignerHashtagSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "hairDesignerProfile"
+            , cascade = CascadeType.ALL
+            , orphanRemoval = true)
+    Set<HairDesignerWorkingDay> hairDesignerWorkingDaySet = new HashSet<>();
+
+
+    public void addHashtag(HairDesignerHashtag hashtag) {
+        this.hairDesignerHashtagSet.add(hashtag);
+        hashtag.setHairDesignerProfile(this);
+    }
+
+    public void addPrice(HairDesignerPrice price) {
+        this.hairDesignerPriceSet.add(price);
+        price.setHairDesignerProfile(this);
+    }
+
+    public void addWorkingDay(HairDesignerWorkingDay workingDay) {
+        this.hairDesignerWorkingDaySet.add(workingDay);
+        workingDay.setHairDesignerProfile(this);
+    }
+
+
+    public HairDesignerProfile (Member hairDesigner, HairDesignerProfileSaveRequestDto saveRequestDto, Integer status) {
+        this.hairDesigner = hairDesigner;
+        this.imageUrl = null;
+        this.name = saveRequestDto.getName();
+        this.description = saveRequestDto.getDescription();
+        this.hairShopName = saveRequestDto.getHairShopName();
+        this.zipCode = saveRequestDto.getZipCode();
+        this.zipAddress = saveRequestDto.getZipAddress();
+        this.latitude = saveRequestDto.getLatitude();
+        this.longitude = saveRequestDto.getLongitude();
+        this.detailAddress = saveRequestDto.getDetailAddress();
+        this.phoneNumber = saveRequestDto.getPhoneNumber();
+        this.status = status;
+    }
 }

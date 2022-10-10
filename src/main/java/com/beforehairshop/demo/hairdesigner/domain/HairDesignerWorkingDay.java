@@ -1,6 +1,5 @@
 package com.beforehairshop.demo.hairdesigner.domain;
 
-import com.beforehairshop.demo.member.domain.Member;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -23,15 +22,13 @@ public class HairDesignerWorkingDay {
     private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "hair_designer_id")
-    private Member hairDesigner;
+    @JoinColumn(name = "hair_designer_profile_id")
+    private HairDesignerProfile hairDesignerProfile;
 
     private String workingDay;
 
-    //@Column(columnDefinition = "TIMESTAMP")
     private LocalTime startTime;
 
-    //@Column(columnDefinition = "TIMESTAMP")
     private LocalTime endTime;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -43,7 +40,15 @@ public class HairDesignerWorkingDay {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
+    public HairDesignerWorkingDay(HairDesignerProfile hairDesignerProfile, String workingDay, LocalTime startTime, LocalTime endTime, Integer status) {
+        this.hairDesignerProfile = hairDesignerProfile;
+        this.workingDay = workingDay;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.status = status;
+    }
 
-
-
+    public void setHairDesignerProfile(HairDesignerProfile hairDesignerProfile) {
+        this.hairDesignerProfile = hairDesignerProfile;
+    }
 }

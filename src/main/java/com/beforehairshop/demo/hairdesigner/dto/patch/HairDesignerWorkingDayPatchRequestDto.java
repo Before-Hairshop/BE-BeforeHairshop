@@ -1,7 +1,7 @@
 package com.beforehairshop.demo.hairdesigner.dto.patch;
 
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
-import com.beforehairshop.demo.member.domain.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,9 +19,9 @@ public class HairDesignerWorkingDayPatchRequestDto {
     @JsonFormat(pattern = "kk:mm:ss")
     private LocalTime endTime;
 
-    public HairDesignerWorkingDay toEntity(Member hairDesigner) {
+    public HairDesignerWorkingDay toEntity(HairDesignerProfile hairDesignerProfile) {
         return HairDesignerWorkingDay.builder()
-                .hairDesigner(hairDesigner)
+                .hairDesignerProfile(hairDesignerProfile)
                 .workingDay(workingDay)
                 .startTime(startTime)
                 .endTime(endTime)

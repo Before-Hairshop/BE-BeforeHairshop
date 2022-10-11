@@ -3,6 +3,8 @@ package com.beforehairshop.demo.review.service;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
@@ -12,8 +14,10 @@ import com.beforehairshop.demo.review.domain.ReviewImage;
 import com.beforehairshop.demo.review.dto.ReviewDto;
 import com.beforehairshop.demo.review.dto.ReviewHashtagDto;
 import com.beforehairshop.demo.review.dto.ReviewImageDto;
+import com.beforehairshop.demo.review.dto.patch.ReviewHashtagPatchRequestDto;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
+import com.beforehairshop.demo.review.dto.save.ReviewHashtagSaveRequestDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
 import com.beforehairshop.demo.review.repository.ReviewHashtagRepository;
 import com.beforehairshop.demo.review.repository.ReviewImageRepository;
@@ -37,6 +41,7 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 public class ReviewService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
+    private final HairDesignerProfileRepository hairDesignerProfileRepository;
     private final ReviewHashtagRepository reviewHashtagRepository;
     private final ReviewImageRepository reviewImageRepository;
 
@@ -48,36 +53,57 @@ public class ReviewService {
 
         Member reviewer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member hairDesigner = memberRepository.findByIdAndStatus(reviewSaveRequestDto.getHairDesignerId(), StatusKind.NORMAL.getId()).orElse(null);
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
+                hairDesigner, StatusKind.NORMAL.getId()
+        ).orElse(null);
 
-        if (reviewer == null || hairDesigner == null || hairDesigner.getDesignerFlag() != 1)
+        if (reviewer == null || hairDesigner == null || hairDesigner.getDesignerFlag() != 1
+                || hairDesignerProfile == null)
             return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, "리뷰 대상이 유효하지 않거나, 헤어 디자이너가 아니다.");
 
-        Review review = reviewRepository.save(
-                reviewSaveRequestDto.toEntity(member, hairDesigner)
-        );
+        Review review = reviewRepository.save(new Review(reviewSaveRequestDto, reviewer, hairDesignerProfile, StatusKind.NORMAL.getId()));
 
-        reviewHashtagRepository.saveAll(reviewSaveRequestDto.getHashtagList()
-                .stream()
-                .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
-                .collect(Collectors.toList()));
+        for (ReviewHashtagSaveRequestDto saveRequestDto : reviewSaveRequestDto.getHashtagList()) {
+            ReviewHashtag reviewHashtag = new ReviewHashtag(saveRequestDto.getHashtag(), StatusKind.NORMAL.getId());
+            review.addReviewHashtag(reviewHashtag);
+        }
+
+//        reviewSaveRequestDto.getHashtagList().stream()
+//                        .map(reviewHashtagSaveRequestDto -> review.getReviewHashtagSet().add(
+//                                reviewHashtagSaveRequestDto.toEntity(review)
+//                        ));
+
+
+
+//        reviewHashtagRepository.saveAll(reviewSaveRequestDto.getHashtagList()
+//                .stream()
+//                .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
+//                .collect(Collectors.toList()));
 
         return makeResult(HttpStatus.OK, new ReviewDto(review));
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findManyByHairDesigner(BigInteger hairDesignerId, Pageable pageable) {
-        List<Review> reviewList = reviewRepository.findAllByHairDesignerIdAndStatus(hairDesignerId, StatusKind.NORMAL.getId(), pageable);
+    public ResponseEntity<ResultDto> findManyByHairDesigner(Member member, BigInteger hairDesignerId, Pageable pageable) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        List<Review> reviewList = reviewRepository.findAllByHairDesignerProfileIdAndStatus(
+                hairDesignerId
+                , StatusKind.NORMAL.getId()
+                , pageable
+        );
 
         List<ReviewDetailResponseDto> reviewDetailResponseDtoList = new ArrayList<>();
         for (Review review : reviewList) {
             List<ReviewHashtagDto> hashtagDtoList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
                     .stream()
-                    .map(reviewHashtag -> new ReviewHashtagDto(reviewHashtag))
+                    .map(ReviewHashtagDto::new)
                     .collect(Collectors.toList());
 
             List<ReviewImageDto> imageDtoList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
                     .stream()
-                    .map(reviewImage -> new ReviewImageDto(reviewImage))
+                    .map(ReviewImageDto::new)
                     .collect(Collectors.toList());
 
             reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(new ReviewDto(review), hashtagDtoList, imageDtoList));
@@ -109,14 +135,22 @@ public class ReviewService {
 
         if (reviewPatchRequestDto.getHashtagList() != null) {
             // review hash tag 삭제
-            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
-            reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
+            review.getReviewHashtagSet().clear();
+
+//            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
+//            reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
 
             // review hash tag 생성
-            reviewHashtagRepository.saveAll(reviewPatchRequestDto.getHashtagList()
-                    .stream()
-                    .map(reviewHashtagPatchRequestDto -> reviewHashtagPatchRequestDto.toEntity(review))
-                    .collect(Collectors.toList()));
+            for (ReviewHashtagPatchRequestDto patchRequestDto : reviewPatchRequestDto.getHashtagList()) {
+                ReviewHashtag reviewHashtag = new ReviewHashtag(patchRequestDto.getHashtag(), StatusKind.NORMAL.getId());
+
+                review.addReviewHashtag(reviewHashtag);
+            }
+
+//            reviewHashtagRepository.saveAll(reviewPatchRequestDto.getHashtagList()
+//                    .stream()
+//                    .map(reviewHashtagPatchRequestDto -> reviewHashtagPatchRequestDto.toEntity(review))
+//                    .collect(Collectors.toList()));
         }
 
         return makeResult(HttpStatus.OK, new ReviewDto(review));
@@ -154,6 +188,7 @@ public class ReviewService {
                     CloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId())
             );
 
+            review.getReviewImageSet().add(reviewImage);
         }
 
         return makeResult(HttpStatus.OK, reviewImagePreSignedList);
@@ -178,7 +213,8 @@ public class ReviewService {
             if (reviewImage == null)
                 return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image 이다");
 
-            reviewImageRepository.delete(reviewImage);
+            review.getReviewImageSet().remove(reviewImage);
+//            reviewImageRepository.delete(reviewImage);
         }
 
         // 프론트엔드에서 요청한 이미지의 개수만큼 presigned url 을 만들어 리턴한다.
@@ -200,8 +236,23 @@ public class ReviewService {
             // image url 수정
             reviewImage.setImageUrl(CloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId()));
 
+            review.getReviewImageSet().add(reviewImage);
         }
 
         return makeResult(HttpStatus.OK, reviewImagePreSignedUrlList);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> delete(Member member, BigInteger reviewId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
+        if (review == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 리뷰는 존재하지 않습니다.");
+
+        reviewRepository.delete(review);
+
+        return makeResult(HttpStatus.OK, "삭제 완료");
     }
 }

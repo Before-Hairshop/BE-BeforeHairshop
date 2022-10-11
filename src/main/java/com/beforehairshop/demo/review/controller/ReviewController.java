@@ -33,9 +33,10 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 목록 조회")
     @GetMapping("list")
-    public ResponseEntity<ResultDto> findMany(@RequestParam(name = "hair_designer_id") BigInteger hairDesignerId
+    public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "hair_designer_id") BigInteger hairDesignerId
             , @PageableDefault(size = 5) Pageable pageable) {
-        return reviewService.findManyByHairDesigner(hairDesignerId, pageable);
+        return reviewService.findManyByHairDesigner(principalDetails.getMember(), hairDesignerId, pageable);
     }
 
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
@@ -76,4 +77,13 @@ public class ReviewController {
 
         return reviewService.saveImage(principalDetails.getMember(), reviewId, reviewImageCount, amazonS3Service);
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
+    @Operation(summary = "리뷰 삭제")
+    @DeleteMapping("")
+    public ResponseEntity<ResultDto> delete(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "review_id") BigInteger reviewId) {
+        return reviewService.delete(principalDetails.getMember(), reviewId);
+    }
+
 }

@@ -1,9 +1,8 @@
 package com.beforehairshop.demo.review.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.review.dto.save.ReviewHashtagSaveRequestDto;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -13,6 +12,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
@@ -36,4 +36,9 @@ public class ReviewHashtag {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+    public ReviewHashtag(String hashtag, Integer status) {
+        this.hashtag = hashtag;
+        this.status = status;
+    }
 }

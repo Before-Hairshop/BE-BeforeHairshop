@@ -3,7 +3,9 @@ package com.beforehairshop.demo.recommend.service;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
+import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.domain.MemberProfile;
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
@@ -36,6 +38,7 @@ public class RecommendService {
 
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
+    private final HairDesignerProfileRepository hairDesignerProfileRepository;
     private final RecommendRepository recommendRepository;
     private final RecommendImageRepository recommendImageRepository;
 
@@ -46,37 +49,20 @@ public class RecommendService {
 
         MemberProfile memberProfile = memberProfileRepository.findById(memberProfileId).orElse(null);
         if (memberProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "추천을 보낼 유저가 유효하지 않습니다.");
+            return makeResult(HttpStatus.BAD_REQUEST, "추천을 받을 유저가 유효하지 않습니다.");
+
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(recommender, StatusKind.NORMAL.getId()).orElse(null);
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.BAD_GATEWAY, "추천을 보낼 유저가 유효하지 않다.");
+
+        Recommend recommend = new Recommend(hairDesignerProfile, memberProfile, recommendSaveRequestDto, StatusKind.NORMAL.getId());
+        memberProfile.getRecommendedSet().add(recommend);
+        hairDesignerProfile.getRecommendSet().add(recommend);
 
         Member updatedRecommender = memberRepository.findByIdAndStatus(recommender.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member updatedRecommendedPerson = memberRepository.findByIdAndStatus(memberProfile.getMember().getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (updatedRecommender == null || updatedRecommendedPerson == null)
             return makeResult(HttpStatus.BAD_REQUEST, "추천하는 사람 혹은 추천받는 사람의 member entity 가 null 입니다.");
-
-
-        Recommend recommend = recommendRepository.save(
-                recommendSaveRequestDto.toEntity(recommender, memberProfile.getMember())
-        );
-
-//        List<StyleRecommend> styleRecommendList = styleRecommendRepository.saveAll(
-//                recommendSaveRequestDto.getStyleRecommendSaveRequestDtoList()
-//                    .stream()
-//                    .map(styleRecommendSaveRequestDto -> styleRecommendSaveRequestDto.toEntity(recommend))
-//                    .collect(Collectors.toList())
-//        );
-
-        updatedRecommender.getRecommendSet().add(recommend);
-        updatedRecommendedPerson.getRecommendedSet().add(recommend);
-
-//        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedRecommender, "ROLE_DESIGNER");
-//        PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedRecommendedPerson, "ROLE_USER");
-
-//        List<StyleRecommendDetailResponseDto> styleRecommendDetailResponseDtoList = new ArrayList<>();
-//        for (int i = 0; i < styleRecommendList.size(); i++) {
-//            styleRecommendDetailResponseDtoList.add(new StyleRecommendDetailResponseDto(
-//                    new StyleRecommendDto(styleRecommendList.get(i)), null
-//            ));
-//        }
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
@@ -94,6 +80,8 @@ public class RecommendService {
 
         List<String> recommendImagePreSignedUrlList = new ArrayList<>();
         for (int i = 0; i < imageCount; i++) {
+           // RecommendImage recommendImage = new RecommendImage(recommend, null, StatusKind.NORMAL.getId());
+
             RecommendImage recommendImage = recommendImageRepository.save(
                     RecommendImage.builder()
                             .recommend(recommend)
@@ -111,6 +99,7 @@ public class RecommendService {
             recommendImage.setImageUrl(
                     CloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
             );
+            recommend.getRecommendImageSet().add(recommendImage);
         }
 
         return makeResult(HttpStatus.OK, recommendImagePreSignedUrlList);
@@ -121,39 +110,16 @@ public class RecommendService {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션이 만료되었습니다.");
 
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
+                member, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend == null)
-            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서가 없습니다.");
+        if (hairDesignerProfile == null || !recommend.getRecommenderProfile().getId().equals(hairDesignerProfile.getId()) ||recommend == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서가 없거나 추천서를 수정할 권한이 없습니다.");
 
         // Entity 의 필드 값 수정
         recommend.patchEntity(patchDto);
-
-//        for (int i = 0; i < patchDto.getStyleRecommendPatchRequestDtoList().size(); i++) {
-//            Recommend styleRecommend = recommendRepository.findByIdAndStatus(
-//                    patchDto.getStyleRecommendPatchRequestDtoList().get(i).getStyleRecommendId()
-//                    , StatusKind.NORMAL.getId()
-//            ).orElse(null);
-//
-//            if (styleRecommend == null) return makeResult(HttpStatus.BAD_REQUEST, "잘못된 style recommend id 가 입력되었습니다.");
-//
-//            // 수정 과정
-//            if (patchDto.getStyleRecommendPatchRequestDtoList().get(i).getHairstyle() != null)
-//                styleRecommend.setHairstyle(patchDto.getStyleRecommendPatchRequestDtoList().get(i).getHairstyle());
-//
-//            if (patchDto.getStyleRecommendPatchRequestDtoList().get(i).getPrice() != null)
-//                styleRecommend.setPrice(patchDto.getStyleRecommendPatchRequestDtoList().get(i).getPrice());
-//
-//            if (patchDto.getStyleRecommendPatchRequestDtoList().get(i).getReason() != null)
-//                styleRecommend.setReason(patchDto.getStyleRecommendPatchRequestDtoList().get(i).getReason());
-//        }
-
-//        List<StyleRecommendDetailResponseDto> styleRecommendDetailResponseDtoList = new ArrayList<>();
-//        for (int i = 0; i < styleRecommendList.size(); i++) {
-//            styleRecommendDetailResponseDtoList.add(new StyleRecommendDetailResponseDto(
-//                    styleRecommendList.get(i),
-//                    styleRecommendImageRepository.findByStyleRecommendAndStatus(styleRecommendList.get(i), StatusKind.NORMAL.getId())
-//            ));
-//        }
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
@@ -172,7 +138,9 @@ public class RecommendService {
             if (recommendImage == null)
                 return makeResult(HttpStatus.NOT_FOUND, "해당 URL 을 가진 이미지는 없습니다.");
 
-            recommendImageRepository.delete(recommendImage);
+            recommend.getRecommendImageSet().remove(recommendImage);
+
+            // recommendImageRepository.delete(recommendImage);
         }
 
         List<String> addImagePreSignedUrlList = new ArrayList<>();
@@ -194,6 +162,7 @@ public class RecommendService {
             recommendImage.setImageUrl(
                     CloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
             );
+            recommend.getRecommendImageSet().add(recommendImage);
         }
 
         return makeResult(HttpStatus.OK, addImagePreSignedUrlList);
@@ -249,14 +218,28 @@ public class RecommendService {
         if (memberProfile == null)
             return makeResult(HttpStatus.NOT_FOUND, "프로필이 등록되어 있지 않습니다.");
 
-        // 위치 순서로 3km 이내의 헤어
-        List<Recommend> recommendList = recommendRepository.findByRecommendedPersonAndStatusAndSortingByLocation(member.getId(), memberProfile.getLatitude(), memberProfile.getLongitude()
-                , StatusKind.NORMAL.getId(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
+        // 위치 순서로 10km 이내의 헤어
+        List<Recommend> recommendList = recommendRepository.findByRecommendedProfileAndStatusAndSortingByLocation(memberProfile.getId(), memberProfile.getLatitude(), memberProfile.getLongitude()
+                , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
 
         List<RecommendDto> recommendDtoList = recommendList.stream()
                 .map(RecommendDto::new)
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, recommendDtoList);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> delete(Member member, BigInteger recommendId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
+        if (recommend == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서는 없습니다");
+
+        recommendRepository.delete(recommend);
+
+        return makeResult(HttpStatus.OK, "삭제 완료");
     }
 }

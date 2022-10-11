@@ -25,6 +25,7 @@ public class ReviewImage {
     @ManyToOne
     @JoinColumn(name = "review_id")
     private Review review;
+
     private String imageUrl;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -35,4 +36,5 @@ public class ReviewImage {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
 }

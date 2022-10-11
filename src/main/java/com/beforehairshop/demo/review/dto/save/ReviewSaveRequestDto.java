@@ -1,5 +1,7 @@
 package com.beforehairshop.demo.review.dto.save;
 
+import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.review.domain.Review;
 import lombok.AllArgsConstructor;
@@ -19,15 +21,15 @@ public class ReviewSaveRequestDto {
 
     private List<ReviewHashtagSaveRequestDto> hashtagList;
 
-    public Review toEntity(Member reviewer, Member hairDesigner) {
+    public Review toEntity(Member reviewer, HairDesignerProfile hairDesignerProfile) {
         return Review.builder()
                 .reviewer(reviewer)
-                .hairDesigner(hairDesigner)
+                .hairDesignerProfile(hairDesignerProfile)
                 .totalRating(totalRating)
                 .styleRating(styleRating)
                 .serviceRating(serviceRating)
                 .content(content)
-                .status(1)
+                .status(StatusKind.NORMAL.getId())
                 .build();
     }
 }

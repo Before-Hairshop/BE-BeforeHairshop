@@ -18,7 +18,7 @@ import java.util.Date;
 public class ReviewDto {
     private BigInteger id;
     private BigInteger reviewerId;
-    private BigInteger hairDesignerId;
+    private BigInteger hairDesignerProfileId;
     private Integer totalRating;
     private Integer styleRating;
     private Integer serviceRating;
@@ -30,7 +30,7 @@ public class ReviewDto {
     public ReviewDto(Review review) {
         this.id = review.getId();
         this.reviewerId = review.getReviewer().getId();
-        this.hairDesignerId = review.getHairDesigner().getId();
+        this.hairDesignerProfileId = review.getHairDesignerProfile().getId();
         this.totalRating = review.getTotalRating();
         this.styleRating = review.getStyleRating();
         this.serviceRating = review.getServiceRating();

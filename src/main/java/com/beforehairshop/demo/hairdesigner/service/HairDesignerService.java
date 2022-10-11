@@ -1,15 +1,23 @@
 package com.beforehairshop.demo.hairdesigner.service;
 
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
-import com.beforehairshop.demo.aws.S3Uploader;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerHashtag;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerWorkingDay;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerHashtagDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerPriceDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerProfileDto;
 import com.beforehairshop.demo.hairdesigner.dto.HairDesignerWorkingDayDto;
+import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerHashtagPatchRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerPricePatchRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerWorkingDayPatchRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerHashtagSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerPriceSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerWorkingDaySaveRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerDetailGetResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
@@ -68,42 +76,67 @@ public class HairDesignerService {
 
         hairDesigner.setName(hairDesignerProfileSaveRequestDto.getName());
 
-        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.save(hairDesignerProfileSaveRequestDto.toEntity(hairDesigner));
+        HairDesignerProfile hairDesignerProfile = new HairDesignerProfile(hairDesigner, hairDesignerProfileSaveRequestDto, StatusKind.NORMAL.getId());
 
-        /**
-         * 헤어 디자이너의 해쉬 태그(entity)에 대한 row 생성
-         */
-        if (hairDesignerProfileSaveRequestDto.getHashtagList() != null) {
-            hairDesignerHashtagRepository.saveAll(
-                    hairDesignerProfileSaveRequestDto.getHashtagList()
-                            .stream()
-                            .map(hairDesignerHashtagSaveRequestDto -> hairDesignerHashtagSaveRequestDto.toEntity(hairDesigner))
-                            .collect(Collectors.toList())
-            );
+        for (HairDesignerHashtagSaveRequestDto hashtagSaveRequestDto : hairDesignerProfileSaveRequestDto.getHashtagList()) {
+            HairDesignerHashtag hashtag = new HairDesignerHashtag(hairDesignerProfile, hashtagSaveRequestDto.getTag(), StatusKind.NORMAL.getId());
+            hairDesignerProfile.addHashtag(hashtag);
         }
 
-        /**
-         * 헤어 디자이너가 일하는 시간(entity)에 대한 row 생성
-         */
-        if (hairDesignerProfileSaveRequestDto.getWorkingDayList() != null) {
-            hairDesignerWorkingDayRepository.saveAll(
-                    hairDesignerProfileSaveRequestDto.getWorkingDayList()
-                            .stream()
-                            .map(hairDesignerWorkingDaySaveRequestDto -> hairDesignerWorkingDaySaveRequestDto.toEntity(hairDesigner))
-                            .collect(Collectors.toList())
-            );
+        for (HairDesignerPriceSaveRequestDto priceSaveRequestDto : hairDesignerProfileSaveRequestDto.getPriceList()) {
+            HairDesignerPrice hairDesignerPrice = new HairDesignerPrice(hairDesignerProfile
+                    , priceSaveRequestDto.getHairCategory()
+                    , priceSaveRequestDto.getHairStyleName()
+                    , priceSaveRequestDto.getPrice()
+                    , StatusKind.NORMAL.getId());
+            hairDesignerProfile.addPrice(hairDesignerPrice);
         }
 
-        /**
-         *  헤어 디자이너의 스타일링 비용(entity)에 대한 row 생성
-         */
-        if (hairDesignerProfileSaveRequestDto.getPriceList() != null) {
-            hairDesignerPriceRepository.saveAll(
-                    hairDesignerProfileSaveRequestDto.getPriceList()
-                            .stream()
-                            .map(hairDesignerPriceSaveRequestDto -> hairDesignerPriceSaveRequestDto.toEntity(hairDesigner))
-                            .collect(Collectors.toList()));
+        for (HairDesignerWorkingDaySaveRequestDto workingDaySaveRequestDto : hairDesignerProfileSaveRequestDto.getWorkingDayList()) {
+            HairDesignerWorkingDay hairDesignerWorkingDay = new HairDesignerWorkingDay(hairDesignerProfile
+                    , workingDaySaveRequestDto.getWorkingDay()
+                    , workingDaySaveRequestDto.getStartTime()
+                    , workingDaySaveRequestDto.getEndTime()
+                    , StatusKind.NORMAL.getId());
+            hairDesignerProfile.addWorkingDay(hairDesignerWorkingDay);
         }
+
+        hairDesignerProfileRepository.save(hairDesignerProfile);
+
+//        /**
+//         * 헤어 디자이너의 해쉬 태그(entity)에 대한 row 생성
+//         */
+//        if (hairDesignerProfileSaveRequestDto.getHashtagList() != null) {
+//            hairDesignerHashtagRepository.saveAll(
+//                    hairDesignerProfileSaveRequestDto.getHashtagList()
+//                            .stream()
+//                            .map(hairDesignerHashtagSaveRequestDto -> hairDesignerHashtagSaveRequestDto.toEntity(hairDesigner))
+//                            .collect(Collectors.toList())
+//            );
+//        }
+//
+//        /**
+//         * 헤어 디자이너가 일하는 시간(entity)에 대한 row 생성
+//         */
+//        if (hairDesignerProfileSaveRequestDto.getWorkingDayList() != null) {
+//            hairDesignerWorkingDayRepository.saveAll(
+//                    hairDesignerProfileSaveRequestDto.getWorkingDayList()
+//                            .stream()
+//                            .map(hairDesignerWorkingDaySaveRequestDto -> hairDesignerWorkingDaySaveRequestDto.toEntity(hairDesigner))
+//                            .collect(Collectors.toList())
+//            );
+//        }
+//
+//        /**
+//         *  헤어 디자이너의 스타일링 비용(entity)에 대한 row 생성
+//         */
+//        if (hairDesignerProfileSaveRequestDto.getPriceList() != null) {
+//            hairDesignerPriceRepository.saveAll(
+//                    hairDesignerProfileSaveRequestDto.getPriceList()
+//                            .stream()
+//                            .map(hairDesignerPriceSaveRequestDto -> hairDesignerPriceSaveRequestDto.toEntity(hairDesigner))
+//                            .collect(Collectors.toList()));
+//        }
 
         // ROLE 권한 변경
 
@@ -134,34 +167,37 @@ public class HairDesignerService {
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
 
-        //List<HairDesignerHashtag> hairDesignerHashtagList = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
-        List<HairDesignerHashtagDto> hairDesignerHashtagDtoList
-                = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId())
-                .stream()
-                .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
-                .collect(Collectors.toList());
-        List<HairDesignerWorkingDayDto> hairDesignerWorkingDayDtoList
-                = hairDesignerWorkingDayRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId())
-                .stream()
-                .map(hairDesignerWorkingDay -> new HairDesignerWorkingDayDto(hairDesignerWorkingDay))
-                .collect(Collectors.toList());
-
-        List<HairDesignerPriceDto> hairDesignerPriceDtoList
-                = hairDesignerPriceRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId())
-                .stream()
-                .map(hairDesignerPrice -> new HairDesignerPriceDto(hairDesignerPrice))
-                .collect(Collectors.toList());
+//        //List<HairDesignerHashtag> hairDesignerHashtagList = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
+//        List<HairDesignerHashtagDto> hairDesignerHashtagDtoList
+//                = hairDesignerHashtagRepository.findAllByHairDesignerProfileInHashtagEntityAndStatus(designer, StatusKind.NORMAL.getId())
+//                .stream()
+//                .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
+//                .collect(Collectors.toList());
+//        List<HairDesignerWorkingDayDto> hairDesignerWorkingDayDtoList
+//                = hairDesignerWorkingDayRepository.findAllByHairDesignerProfileInWorkingDayEntityAndStatus(designer, StatusKind.NORMAL.getId())
+//                .stream()
+//                .map(hairDesignerWorkingDay -> new HairDesignerWorkingDayDto(hairDesignerWorkingDay))
+//                .collect(Collectors.toList());
+//
+//        List<HairDesignerPriceDto> hairDesignerPriceDtoList
+//                = hairDesignerPriceRepository.findAllByHairDesignerProfileInPriceEntityAndStatus(designer, StatusKind.NORMAL.getId())
+//                .stream()
+//                .map(hairDesignerPrice -> new HairDesignerPriceDto(hairDesignerPrice))
+//                .collect(Collectors.toList());
 
         /**
-         * 별점, 리뷰 정보 가져오는 부분 추가해야 함!
+         * 별점, 리뷰 정보 가져오는 부분
          */
         Float averageStarRating = reviewRepository.calculateByHairDesignerIdAndStatus(designer.getId(), StatusKind.NORMAL.getId());
 
+        List<HairDesignerHashtagDto> hashtagDtoList = hairDesignerProfile.getHairDesignerHashtagSet().stream().map(HairDesignerHashtagDto::new).collect(Collectors.toList());
+        List<HairDesignerWorkingDayDto> workingDayDtoList = hairDesignerProfile.getHairDesignerWorkingDaySet().stream().map(HairDesignerWorkingDayDto::new).collect(Collectors.toList());
+        List<HairDesignerPriceDto> priceDtoList = hairDesignerProfile.getHairDesignerPriceSet().stream().map(HairDesignerPriceDto::new).collect(Collectors.toList());
         return makeResult(HttpStatus.OK, new HairDesignerDetailGetResponseDto(new HairDesignerProfileDto(hairDesignerProfile)
                 , averageStarRating
-                , hairDesignerHashtagDtoList
-                , hairDesignerWorkingDayDtoList
-                , hairDesignerPriceDtoList));
+                , hashtagDtoList
+                , workingDayDtoList
+                , priceDtoList));
     }
 
     @Transactional
@@ -193,10 +229,9 @@ public class HairDesignerService {
                 .map(hairDesignerProfile1 -> new HairDesignerProfileAndHashtagDto(
                         new HairDesignerProfileDto(hairDesignerProfile1),
                         reviewRepository.calculateByHairDesignerIdAndStatus(hairDesignerProfile.getHairDesigner().getId(), StatusKind.NORMAL.getId()),
-                        hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(
-                                hairDesignerProfile1.getHairDesigner(), StatusKind.NORMAL.getId())
-                                .stream()
-                                .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
+
+                        hairDesignerProfile1.getHairDesignerHashtagSet().stream()
+                                .map(HairDesignerHashtagDto::new)
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
@@ -243,37 +278,56 @@ public class HairDesignerService {
 
 
         if (patchDto.getHashtagPatchRequestDtoList() != null) {
-            hairDesignerHashtagRepository.deleteAllInBatch(hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
+            hairDesignerProfile.getHairDesignerHashtagSet().clear();
+            // clear 하면, 다 지워지는지 확인할 것
+//            hairDesignerHashtagRepository.deleteAllInBatch(hairDesignerHashtagRepository.findAllByHairDesignerProfileInHashtagEntityAndStatus(
+//                    hairDesignerProfile, StatusKind.NORMAL.getId())
+//            );
 
-            hairDesignerHashtagRepository.saveAll(
-                    patchDto.getHashtagPatchRequestDtoList()
-                            .stream()
-                            .map(hairDesignerHashtagPatchRequestDto -> hairDesignerHashtagPatchRequestDto.toEntity(hairDesigner))
-                            .collect(Collectors.toList())
-            );
+            for (HairDesignerHashtagPatchRequestDto patchRequestDto : patchDto.getHashtagPatchRequestDtoList()) {
+                hairDesignerProfile.getHairDesignerHashtagSet().add(patchRequestDto.toEntity(hairDesignerProfile));
+            }
+//            hairDesignerHashtagRepository.saveAll(
+//                    patchDto.getHashtagPatchRequestDtoList()
+//                            .stream()
+//                            .map(hairDesignerHashtagPatchRequestDto -> hairDesignerHashtagPatchRequestDto.toEntity(hairDesignerProfile))
+//                            .collect(Collectors.toList())
+//            );
         }
 
         if (patchDto.getPricePatchRequestDtoList() != null) {
-            hairDesignerPriceRepository.deleteAllInBatch(hairDesignerPriceRepository.findAllByHairDesignerAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
+            hairDesignerProfile.getHairDesignerPriceSet().clear();
 
-            hairDesignerPriceRepository.saveAll(
-                    patchDto.getPricePatchRequestDtoList()
-                            .stream()
-                            .map(hairDesignerPricePatchRequestDto -> hairDesignerPricePatchRequestDto.toEntity(hairDesigner))
-                            .collect(Collectors.toList())
-            );
+            for (HairDesignerPricePatchRequestDto patchRequestDto : patchDto.getPricePatchRequestDtoList()) {
+                hairDesignerProfile.getHairDesignerPriceSet().add(patchRequestDto.toEntity(hairDesignerProfile));
+            }
+//            hairDesignerPriceRepository.deleteAllInBatch(hairDesignerPriceRepository.findAllByHairDesignerProfileInPriceEntityAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
+//
+//            hairDesignerPriceRepository.saveAll(
+//                    patchDto.getPricePatchRequestDtoList()
+//                            .stream()
+//                            .map(hairDesignerPricePatchRequestDto -> hairDesignerPricePatchRequestDto.toEntity(hairDesigner))
+//                            .collect(Collectors.toList())
+//            );
         }
 
         if (patchDto.getWorkingDayPatchRequestDtoList() != null) {
-            hairDesignerWorkingDayRepository.deleteAllInBatch(hairDesignerWorkingDayRepository.findAllByHairDesignerAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
+            hairDesignerProfile.getHairDesignerWorkingDaySet().clear();
 
-            hairDesignerWorkingDayRepository.saveAll(
-                    patchDto.getWorkingDayPatchRequestDtoList()
-                            .stream()
-                            .map(hairDesignerWorkingDayPatchRequestDto -> hairDesignerWorkingDayPatchRequestDto.toEntity(hairDesigner))
-                            .collect(Collectors.toList())
-            );
+            for (HairDesignerWorkingDayPatchRequestDto patchRequestDto : patchDto.getWorkingDayPatchRequestDtoList()) {
+                hairDesignerProfile.getHairDesignerWorkingDaySet().add(patchRequestDto.toEntity(hairDesignerProfile));
+            }
+
+//            hairDesignerWorkingDayRepository.deleteAllInBatch(hairDesignerWorkingDayRepository.findAllByHairDesignerProfileInWorkingDayEntityAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
+//
+//            hairDesignerWorkingDayRepository.saveAll(
+//                    patchDto.getWorkingDayPatchRequestDtoList()
+//                            .stream()
+//                            .map(hairDesignerWorkingDayPatchRequestDto -> hairDesignerWorkingDayPatchRequestDto.toEntity(hairDesigner))
+//                            .collect(Collectors.toList())
+//            );
         }
+
 
         // 닉네임 변경
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_DESIGNER");
@@ -319,9 +373,7 @@ public class HairDesignerService {
         List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList = hairDesignerProfileList.stream()
                 .map(hairDesignerProfile -> new HairDesignerProfileAndHashtagDto(new HairDesignerProfileDto(hairDesignerProfile)
                         , reviewRepository.calculateByHairDesignerIdAndStatus(hairDesignerProfile.getHairDesigner().getId(), StatusKind.NORMAL.getId())
-                        , hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(hairDesignerProfile.getHairDesigner(), StatusKind.NORMAL.getId()).stream()
-                        .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
-                        .collect(Collectors.toList())))
+                        , hairDesignerProfile.getHairDesignerHashtagSet().stream().map(HairDesignerHashtagDto::new).collect(Collectors.toList())))
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, hairDesignerProfileAndHashtagDtoList);

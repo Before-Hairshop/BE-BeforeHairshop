@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.hairdesigner.dto.post;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerPrice;
+import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,9 +17,9 @@ public class HairDesignerPriceSaveRequestDto {
     private String hairStyleName;
     private Integer price;
 
-    public HairDesignerPrice toEntity(Member hairDesigner) {
+    public HairDesignerPrice toEntity(HairDesignerProfile hairDesignerProfile) {
         return HairDesignerPrice.builder()
-                .hairDesigner(hairDesigner)
+                .hairDesignerProfile(hairDesignerProfile)
                 .hairCategory(hairCategory)
                 .hairStyleName(hairStyleName)
                 .price(price)

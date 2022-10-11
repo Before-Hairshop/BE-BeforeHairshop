@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.review.dto.save;
 
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.review.domain.Review;
 import com.beforehairshop.demo.review.domain.ReviewHashtag;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class ReviewHashtagSaveRequestDto {
         return ReviewHashtag.builder()
                 .review(review)
                 .hashtag(hashtag)
-                .status(1)
+                .status(StatusKind.NORMAL.getId())
                 .build();
     }
 }

@@ -15,11 +15,11 @@ public interface RecommendRepository extends JpaRepository<Recommend, BigInteger
 
     Optional<Recommend> findByIdAndStatus(BigInteger bigInteger, Integer status);
 
-    @Query(value = "select *, ( 6371 * acos (cos ( radians(?2) ) * cos( radians( h.latitude ) ) * cos( radians( h.longitude ) - radians(?3) ) + sin ( radians(?2) ) * sin( radians( h.latitude )))) AS distance " +
+    @Query(value = "select r.*, ( 6371 * acos (cos ( radians(?2) ) * cos( radians( h.latitude ) ) * cos( radians( h.longitude ) - radians(?3) ) + sin ( radians(?2) ) * sin( radians( h.latitude )))) AS distance " +
             "from recommend r, hair_designer_profile h " +
-            "where r.recommender_id = h.id and r.recommended_person_id = ?1 and status = ?5 " +
-            "group by h.id HAVING distance <= 10 " +
+            "where r.recommender_profile_id = h.id and r.recommended_profile_id = ?1 and r.status = ?5 " +
+            "group by r.id HAVING distance <= 10 " +
             "ORDER BY distance asc LIMIT 5 OFFSET ?4 ;",
             nativeQuery = true)
-    List<Recommend> findByRecommendedPersonAndStatusAndSortingByLocation(BigInteger recommendedPersonId, Float member_latitude, Float member_longitude, Integer pageOffset, Integer Status);
+    List<Recommend> findByRecommendedProfileAndStatusAndSortingByLocation(BigInteger recommendedProfileId, Float member_latitude, Float member_longitude, Integer pageOffset, Integer Status);
 }

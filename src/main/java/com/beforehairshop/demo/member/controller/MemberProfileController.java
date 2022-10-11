@@ -49,7 +49,7 @@ public class MemberProfileController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    @Operation(summary = "유저-본인 프로필 저장 API(본인 이미지)")
+    @Operation(summary = "유저-본인 프로필 저장 API(본인 이미지 & 원하는 스타일 이미지)")
     @PostMapping("image")
     public ResponseEntity<ResultDto> saveMemberProfileImage(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "front_image_flag") Integer frontImageFlag
@@ -95,5 +95,12 @@ public class MemberProfileController {
     @PatchMapping("/deactivate_matching")
     public ResponseEntity<ResultDto> patchMyProfileDeactivateMatchingFlag(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.patchMyProfileDeactivateMatchingFlag(principalDetails.getMember());
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "유저 프로필 삭제 API")
+    @DeleteMapping("")
+    public ResponseEntity<ResultDto> deleteMyProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.deleteMyProfile(principalDetails.getMember());
     }
 }

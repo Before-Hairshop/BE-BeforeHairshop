@@ -56,10 +56,4 @@ public class Member implements Serializable {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
-    @OneToMany(mappedBy = "recommender", fetch = FetchType.LAZY)
-    private Set<Recommend> recommendSet = new HashSet<>();
-
-    @OneToMany(mappedBy = "recommendedPerson", fetch = FetchType.LAZY)
-    private Set<Recommend> recommendedSet = new HashSet<>();
-
 }

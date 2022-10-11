@@ -35,4 +35,10 @@ public class RecommendImage {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+    public RecommendImage(Recommend recommend, String imageUrl, Integer status) {
+        this.recommend = recommend;
+        this.imageUrl = imageUrl;
+        this.status = status;
+    }
 }

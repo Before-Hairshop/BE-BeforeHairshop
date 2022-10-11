@@ -62,7 +62,7 @@ public class MemberProfile {
     private String phoneNumber;
     private Date treatmentDate;
 
-    @Column(columnDefinition = "TINYINT DEFAULT 1")
+    @Column(columnDefinition = "TINYINT DEFAULT 1") // 1 (활성화), 0 (비활성화)
     private Integer matchingActivationFlag;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -85,7 +85,7 @@ public class MemberProfile {
         desiredHairstyleImage.setMemberProfile(this);
     }
 
-    public MemberProfile(Member member, MemberProfileSaveRequestDto saveRequestDto, String frontImageUrl, String sideImageUrl, String backImageUrl, Integer status) {
+    public MemberProfile(Member member, MemberProfileSaveRequestDto saveRequestDto, String frontImageUrl, String sideImageUrl, String backImageUrl, Integer matchingFlag, Integer status) {
         this.member = member;
         this.name = saveRequestDto.getName();
         this.hairCondition = saveRequestDto.getHairCondition();
@@ -102,7 +102,7 @@ public class MemberProfile {
         this.longitude = saveRequestDto.getLongitude();
         this.phoneNumber = saveRequestDto.getPhoneNumber();
         this.treatmentDate = saveRequestDto.getTreatmentDate();
-        this.matchingActivationFlag = 1;
+        this.matchingActivationFlag = matchingFlag;
         this.status = status;
     }
 }

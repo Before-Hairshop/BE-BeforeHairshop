@@ -34,7 +34,7 @@ public class MemberProfileSaveRequestDto {
     private String phoneNumber;
 
 
-    public MemberProfile toEntity(Member member, String frontImageUrl, String sideImageUrl, String backImageUrl) {
+    public MemberProfile toEntity(Member member, String frontImageUrl, String sideImageUrl, String backImageUrl, Integer matchingFlag) {
         return MemberProfile.builder()
                 .name(name)
                 .member(member)
@@ -42,6 +42,7 @@ public class MemberProfileSaveRequestDto {
                 .hairTendency(hairTendency)
                 .desiredHairstyle(desiredHairstyle)
                 .desiredHairstyleDescription(desiredHairstyleDescription)
+                .matchingActivationFlag(matchingFlag)
                 .frontImageUrl(frontImageUrl)
                 .sideImageUrl(sideImageUrl)
                 .backImageUrl(backImageUrl)

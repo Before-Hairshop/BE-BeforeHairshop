@@ -218,9 +218,9 @@ public class RecommendService {
         if (memberProfile == null)
             return makeResult(HttpStatus.NOT_FOUND, "프로필이 등록되어 있지 않습니다.");
 
-        // 위치 순서로 3km 이내의 헤어
-        List<Recommend> recommendList = recommendRepository.findByRecommendedPersonAndStatusAndSortingByLocation(member.getId(), memberProfile.getLatitude(), memberProfile.getLongitude()
-                , StatusKind.NORMAL.getId(), new PageOffsetHandler().getOffsetByPageNumber(pageNumber));
+        // 위치 순서로 10km 이내의 헤어
+        List<Recommend> recommendList = recommendRepository.findByRecommendedProfileAndStatusAndSortingByLocation(memberProfile.getId(), memberProfile.getLatitude(), memberProfile.getLongitude()
+                , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
 
         List<RecommendDto> recommendDtoList = recommendList.stream()
                 .map(RecommendDto::new)

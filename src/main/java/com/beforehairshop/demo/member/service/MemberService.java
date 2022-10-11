@@ -50,9 +50,6 @@ public class MemberService {
     private final MemberProfileDesiredHairstyleImageRepository memberProfileDesiredHairstyleImageRepository;
 
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
-    private final HairDesignerHashtagRepository hairDesignerHashtagRepository;
-    private final HairDesignerPriceRepository hairDesignerPriceRepository;
-    private final HairDesignerWorkingDayRepository hairDesignerWorkingDayRepository;
 
     @Transactional
     public BigInteger save(MemberSaveRequestDto requestDto) {
@@ -92,7 +89,7 @@ public class MemberService {
         // 닉네임 변경
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");
 
-        MemberProfile memberProfile = memberProfileSaveRequestDto.toEntity(updatedMember, null, null, null);
+        MemberProfile memberProfile = memberProfileSaveRequestDto.toEntity(updatedMember, null, null, null, MatchingFlagKind.ACTIVATION_CODE.getId());
 
         memberProfileRepository.save(memberProfile);
 

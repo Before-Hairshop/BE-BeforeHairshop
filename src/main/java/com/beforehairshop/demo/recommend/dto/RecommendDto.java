@@ -17,8 +17,8 @@ import java.util.Date;
 @AllArgsConstructor
 public class RecommendDto {
     private BigInteger id;
-    private BigInteger recommenderId;
-    private BigInteger recommendedPersonId;
+    private BigInteger recommenderProfileId;
+    private BigInteger recommendedProfileId;
     private String greeting;
     private Date treatmentDate;
 
@@ -34,8 +34,8 @@ public class RecommendDto {
 
     public RecommendDto(Recommend recommend) {
         this.id = recommend.getId();
-        this.recommenderId = recommend.getRecommender().getId();
-        this.recommendedPersonId = recommend.getRecommendedPerson().getId();
+        this.recommenderProfileId = recommend.getRecommenderProfile().getId();
+        this.recommendedProfileId = recommend.getRecommendedProfile().getId();
         this.greeting = recommend.getGreeting();
         this.treatmentDate = recommend.getTreatmentDate();
         this.hairstyle = recommend.getHairstyle();

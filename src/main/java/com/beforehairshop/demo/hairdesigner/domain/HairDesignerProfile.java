@@ -2,6 +2,7 @@ package com.beforehairshop.demo.hairdesigner.domain;
 
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.member.domain.Member;
+import com.beforehairshop.demo.recommend.domain.Recommend;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -48,6 +49,10 @@ public class HairDesignerProfile {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+
+    @OneToMany(mappedBy = "recommenderProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Recommend> recommendSet = new HashSet<>();
 
 
     @OneToMany(mappedBy = "hairDesignerProfile"

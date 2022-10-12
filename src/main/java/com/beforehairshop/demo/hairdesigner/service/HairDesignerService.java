@@ -102,51 +102,7 @@ public class HairDesignerService {
         }
 
         hairDesignerProfileRepository.save(hairDesignerProfile);
-
-//        /**
-//         * 헤어 디자이너의 해쉬 태그(entity)에 대한 row 생성
-//         */
-//        if (hairDesignerProfileSaveRequestDto.getHashtagList() != null) {
-//            hairDesignerHashtagRepository.saveAll(
-//                    hairDesignerProfileSaveRequestDto.getHashtagList()
-//                            .stream()
-//                            .map(hairDesignerHashtagSaveRequestDto -> hairDesignerHashtagSaveRequestDto.toEntity(hairDesigner))
-//                            .collect(Collectors.toList())
-//            );
-//        }
-//
-//        /**
-//         * 헤어 디자이너가 일하는 시간(entity)에 대한 row 생성
-//         */
-//        if (hairDesignerProfileSaveRequestDto.getWorkingDayList() != null) {
-//            hairDesignerWorkingDayRepository.saveAll(
-//                    hairDesignerProfileSaveRequestDto.getWorkingDayList()
-//                            .stream()
-//                            .map(hairDesignerWorkingDaySaveRequestDto -> hairDesignerWorkingDaySaveRequestDto.toEntity(hairDesigner))
-//                            .collect(Collectors.toList())
-//            );
-//        }
-//
-//        /**
-//         *  헤어 디자이너의 스타일링 비용(entity)에 대한 row 생성
-//         */
-//        if (hairDesignerProfileSaveRequestDto.getPriceList() != null) {
-//            hairDesignerPriceRepository.saveAll(
-//                    hairDesignerProfileSaveRequestDto.getPriceList()
-//                            .stream()
-//                            .map(hairDesignerPriceSaveRequestDto -> hairDesignerPriceSaveRequestDto.toEntity(hairDesigner))
-//                            .collect(Collectors.toList()));
-//        }
-
-        // ROLE 권한 변경
-
-//        Collection<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-//        updatedAuthorities.add(new GrantedAuthority() {
-//            @Override
-//            public String getAuthority() {
-//                return member.getRole();
-//            }
-//        });
+        
 
         // 권한 변경()
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(hairDesigner, "ROLE_DESIGNER");
@@ -167,23 +123,6 @@ public class HairDesignerService {
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
 
-//        //List<HairDesignerHashtag> hairDesignerHashtagList = hairDesignerHashtagRepository.findAllByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId());
-//        List<HairDesignerHashtagDto> hairDesignerHashtagDtoList
-//                = hairDesignerHashtagRepository.findAllByHairDesignerProfileInHashtagEntityAndStatus(designer, StatusKind.NORMAL.getId())
-//                .stream()
-//                .map(hairDesignerHashtag -> new HairDesignerHashtagDto(hairDesignerHashtag))
-//                .collect(Collectors.toList());
-//        List<HairDesignerWorkingDayDto> hairDesignerWorkingDayDtoList
-//                = hairDesignerWorkingDayRepository.findAllByHairDesignerProfileInWorkingDayEntityAndStatus(designer, StatusKind.NORMAL.getId())
-//                .stream()
-//                .map(hairDesignerWorkingDay -> new HairDesignerWorkingDayDto(hairDesignerWorkingDay))
-//                .collect(Collectors.toList());
-//
-//        List<HairDesignerPriceDto> hairDesignerPriceDtoList
-//                = hairDesignerPriceRepository.findAllByHairDesignerProfileInPriceEntityAndStatus(designer, StatusKind.NORMAL.getId())
-//                .stream()
-//                .map(hairDesignerPrice -> new HairDesignerPriceDto(hairDesignerPrice))
-//                .collect(Collectors.toList());
 
         /**
          * 별점, 리뷰 정보 가져오는 부분
@@ -279,20 +218,12 @@ public class HairDesignerService {
 
         if (patchDto.getHashtagPatchRequestDtoList() != null) {
             hairDesignerProfile.getHairDesignerHashtagSet().clear();
-            // clear 하면, 다 지워지는지 확인할 것
-//            hairDesignerHashtagRepository.deleteAllInBatch(hairDesignerHashtagRepository.findAllByHairDesignerProfileInHashtagEntityAndStatus(
-//                    hairDesignerProfile, StatusKind.NORMAL.getId())
-//            );
+
 
             for (HairDesignerHashtagPatchRequestDto patchRequestDto : patchDto.getHashtagPatchRequestDtoList()) {
                 hairDesignerProfile.getHairDesignerHashtagSet().add(patchRequestDto.toEntity(hairDesignerProfile));
             }
-//            hairDesignerHashtagRepository.saveAll(
-//                    patchDto.getHashtagPatchRequestDtoList()
-//                            .stream()
-//                            .map(hairDesignerHashtagPatchRequestDto -> hairDesignerHashtagPatchRequestDto.toEntity(hairDesignerProfile))
-//                            .collect(Collectors.toList())
-//            );
+
         }
 
         if (patchDto.getPricePatchRequestDtoList() != null) {
@@ -301,14 +232,7 @@ public class HairDesignerService {
             for (HairDesignerPricePatchRequestDto patchRequestDto : patchDto.getPricePatchRequestDtoList()) {
                 hairDesignerProfile.getHairDesignerPriceSet().add(patchRequestDto.toEntity(hairDesignerProfile));
             }
-//            hairDesignerPriceRepository.deleteAllInBatch(hairDesignerPriceRepository.findAllByHairDesignerProfileInPriceEntityAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
-//
-//            hairDesignerPriceRepository.saveAll(
-//                    patchDto.getPricePatchRequestDtoList()
-//                            .stream()
-//                            .map(hairDesignerPricePatchRequestDto -> hairDesignerPricePatchRequestDto.toEntity(hairDesigner))
-//                            .collect(Collectors.toList())
-//            );
+
         }
 
         if (patchDto.getWorkingDayPatchRequestDtoList() != null) {
@@ -318,14 +242,6 @@ public class HairDesignerService {
                 hairDesignerProfile.getHairDesignerWorkingDaySet().add(patchRequestDto.toEntity(hairDesignerProfile));
             }
 
-//            hairDesignerWorkingDayRepository.deleteAllInBatch(hairDesignerWorkingDayRepository.findAllByHairDesignerProfileInWorkingDayEntityAndStatus(hairDesigner, StatusKind.NORMAL.getId()));
-//
-//            hairDesignerWorkingDayRepository.saveAll(
-//                    patchDto.getWorkingDayPatchRequestDtoList()
-//                            .stream()
-//                            .map(hairDesignerWorkingDayPatchRequestDto -> hairDesignerWorkingDayPatchRequestDto.toEntity(hairDesigner))
-//                            .collect(Collectors.toList())
-//            );
         }
 
 

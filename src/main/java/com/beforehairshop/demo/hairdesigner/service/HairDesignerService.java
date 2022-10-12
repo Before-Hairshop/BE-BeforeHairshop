@@ -102,7 +102,7 @@ public class HairDesignerService {
         }
 
         hairDesignerProfileRepository.save(hairDesignerProfile);
-        
+
 
         // 권한 변경()
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(hairDesigner, "ROLE_DESIGNER");
@@ -167,7 +167,7 @@ public class HairDesignerService {
                 = hairDesignerProfileList.stream()
                 .map(hairDesignerProfile1 -> new HairDesignerProfileAndHashtagDto(
                         new HairDesignerProfileDto(hairDesignerProfile1),
-                        reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile.getId(), StatusKind.NORMAL.getId()),
+                        reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile1.getId(), StatusKind.NORMAL.getId()),
 
                         hairDesignerProfile1.getHairDesignerHashtagSet().stream()
                                 .map(HairDesignerHashtagDto::new)

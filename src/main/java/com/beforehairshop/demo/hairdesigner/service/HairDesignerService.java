@@ -188,7 +188,7 @@ public class HairDesignerService {
         /**
          * 별점, 리뷰 정보 가져오는 부분
          */
-        Float averageStarRating = reviewRepository.calculateByHairDesignerIdAndStatus(designer.getId(), StatusKind.NORMAL.getId());
+        Float averageStarRating = reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile.getId(), StatusKind.NORMAL.getId());
 
         List<HairDesignerHashtagDto> hashtagDtoList = hairDesignerProfile.getHairDesignerHashtagSet().stream().map(HairDesignerHashtagDto::new).collect(Collectors.toList());
         List<HairDesignerWorkingDayDto> workingDayDtoList = hairDesignerProfile.getHairDesignerWorkingDaySet().stream().map(HairDesignerWorkingDayDto::new).collect(Collectors.toList());
@@ -228,7 +228,7 @@ public class HairDesignerService {
                 = hairDesignerProfileList.stream()
                 .map(hairDesignerProfile1 -> new HairDesignerProfileAndHashtagDto(
                         new HairDesignerProfileDto(hairDesignerProfile1),
-                        reviewRepository.calculateByHairDesignerIdAndStatus(hairDesignerProfile.getHairDesigner().getId(), StatusKind.NORMAL.getId()),
+                        reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile.getId(), StatusKind.NORMAL.getId()),
 
                         hairDesignerProfile1.getHairDesignerHashtagSet().stream()
                                 .map(HairDesignerHashtagDto::new)
@@ -372,7 +372,7 @@ public class HairDesignerService {
 
         List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList = hairDesignerProfileList.stream()
                 .map(hairDesignerProfile -> new HairDesignerProfileAndHashtagDto(new HairDesignerProfileDto(hairDesignerProfile)
-                        , reviewRepository.calculateByHairDesignerIdAndStatus(hairDesignerProfile.getHairDesigner().getId(), StatusKind.NORMAL.getId())
+                        , reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile.getId(), StatusKind.NORMAL.getId())
                         , hairDesignerProfile.getHairDesignerHashtagSet().stream().map(HairDesignerHashtagDto::new).collect(Collectors.toList())))
                 .collect(Collectors.toList());
 

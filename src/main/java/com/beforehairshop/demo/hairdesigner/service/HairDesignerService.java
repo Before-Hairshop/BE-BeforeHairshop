@@ -36,6 +36,7 @@ import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,9 +52,10 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class HairDesignerService {
 
+    private final CloudFrontUrlHandler cloudFrontUrlHandler;
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
     private final HairDesignerWorkingDayRepository hairDesignerWorkingDayRepository;
     private final HairDesignerPriceRepository hairDesignerPriceRepository;
@@ -267,10 +269,10 @@ public class HairDesignerService {
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 헤어 디자이너 프로필이 없습니다.");
 
         // presigned url 생성
-        String preSignedUrl = amazonS3Service.generatePreSignedUrl(CloudFrontUrlHandler.getProfileOfDesignerS3Path(hairDesigner.getId()));
+        String preSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfDesignerS3Path(hairDesigner.getId()));
 
-        hairDesignerProfile.setImageUrl(CloudFrontUrlHandler.getProfileOfDesignerImageUrl(hairDesigner.getId()));
-        hairDesigner.setImageUrl(CloudFrontUrlHandler.getProfileOfDesignerImageUrl(hairDesigner.getId()));
+        hairDesignerProfile.setImageUrl(cloudFrontUrlHandler.getProfileOfDesignerImageUrl(hairDesigner.getId()));
+        hairDesigner.setImageUrl(cloudFrontUrlHandler.getProfileOfDesignerImageUrl(hairDesigner.getId()));
 
         // 권한 변경 X (image url 변경)
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(hairDesigner, "ROLE_DESIGNER");
@@ -322,8 +324,27 @@ public class HairDesignerService {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        String preSignedUrl = amazonS3Service.generatePreSignedUrl(CloudFrontUrlHandler.getProfileOfDesignerS3Path(member.getId()));
+        String preSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfDesignerS3Path(member.getId()));
 
         return makeResult(HttpStatus.OK, new HairDesignerProfileImageResponseDto(preSignedUrl));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findMe(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        if (member.getDesignerFlag() != 1 && member.getRole() != "ROLE_DESIGNER")
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 헤어 디자이너가 아닙니다.");
+
+
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
+                member, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.NOT_FOUND, "아직 프로필을 등록하지 않은 유저입니다.");
+
+        return makeResult(HttpStatus.OK, new HairDesignerProfileDto(hairDesignerProfile));
     }
 }

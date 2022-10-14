@@ -19,6 +19,7 @@ import com.beforehairshop.demo.recommend.repository.RecommendImageRepository;
 import com.beforehairshop.demo.recommend.repository.RecommendRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,11 @@ import java.util.stream.Collectors;
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RecommendService {
+
+    private final CloudFrontUrlHandler cloudFrontUrlHandler;
 
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
@@ -92,12 +96,12 @@ public class RecommendService {
 
             recommendImagePreSignedUrlList.add(
                     amazonS3Service.generatePreSignedUrl(
-                        CloudFrontUrlHandler.getRecommendImageS3Path(recommendId, recommendImage.getId())
+                            cloudFrontUrlHandler.getRecommendImageS3Path(recommendId, recommendImage.getId())
                     )
             );
 
             recommendImage.setImageUrl(
-                    CloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
+                    cloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
             );
             recommend.getRecommendImageSet().add(recommendImage);
         }
@@ -155,12 +159,12 @@ public class RecommendService {
 
             addImagePreSignedUrlList.add(
                     amazonS3Service.generatePreSignedUrl(
-                            CloudFrontUrlHandler.getRecommendImageS3Path(recommendId, recommendImage.getId())
+                            cloudFrontUrlHandler.getRecommendImageS3Path(recommendId, recommendImage.getId())
                     )
             );
 
             recommendImage.setImageUrl(
-                    CloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
+                    cloudFrontUrlHandler.getRecommendImageUrl(recommendId, recommendImage.getId())
             );
             recommend.getRecommendImageSet().add(recommendImage);
         }

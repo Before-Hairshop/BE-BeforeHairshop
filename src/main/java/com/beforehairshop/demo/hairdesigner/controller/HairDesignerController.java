@@ -33,6 +33,13 @@ public class HairDesignerController {
     private final AmazonS3Service amazonS3Service;
 
 
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "본인 - 헤어 디자이너 프로필 조회 API")
+    @GetMapping("")
+    public ResponseEntity<ResultDto> findMe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return hairDesignerService.findMe(principalDetails.getMember());
+    }
+
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "헤어 디자이너 상세 조회(id)")
     @GetMapping("id")

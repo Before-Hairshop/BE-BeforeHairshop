@@ -55,6 +55,12 @@ public class MemberController {
         return memberService.changeToUser(principalDetails.getMember());
     }
 
+//    @PostMapping("/sign_in/kakao")
+//    @Operation(summary = "회원가입(카카오)")
+//    public ResponseEntity<ResultDto> signInKako(@RequestBody "member save dto") {
+//
+//    }
+
 
 
 }

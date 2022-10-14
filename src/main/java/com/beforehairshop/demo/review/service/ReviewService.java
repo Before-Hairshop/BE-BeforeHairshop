@@ -39,6 +39,7 @@ import static com.beforehairshop.demo.response.ResultDto.*;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
+    private final CloudFrontUrlHandler cloudFrontUrlHandler;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
@@ -178,14 +179,14 @@ public class ReviewService {
 
             reviewImage = reviewImageRepository.save(reviewImage);
             String preSignedUrl = amazonS3Service.generatePreSignedUrl(
-                    CloudFrontUrlHandler.getReviewImageS3Path(review.getId(), reviewImage.getId())
+                    cloudFrontUrlHandler.getReviewImageS3Path(review.getId(), reviewImage.getId())
             );
 
             reviewImagePreSignedList.add(preSignedUrl);
 
             // image url 수정
             reviewImage.setImageUrl(
-                    CloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId())
+                    cloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId())
             );
 
             review.getReviewImageSet().add(reviewImage);
@@ -228,13 +229,13 @@ public class ReviewService {
 
             reviewImage = reviewImageRepository.save(reviewImage);
             String preSignedUrl = amazonS3Service.generatePreSignedUrl(
-                    CloudFrontUrlHandler.getReviewImageS3Path(review.getId(), reviewImage.getId())
+                    cloudFrontUrlHandler.getReviewImageS3Path(review.getId(), reviewImage.getId())
             );
 
             reviewImagePreSignedUrlList.add(preSignedUrl);
 
             // image url 수정
-            reviewImage.setImageUrl(CloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId()));
+            reviewImage.setImageUrl(cloudFrontUrlHandler.getReviewImageUrl(review.getId(), reviewImage.getId()));
 
             review.getReviewImageSet().add(reviewImage);
         }

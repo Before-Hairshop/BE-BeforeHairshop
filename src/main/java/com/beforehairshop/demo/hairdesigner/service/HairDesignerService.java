@@ -328,4 +328,23 @@ public class HairDesignerService {
 
         return makeResult(HttpStatus.OK, new HairDesignerProfileImageResponseDto(preSignedUrl));
     }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findMe(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        if (member.getDesignerFlag() != 1 && member.getRole() != "ROLE_DESIGNER")
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 헤어 디자이너가 아닙니다.");
+
+
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
+                member, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.NOT_FOUND, "아직 프로필을 등록하지 않은 유저입니다.");
+
+        return makeResult(HttpStatus.OK, new HairDesignerProfileDto(hairDesignerProfile));
+    }
 }

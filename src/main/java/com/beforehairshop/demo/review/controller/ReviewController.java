@@ -30,6 +30,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final AmazonS3Service amazonS3Service;
 
+    
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 목록 조회")
     @GetMapping("list")

@@ -45,7 +45,7 @@ public class RecommendController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
-    @Operation(summary = "스타일 추천서 한 개 조회")
+    @Operation(summary = "스타일 추천서 한 개 상세 조회")
     @GetMapping("")
     public ResponseEntity<ResultDto> findOne(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "recommend_id") BigInteger recommendId) {

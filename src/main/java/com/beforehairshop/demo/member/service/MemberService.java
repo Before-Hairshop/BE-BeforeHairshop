@@ -415,7 +415,7 @@ public class MemberService {
             return makeResult(HttpStatus.NOT_FOUND, "헤어 디자이너가 프로필이 없습니다.");
 
         List<MemberProfile> memberProfileList
-                = memberProfileRepository.findManyByLocationAndStatus(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude()
+                = memberProfileRepository.findManyByLocationAndMatchingFlagAndStatus(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude()
                 , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
 
         List<MemberProfileDto> memberProfileListResponseDtoList = memberProfileList.stream()

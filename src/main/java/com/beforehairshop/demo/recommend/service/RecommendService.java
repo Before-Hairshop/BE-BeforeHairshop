@@ -15,8 +15,10 @@ import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.recommend.domain.Recommend;
 import com.beforehairshop.demo.recommend.domain.RecommendImage;
 import com.beforehairshop.demo.recommend.dto.RecommendDto;
+import com.beforehairshop.demo.recommend.dto.RecommendImageDto;
 import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendSaveRequestDto;
+import com.beforehairshop.demo.recommend.dto.response.RecommendDetailResponseDto;
 import com.beforehairshop.demo.recommend.repository.RecommendImageRepository;
 import com.beforehairshop.demo.recommend.repository.RecommendRepository;
 import com.beforehairshop.demo.response.ResultDto;
@@ -210,7 +212,21 @@ public class RecommendService {
         if (recommend == null)
             return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
 
-        return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+        List<RecommendImageDto> recommendImageDtoList = new ArrayList<>();
+        if (recommend.getRecommendImageSet() == null || recommend.getRecommendImageSet().size() == 0) {
+            recommendImageDtoList = null;
+        }
+        else {
+            recommendImageDtoList = recommend.getRecommendImageSet().stream()
+                    .map(RecommendImageDto::new)
+                    .collect(Collectors.toList());
+        }
+
+
+        return makeResult(HttpStatus.OK, new RecommendDetailResponseDto(
+                new RecommendDto(recommend)
+                ,recommendImageDtoList
+        ));
     }
 
 

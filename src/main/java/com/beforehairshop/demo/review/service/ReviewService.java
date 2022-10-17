@@ -122,6 +122,9 @@ public class ReviewService {
         if (review == null)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id를 가지는 리뷰는 없습니다.");
 
+        if (!review.getReviewer().getId().equals(member.getId()))
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "해당 리뷰를 수정할 권한이 없는 유저입니다.");
+
         if (reviewPatchRequestDto.getTotalRating() != null)
             review.setTotalRating(reviewPatchRequestDto.getTotalRating());
 
@@ -203,7 +206,7 @@ public class ReviewService {
 
         Review review = reviewRepository.findById(reviewId).orElse(null);
         if (!review.getReviewer().getId().equals(member.getId())) {
-            return makeResult(HttpStatus.BAD_REQUEST, "수정 권한이 없는 유저입니다.");
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "수정 권한이 없는 유저입니다.");
         }
 
         // 삭제할 이미지 삭제

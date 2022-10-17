@@ -59,6 +59,9 @@ public class RecommendService {
         if (memberProfile == null)
             return makeResult(HttpStatus.BAD_REQUEST, "추천을 받을 유저의 프로필이 없습니다.");
 
+        if (memberProfile.getMatchingActivationFlag() != 1)
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "추천을 받을 유저가 매칭을 비활성화시켰습니다.");
+
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(recommender, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
             return makeResult(HttpStatus.NOT_FOUND, "추천을 보낼 디자이너의 프로필이 없습니다");

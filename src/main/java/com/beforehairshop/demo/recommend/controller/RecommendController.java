@@ -93,6 +93,8 @@ public class RecommendController {
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "추천을 보낼 디자이너의 프로필이 없습니다"
                     , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "503", description = "추천을 받을 유저가 매칭을 비활성화시켰습니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })

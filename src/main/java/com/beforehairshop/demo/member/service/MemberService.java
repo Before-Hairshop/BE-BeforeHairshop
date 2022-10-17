@@ -100,8 +100,6 @@ public class MemberService {
     private boolean saveDtoIsValid(MemberProfileSaveRequestDto memberProfileSaveRequestDto) {
         return memberProfileSaveRequestDto.getName() != null && memberProfileSaveRequestDto.getHairCondition() != null
                 && memberProfileSaveRequestDto.getHairTendency() != null && memberProfileSaveRequestDto.getPayableAmount() != null
-                && memberProfileSaveRequestDto.getZipCode() != null && memberProfileSaveRequestDto.getZipAddress() != null
-                && memberProfileSaveRequestDto.getLatitude() != null && memberProfileSaveRequestDto.getLongitude() != null
                 && memberProfileSaveRequestDto.getTreatmentDate() != null && memberProfileSaveRequestDto.getPhoneNumber() != null;
     }
 

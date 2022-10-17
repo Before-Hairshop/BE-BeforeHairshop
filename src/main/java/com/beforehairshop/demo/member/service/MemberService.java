@@ -76,10 +76,10 @@ public class MemberService {
 
         // 이미 존재한다면, bad request 처리해준다.
         if (memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null) != null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 이미 존재합니다. 유저 당 하나의 프로필만 존재할 수 있습니다.");
+            return makeResult(HttpStatus.CONFLICT, "해당 유저의 프로필은 이미 존재합니다. 유저 당 하나의 프로필만 존재할 수 있습니다.");
 
-        if (memberProfileSaveRequestDto.getName() == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "닉네임을 입력하지 않았습니다.");
+        if (!saveDtoIsValid(memberProfileSaveRequestDto))
+            return makeResult(HttpStatus.NO_CONTENT, "필요한 정보를 전부 입력하지 않았습니다.");
 
         Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (updatedMember == null)
@@ -95,6 +95,14 @@ public class MemberService {
         memberProfileRepository.save(memberProfile);
 
         return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
+    }
+
+    private boolean saveDtoIsValid(MemberProfileSaveRequestDto memberProfileSaveRequestDto) {
+        return memberProfileSaveRequestDto.getName() != null && memberProfileSaveRequestDto.getHairCondition() != null
+                && memberProfileSaveRequestDto.getHairTendency() != null && memberProfileSaveRequestDto.getPayableAmount() != null
+                && memberProfileSaveRequestDto.getZipCode() != null && memberProfileSaveRequestDto.getZipAddress() != null
+                && memberProfileSaveRequestDto.getLatitude() != null && memberProfileSaveRequestDto.getLongitude() != null
+                && memberProfileSaveRequestDto.getTreatmentDate() != null && memberProfileSaveRequestDto.getPhoneNumber() != null;
     }
 
     @Transactional
@@ -125,7 +133,7 @@ public class MemberService {
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null) {
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 프로필은 존재하지 않습니다. 먼저 만들고 난 뒤 수정해야합니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "해당 유저의 프로필은 존재하지 않습니다. 먼저 만들고 난 뒤 수정해야합니다.");
         }
 
         Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
@@ -201,7 +209,8 @@ public class MemberService {
         ).orElse(null);
 
         if (memberProfile != null)
-            memberProfile.setStatus(StatusKind.DELETE.getId());
+            memberProfileRepository.delete(memberProfile);
+            //memberProfile.setStatus(StatusKind.DELETE.getId());
 
         updatedMember.setDesignerFlag(1);
         updatedMember.setRole("ROLE_DESIGNER");
@@ -271,7 +280,7 @@ public class MemberService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         if (frontImageFlag != 1)
-            return makeResult(HttpStatus.BAD_REQUEST, "Front image 는 무조건 입력해야 합니다.");
+            return makeResult(HttpStatus.NO_CONTENT, "Front image 는 무조건 입력해야 합니다.");
 
 
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
@@ -335,7 +344,7 @@ public class MemberService {
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
 
         if (memberProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저에게는 유저 프로필이 등록되어 있지 않습니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "해당 유저에게는 유저 프로필이 등록되어 있지 않습니다.");
 
         String frontPreSignedUrl = null, sidePreSignedUrl = null, backPreSignedUrl = null;
 
@@ -403,7 +412,7 @@ public class MemberService {
                 = hairDesignerProfileRepository.findByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId()).orElse(null);
 
         if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너가 프로필이 없습니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "헤어 디자이너가 프로필이 없습니다.");
 
         List<MemberProfile> memberProfileList
                 = memberProfileRepository.findManyByLocationAndStatus(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude()

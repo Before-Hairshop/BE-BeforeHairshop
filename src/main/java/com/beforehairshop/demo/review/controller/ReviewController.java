@@ -78,6 +78,10 @@ public class ReviewController {
                     , content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))),
             @ApiResponse(responseCode = "400", description = "Request body 에 잘못된 이미지 url 가 입력됐다"
                     , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "잘못된 리뷰 ID 입니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "503", description = "해당 리뷰를 수정할 권한이 없습니다"
+                    , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -92,6 +96,16 @@ public class ReviewController {
     }
 
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 저장 성공"
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewDto.class)))),
+            @ApiResponse(responseCode = "204", description = "리뷰 저장에 필요한 정보가 부족함."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "리뷰 대상이 유효하지 않거나, 헤어 디자이너가 아니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 생성(이미지 제외)")
     @PostMapping()
@@ -100,6 +114,16 @@ public class ReviewController {
         return reviewService.save(principalDetails.getMember(), reviewSaveRequestDto);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 이미지 저장 성공"
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))),
+            @ApiResponse(responseCode = "404", description = "잘못된 리뷰 ID 입니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "503", description = "해당 리뷰를 수정할 권한이 없습니다"
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 생성(이미지)")
     @PostMapping("image")
@@ -110,6 +134,16 @@ public class ReviewController {
         return reviewService.saveImage(principalDetails.getMember(), reviewId, reviewImageCount, amazonS3Service);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "잘못된 리뷰 ID 입니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "503", description = "해당 리뷰를 삭제할 권한이 없습니다"
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "리뷰 삭제")
     @DeleteMapping("")

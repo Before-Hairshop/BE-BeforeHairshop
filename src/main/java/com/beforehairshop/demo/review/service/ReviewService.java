@@ -52,6 +52,9 @@ public class ReviewService {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
+        if (!saveDtoIsValid(reviewSaveRequestDto))
+            return makeResult(HttpStatus.NO_CONTENT, "리뷰 저장에 필요한 정보가 입력되지 않았습니다.");
+
         Member reviewer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member hairDesigner = memberRepository.findByIdAndStatus(reviewSaveRequestDto.getHairDesignerId(), StatusKind.NORMAL.getId()).orElse(null);
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
@@ -60,7 +63,7 @@ public class ReviewService {
 
         if (reviewer == null || hairDesigner == null || hairDesigner.getDesignerFlag() != 1
                 || hairDesignerProfile == null)
-            return makeResult(HttpStatus.INTERNAL_SERVER_ERROR, "리뷰 대상이 유효하지 않거나, 헤어 디자이너가 아니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "리뷰 대상이 유효하지 않거나, 헤어 디자이너가 아니다.");
 
         Review review = reviewRepository.save(new Review(reviewSaveRequestDto, reviewer, hairDesignerProfile, StatusKind.NORMAL.getId()));
 
@@ -82,6 +85,12 @@ public class ReviewService {
 //                .collect(Collectors.toList()));
 
         return makeResult(HttpStatus.OK, new ReviewDto(review));
+    }
+
+    private boolean saveDtoIsValid(ReviewSaveRequestDto reviewSaveRequestDto) {
+        return reviewSaveRequestDto.getHairDesignerId() != null && reviewSaveRequestDto.getTotalRating() != null
+                && reviewSaveRequestDto.getStyleRating() != null && reviewSaveRequestDto.getServiceRating() != null
+                && reviewSaveRequestDto.getContent() != null;
     }
 
     @Transactional
@@ -168,8 +177,11 @@ public class ReviewService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
+        if (review == null)
+            return makeResult(HttpStatus.NOT_FOUND, "잘못된 리뷰 ID 입니다.");
+
         if (!review.getReviewer().getId().equals(reviewer.getId()))
-            return makeResult(HttpStatus.BAD_REQUEST, "수정 권한이 없는 유저입니다.");
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "수정 권한이 없는 유저입니다.");
 
         List<String> reviewImagePreSignedList = new ArrayList<>();
         for (int i = 0; i < reviewImageCount; i++) {
@@ -205,6 +217,9 @@ public class ReviewService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (review == null)
+            return makeResult(HttpStatus.NOT_FOUND, "잘못된 리뷰 ID 가 입력되었습니다");
+
         if (!review.getReviewer().getId().equals(member.getId())) {
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "수정 권한이 없는 유저입니다.");
         }
@@ -254,6 +269,9 @@ public class ReviewService {
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
         if (review == null)
             return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 리뷰는 존재하지 않습니다.");
+
+        if (!review.getReviewer().getId().equals(member.getId()))
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "삭제할 권한이 없는 유저입니다.");
 
         reviewRepository.delete(review);
 

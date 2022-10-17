@@ -44,7 +44,7 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        if (host.equals("localhost")) {
+        if (host.equals("localhost") || host.contains("ap-northeast-2.compute.amazonaws.com")) {
             RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
             configuration.setHostName(host);
             configuration.setPort(port);

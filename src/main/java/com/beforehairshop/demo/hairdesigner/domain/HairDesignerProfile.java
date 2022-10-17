@@ -3,6 +3,7 @@ package com.beforehairshop.demo.hairdesigner.domain;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.recommend.domain.Recommend;
+import com.beforehairshop.demo.recommend.domain.RecommendRequest;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -70,6 +71,13 @@ public class HairDesignerProfile {
             , orphanRemoval = true)
     Set<HairDesignerWorkingDay> hairDesignerWorkingDaySet = new HashSet<>();
 
+    @OneToMany(mappedBy = "toRecommendRequestProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<RecommendRequest> toRecommendRequestSet = new HashSet<>();
+
+    public void addToRecommendRequest(RecommendRequest recommendRequest) {
+        this.toRecommendRequestSet.add(recommendRequest);
+        recommendRequest.setToRecommendRequestProfile(this);
+    }
 
     public void addHashtag(HairDesignerHashtag hashtag) {
         this.hairDesignerHashtagSet.add(hashtag);

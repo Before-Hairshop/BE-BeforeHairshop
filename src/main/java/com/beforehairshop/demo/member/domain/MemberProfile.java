@@ -3,6 +3,7 @@ package com.beforehairshop.demo.member.domain;
 import com.beforehairshop.demo.member.dto.MemberProfileDto;
 import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
 import com.beforehairshop.demo.recommend.domain.Recommend;
+import com.beforehairshop.demo.recommend.domain.RecommendRequest;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -78,6 +79,16 @@ public class MemberProfile {
 
     @OneToMany(mappedBy = "memberProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberProfileDesiredHairstyleImage> memberProfileDesiredHairstyleImageSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "fromRecommendRequestProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RecommendRequest> fromRecommendRequestSet = new HashSet<>();
+
+
+    public void addFromRecommendRequest(RecommendRequest recommendRequest) {
+        this.fromRecommendRequestSet.add(recommendRequest);
+        recommendRequest.setFromRecommendRequestProfile(this);
+    }
+
 
     public void addDesiredHairstyleImage(MemberProfileDesiredHairstyleImage desiredHairstyleImage) {
         this.memberProfileDesiredHairstyleImageSet.add(desiredHairstyleImage);

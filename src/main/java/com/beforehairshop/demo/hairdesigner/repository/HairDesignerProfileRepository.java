@@ -14,7 +14,10 @@ public interface HairDesignerProfileRepository extends JpaRepository<HairDesigne
 
     Optional<HairDesignerProfile> findByHairDesignerAndStatus(Member hairDesigner, Integer status);
 
+    Optional<HairDesignerProfile> findByIdAndStatus(BigInteger id, Integer status);
+
     List<HairDesignerProfile> findAllByNameAndStatus(String name, Integer status, Pageable pageable);
+
 
     @Query(value = "SELECT *, ( 6371 * acos (cos ( radians(?1) ) * cos( radians( h.latitude ) ) * cos( radians( h.longitude ) - radians(?2) ) + sin ( radians(?1) ) * sin( radians( h.latitude )))) AS distance " +
             "FROM hair_designer_profile h WHERE h.status = ?4 GROUP BY h.id HAVING distance <= 10 " +

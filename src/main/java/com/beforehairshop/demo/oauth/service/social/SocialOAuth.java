@@ -18,13 +18,14 @@ public interface SocialOAuth {
     String requestAccessToken(String code);
 
     default SocialLoginType type() {
-        if (this instanceof GoogleOAuth) {
-            return SocialLoginType.GOOGLE;
-        } else if (this instanceof KakaoOAuth) {
+        if (this instanceof KakaoOAuth) {
             return SocialLoginType.KAKAO;
         } else {
             return null;
         }
+//        if (this instanceof GoogleOAuth) {
+//            return SocialLoginType.GOOGLE;
+//        }
     }
 
     /**

@@ -1,20 +1,42 @@
 package com.beforehairshop.demo.oauth.controller;
 
 import com.beforehairshop.demo.member.service.MemberService;
+import com.beforehairshop.demo.oauth.dto.post.AppleUserSaveRequestDto;
+import com.beforehairshop.demo.oauth.dto.post.KakaoUserSaveRequestDto;
 import com.beforehairshop.demo.oauth.service.OAuthService;
+import com.beforehairshop.demo.response.ResultDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.relation.RelationSupport;
+
 @RestController
-@CrossOrigin
-@RequiredArgsConstructor
-@RequestMapping(value = "/auth")
-@Slf4j
+@Tag(name = "모든 유저 관련 Controller")
+@AllArgsConstructor
+@RequestMapping("/api/v1/oauth")
 public class OAuthController {
 
     private final OAuthService oAuthService;
     private final MemberService memberService;
+
+    @PostMapping("kakao")
+    @Operation(summary = "카카오 로그인 API")
+    public ResponseEntity<ResultDto> signInKakao(@RequestBody KakaoUserSaveRequestDto saveRequestDto) {
+        return oAuthService.signInKakao(saveRequestDto);
+    }
+
+    @PostMapping("apple")
+    @Operation(summary = "애플 로그인 API")
+    public ResponseEntity<ResultDto> signInApple(@RequestBody AppleUserSaveRequestDto saveRequestDto) {
+        return oAuthService.signInApple(saveRequestDto);
+    }
+
+
 
 //    /**
 //     * 사용자로부터 SNS 로그인 요청을 Social Login Type 을 받아 처리

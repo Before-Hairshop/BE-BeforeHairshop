@@ -2,9 +2,14 @@ name: CI / CD with Gradle (SpringBoot Project)
 
 on:
   push:
-    branches: [ "main" ]
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - main
+      - develop
   pull_request:
-    branches: [ "main" ]
+    branches:    
+      - main
+      - develop
 
 permissions:
   contents: read
@@ -34,6 +39,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     
+    ## ==== Prod 환경에서의 secret 파일 생성 ====
+
     ## create application.yml (in prod)
     - name: make application.yml (in prod)
       if: contains(github.ref, 'main')
@@ -42,24 +49,6 @@ jobs:
         touch ./application.yml
         echo "${{secrets.APPLICATION_IN_PROD}}" > ./application.yml
       shell: bash    
-
-    # ## create application.yml (in dev)
-    # - name: make application.yml (in dev)
-    #   if: contains(github.ref, 'develop')
-    #   run: |
-    #     cd ./src/main/resources
-    #     touch ./application.yml
-    #     echo "${{secrets.APPLICATION_IN_DEV}}" > ./application.yml
-    #   shell: bash        
-
-    # ## create application-dev.yml
-    # - name: make application-dev.yml
-    #   if: contains(github.ref, 'develop')
-    #   run: |
-    #     cd ./src/main/resources
-    #     touch ./application-dev.yml
-    #     echo "${{secrets.APPLICATION_DEV}}" > ./application-dev.yml
-    #   shell: bash
 
     ## create application-prod.yml
     - name: make application-prod.yml
@@ -70,27 +59,63 @@ jobs:
         echo "${{secrets.APPLICATION_PROD}}" > ./application-prod.yml
       shell: bash
 
-    ## create aws.yml
+    ## create aws-prod.yml
     - name: make aws-prod.yml
+      if: contains(github.ref, 'main')
       run: |
         cd ./src/main/resources
         touch ./aws-prod.yml
         echo "${{secrets.AWS_PROD}}" > ./aws-prod.yml
       shell: bash
 
-    ## create oauth.yml
+    ## create oauth-prod.yml
     - name: make oauth-prod.yml
+      if: contains(github.ref, 'main')
       run: |
         cd ./src/main/resources
         touch ./oauth-prod.yml
         echo "${{secrets.OAUTH_PROD}}" > ./oauth-prod.yml
       shell: bash
 
-    # ## Build 
-    # - name: Build with Gradle
-    #   uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-    #   with:
-    #     arguments: build
+
+    ## ==== Dev 환경에서의 secret 파일 생성 ====
+
+    ## create application.yml (in dev)
+    - name: make application.yml (in dev)
+      if: contains(github.ref, 'develop')
+      run: |
+        cd ./src/main/resources
+        touch ./application.yml
+        echo "${{secrets.APPLICATION_IN_DEV}}" > ./application.yml
+      shell: bash    
+
+    ## create application-dev.yml
+    - name: make application-dev.yml
+      if: contains(github.ref, 'develop')
+      run: |
+        cd ./src/main/resources
+        touch ./application-dev.yml
+        echo "${{secrets.APPLICATION_DEV}}" > ./application-dev.yml
+      shell: bash
+
+    ## create aws-dev.yml
+    - name: make aws-dev.yml
+      if: contains(github.ref, 'develop')
+      run: |
+        cd ./src/main/resources
+        touch ./aws-dev.yml
+        echo "${{secrets.AWS_DEV}}" > ./aws-dev.yml
+      shell: bash
+
+    ## create oauth-dev.yml
+    - name: make oauth-dev.yml
+      if: contains(github.ref, 'develop')
+      run: |
+        cd ./src/main/resources
+        touch ./oauth-dev.yml
+        echo "${{secrets.OAUTH_DEV}}" > ./oauth-dev.yml
+      shell: bash
+
 
     ## gradle build
     - name: Build with Gradle
@@ -98,24 +123,24 @@ jobs:
     
     ## ============ CD ============
 
-    ## docker build & push to production
-    - name: Docker build & push to prod
+    ## [PROD] docker build & push to production
+    - name: (PROD) Docker build & push to prod
       if: contains(github.ref, 'main')
       run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}:bh-prod .
           docker push ${{ secrets.DOCKER_REPO }}:bh-prod
 
-    # ## docker build & push to develop
-    # - name: Docker build & push to dev
-    #   if: contains(github.ref, 'develop')
-    #   run: |
-    #       docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-    #       docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}:bh-dev .
-    #       docker push ${{ secrets.DOCKER_REPO }}:bh-dev
+    ## [DEV] docker build & push to develop
+    - name: (DEV) Docker build & push to dev
+      if: contains(github.ref, 'develop')
+      run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}:bh-dev .
+          docker push ${{ secrets.DOCKER_REPO }}:bh-dev
 
-    ## deploy to prod (ap-northeast-2a)
-    - name: Deploy to prod (ap-northeast-2a)
+    ## [PROD] deploy to prod (ap-northeast-2a)
+    - name: (PROD) Deploy to prod (ap-northeast-2a)
       uses: appleboy/ssh-action@master
       id: deploy-prod-a
       if: contains(github.ref, 'main')
@@ -131,8 +156,8 @@ jobs:
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
 
-    ## deploy to prod (ap-northeast-2c)
-    - name: Deploy to prod (ap-northeast-2c)
+    ## [PROD] deploy to prod (ap-northeast-2c)
+    - name: (PROD) Deploy to prod (ap-northeast-2c)
       uses: appleboy/ssh-action@master
       id: deploy-prod-c
       if: contains(github.ref, 'main')
@@ -147,21 +172,39 @@ jobs:
             docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
-
-    # ## deploy to develop
-    # - name: Deploy to dev
-    #   uses: appleboy/ssh-action@master
-    #   id: deploy-dev
-    #   if: contains(github.ref, 'develop')
-    #   with:
-    #     host: ${{ secrets.HOST_DEV }}
-    #     username: ${{ secrets.USERNAME }}
-    #     password: ${{ secrets.PASSWORD }}
-    #     port: 22
-    #     #key: ${{ secrets.PRIVATE_KEY }}
-    #     script: |
-    #         sudo docker rm -f $(docker ps -qa)
-    #         sudo docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
-    #         docker-compose up -d
-    #         docker image prune -f
     
+    ## [DEV] deploy to develop (ap-northeast-2a)
+    - name: (DEV) Deploy to dev (ap-northeast-2a) 
+      uses: appleboy/ssh-action@master
+      id: deploy-dev-a
+      if: contains(github.ref, 'develop')
+      with:
+        host: ${{ secrets.EC2_HOST_IN_A_DEV }}
+        username: ${{ secrets.EC2_IN_A_USERNAME }}
+        password: ${{ secrets.EC2_IN_A_PASSWORD }}
+        port: 22
+        #key: ${{ secrets.PRIVATE_KEY }}
+        script: |
+            sudo docker rm -f $(docker ps -aq)
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
+            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-dev
+            docker image prune -f
+    
+    ## [DEV] deploy to develop (ap-northeast-2c)
+    - name: (DEV) Deploy to dev (ap-northeast-2c) 
+      uses: appleboy/ssh-action@master
+      id: deploy-dev-c
+      if: contains(github.ref, 'develop')
+      with:
+        host: ${{ secrets.EC2_HOST_IN_C_DEV }}
+        username: ${{ secrets.EC2_IN_C_USERNAME }}
+        password: ${{ secrets.EC2_IN_C_PASSWORD }}
+        port: 22
+        #key: ${{ secrets.PRIVATE_KEY }}
+        script: |
+            sudo docker rm -f $(docker ps -aq)
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
+            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-dev
+            docker image prune -f

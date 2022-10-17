@@ -1,5 +1,7 @@
 package com.beforehairshop.demo.recommend.service;
 
+import com.amazonaws.services.ecs.model.StabilityStatus;
+import com.amazonaws.services.xray.model.Http;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
@@ -53,20 +55,15 @@ public class RecommendService {
 
         MemberProfile memberProfile = memberProfileRepository.findById(memberProfileId).orElse(null);
         if (memberProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "추천을 받을 유저가 유효하지 않습니다.");
+            return makeResult(HttpStatus.BAD_REQUEST, "추천을 받을 유저의 프로필이 없습니다.");
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(recommender, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.BAD_GATEWAY, "추천을 보낼 유저가 유효하지 않다.");
+            return makeResult(HttpStatus.NOT_FOUND, "추천을 보낼 디자이너의 프로필이 없습니다");
 
         Recommend recommend = new Recommend(hairDesignerProfile, memberProfile, recommendSaveRequestDto, StatusKind.NORMAL.getId());
         memberProfile.getRecommendedSet().add(recommend);
         hairDesignerProfile.getRecommendSet().add(recommend);
-
-        Member updatedRecommender = memberRepository.findByIdAndStatus(recommender.getId(), StatusKind.NORMAL.getId()).orElse(null);
-        Member updatedRecommendedPerson = memberRepository.findByIdAndStatus(memberProfile.getMember().getId(), StatusKind.NORMAL.getId()).orElse(null);
-        if (updatedRecommender == null || updatedRecommendedPerson == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "추천하는 사람 혹은 추천받는 사람의 member entity 가 null 입니다.");
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
@@ -79,7 +76,7 @@ public class RecommendService {
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
 
         if (recommend == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "Style Recommend Id가 잘못된 값입니다.");
+            return makeResult(HttpStatus.BAD_REQUEST, "Recommend Id 가 잘못된 값입니다.");
 
 
         List<String> recommendImagePreSignedUrlList = new ArrayList<>();
@@ -119,8 +116,12 @@ public class RecommendService {
         ).orElse(null);
 
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (hairDesignerProfile == null || !recommend.getRecommenderProfile().getId().equals(hairDesignerProfile.getId()) ||recommend == null)
-            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서가 없거나 추천서를 수정할 권한이 없습니다.");
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서가 없습니다.");
+
+        if (recommend == null || !recommend.getRecommenderProfile().getId().equals(hairDesignerProfile.getId())) {
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 해당 추천서를 수정할 권한이 없습니다.");
+        }
 
         // Entity 의 필드 값 수정
         recommend.patchEntity(patchDto);
@@ -214,7 +215,7 @@ public class RecommendService {
 
 
     @Transactional
-    public ResponseEntity<ResultDto> findManyByMe(Member member, Integer pageNumber) {
+    public ResponseEntity<ResultDto> findManyByMe(Member member) {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
@@ -222,9 +223,9 @@ public class RecommendService {
         if (memberProfile == null)
             return makeResult(HttpStatus.NOT_FOUND, "프로필이 등록되어 있지 않습니다.");
 
-        // 위치 순서로 10km 이내의 헤어
-        List<Recommend> recommendList = recommendRepository.findByRecommendedProfileAndStatusAndSortingByLocation(memberProfile.getId(), memberProfile.getLatitude(), memberProfile.getLongitude()
-                , new PageOffsetHandler().getOffsetByPageNumber(pageNumber), StatusKind.NORMAL.getId());
+        List<Recommend> recommendList = recommendRepository.findByRecommendedProfileAndStatusAndSortingByLocation(memberProfile.getId()
+                , memberProfile.getLatitude(), memberProfile.getLongitude()
+                , StatusKind.NORMAL.getId());
 
         List<RecommendDto> recommendDtoList = recommendList.stream()
                 .map(RecommendDto::new)
@@ -242,8 +243,45 @@ public class RecommendService {
         if (recommend == null)
             return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서는 없습니다");
 
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
+                member, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
+        if (hairDesignerProfile == null) {
+            return makeResult(HttpStatus.BAD_REQUEST, "디자이너의 프로필이 없습니다.");
+        }
+        if (!recommend.getRecommenderProfile().getId().equals(hairDesignerProfile.getId())) {
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "해당 유저는 추천서를 삭제할 권한이 없습니다");
+        }
+
         recommendRepository.delete(recommend);
 
         return makeResult(HttpStatus.OK, "삭제 완료");
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findManyByDesigner(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        if (member.getDesignerFlag() != 1 || !member.getRole().equals("ROLE_DESIGNER"))
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저가 디자이너가 아닙니다.");
+
+
+        HairDesignerProfile hairDesignerProfile
+                = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 유저의 헤어 디자이너 프로필이 없습니다.");
+
+        List<Recommend> recommendList
+                = recommendRepository.findByRecommenderProfileAndStatusOrderByCreateDate(hairDesignerProfile, StatusKind.NORMAL.getId());
+
+        if (recommendList == null)
+            return makeResult(HttpStatus.OK, null);
+        else
+            return makeResult(HttpStatus.OK
+                    , recommendList.stream()
+                            .map(RecommendDto::new)
+                            .collect(Collectors.toList()));
     }
 }

@@ -71,7 +71,7 @@ public class HairDesignerService {
 
         Member hairDesigner = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesigner == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "id 값으로 불러온 member 가 null 입니다. id 값을 확인해주세요");
+            return makeResult(HttpStatus.NOT_FOUND, "삭제되었거나 유효하지 않은 유저입니다.");
 
         if (hairDesigner.getDesignerFlag() == 0)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 일반 유저입니다. 권한 변경을 먼저 해주시기 바랍니다.");
@@ -80,27 +80,33 @@ public class HairDesignerService {
 
         HairDesignerProfile hairDesignerProfile = new HairDesignerProfile(hairDesigner, hairDesignerProfileSaveRequestDto, StatusKind.NORMAL.getId());
 
-        for (HairDesignerHashtagSaveRequestDto hashtagSaveRequestDto : hairDesignerProfileSaveRequestDto.getHashtagList()) {
-            HairDesignerHashtag hashtag = new HairDesignerHashtag(hairDesignerProfile, hashtagSaveRequestDto.getTag(), StatusKind.NORMAL.getId());
-            hairDesignerProfile.addHashtag(hashtag);
+        if (hairDesignerProfileSaveRequestDto.getHashtagList() != null) {
+            for (HairDesignerHashtagSaveRequestDto hashtagSaveRequestDto : hairDesignerProfileSaveRequestDto.getHashtagList()) {
+                HairDesignerHashtag hashtag = new HairDesignerHashtag(hairDesignerProfile, hashtagSaveRequestDto.getTag(), StatusKind.NORMAL.getId());
+                hairDesignerProfile.addHashtag(hashtag);
+            }
         }
 
-        for (HairDesignerPriceSaveRequestDto priceSaveRequestDto : hairDesignerProfileSaveRequestDto.getPriceList()) {
-            HairDesignerPrice hairDesignerPrice = new HairDesignerPrice(hairDesignerProfile
-                    , priceSaveRequestDto.getHairCategory()
-                    , priceSaveRequestDto.getHairStyleName()
-                    , priceSaveRequestDto.getPrice()
-                    , StatusKind.NORMAL.getId());
-            hairDesignerProfile.addPrice(hairDesignerPrice);
+        if (hairDesignerProfileSaveRequestDto.getPriceList() != null) {
+            for (HairDesignerPriceSaveRequestDto priceSaveRequestDto : hairDesignerProfileSaveRequestDto.getPriceList()) {
+                HairDesignerPrice hairDesignerPrice = new HairDesignerPrice(hairDesignerProfile
+                        , priceSaveRequestDto.getHairCategory()
+                        , priceSaveRequestDto.getHairStyleName()
+                        , priceSaveRequestDto.getPrice()
+                        , StatusKind.NORMAL.getId());
+                hairDesignerProfile.addPrice(hairDesignerPrice);
+            }
         }
 
-        for (HairDesignerWorkingDaySaveRequestDto workingDaySaveRequestDto : hairDesignerProfileSaveRequestDto.getWorkingDayList()) {
-            HairDesignerWorkingDay hairDesignerWorkingDay = new HairDesignerWorkingDay(hairDesignerProfile
-                    , workingDaySaveRequestDto.getWorkingDay()
-                    , workingDaySaveRequestDto.getStartTime()
-                    , workingDaySaveRequestDto.getEndTime()
-                    , StatusKind.NORMAL.getId());
-            hairDesignerProfile.addWorkingDay(hairDesignerWorkingDay);
+        if (hairDesignerProfileSaveRequestDto.getWorkingDayList() != null) {
+            for (HairDesignerWorkingDaySaveRequestDto workingDaySaveRequestDto : hairDesignerProfileSaveRequestDto.getWorkingDayList()) {
+                HairDesignerWorkingDay hairDesignerWorkingDay = new HairDesignerWorkingDay(hairDesignerProfile
+                        , workingDaySaveRequestDto.getWorkingDay()
+                        , workingDaySaveRequestDto.getStartTime()
+                        , workingDaySaveRequestDto.getEndTime()
+                        , StatusKind.NORMAL.getId());
+                hairDesignerProfile.addWorkingDay(hairDesignerWorkingDay);
+            }
         }
 
         hairDesignerProfileRepository.save(hairDesignerProfile);
@@ -118,12 +124,13 @@ public class HairDesignerService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         Member designer = memberRepository.findByIdAndStatus(hairDesignerId, StatusKind.NORMAL.getId()).orElse(null);
-        if (designer == null)
+        if (designer == null || designer.getDesignerFlag() != 1)
             return makeResult(HttpStatus.BAD_REQUEST, "해당 ID를 가지는 디자이너는 없다.");
+
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 id 값을 가지는 member 는 없습니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "해당 디자이너는 프로필이 없습니다.");
 
 
         /**
@@ -187,11 +194,15 @@ public class HairDesignerService {
         if (hairDesigner == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
+        Member updatedMember = memberRepository.findByIdAndStatus(hairDesigner.getId(), StatusKind.NORMAL.getId()).orElse(null);
+        if (updatedMember == null || updatedMember.getDesignerFlag() != 1 || !updatedMember.getRole().equals("ROLE_DESIGNER"))
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 유효하지 않거나, 디자이너가 아닙니다.");
+
+
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(hairDesigner, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 디자이너 프로필이 없습니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "해당 유저는 디자이너 프로필이 없습니다.");
 
-        Member updatedMember = memberRepository.findByIdAndStatus(hairDesigner.getId(), StatusKind.NORMAL.getId()).orElse(null);
         if (patchDto.getName() != null) {
 
             hairDesignerProfile.setName(patchDto.getName());
@@ -266,7 +277,7 @@ public class HairDesignerService {
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
 
         if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저의 헤어 디자이너 프로필이 없습니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "해당 유저의 헤어 디자이너 프로필이 없습니다.");
 
         // presigned url 생성
         String preSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfDesignerS3Path(hairDesigner.getId()));
@@ -303,12 +314,12 @@ public class HairDesignerService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         Member designer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
-        if (designer == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "유저의 세션이 만료되었거나, 잘못된 유저 정보입니다.");
+        if (designer == null || designer.getDesignerFlag() != 1 || !designer.getRole().equals("ROLE_DESIGNER"))
+            return makeResult(HttpStatus.BAD_REQUEST, "유효하지 않은 유저이거나 디자이너가 아닙니다");
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
         if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저에겐 헤어 디자이너 프로필이 존재하지 않습니다.");
+            return makeResult(HttpStatus.NOT_FOUND, "해당 유저에겐 헤어 디자이너 프로필이 존재하지 않습니다.");
 
         hairDesignerProfileRepository.delete(hairDesignerProfile);
         designer.setImageUrl(null);
@@ -323,6 +334,13 @@ public class HairDesignerService {
     public ResponseEntity<ResultDto> patchImage(Member member, AmazonS3Service amazonS3Service) {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        if (member.getDesignerFlag() != 1 || !member.getRole().equals("ROLE_DESIGNER"))
+            return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 디자이너가 아닙니다.");
+
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        if (hairDesignerProfile == null)
+            return makeResult(HttpStatus.NOT_FOUND, "해당 디자이너의 프로필은 존재하지 않습니다.");
 
         String preSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfDesignerS3Path(member.getId()));
 

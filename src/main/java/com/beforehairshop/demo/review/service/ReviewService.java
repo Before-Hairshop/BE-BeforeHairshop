@@ -116,7 +116,7 @@ public class ReviewService {
                     .map(ReviewImageDto::new)
                     .collect(Collectors.toList());
 
-            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(new ReviewDto(review), hashtagDtoList, imageDtoList));
+            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(member.getName(), new ReviewDto(review), hashtagDtoList, imageDtoList));
         }
 
         return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);

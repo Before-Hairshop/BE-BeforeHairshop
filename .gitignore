@@ -160,5 +160,8 @@ application-local.yml
 application-dev.yml
 application-prod.yml
 
+# ==== Firebase Key ====
+firebase_service_key.json
+
 # ==================== Springboot ====================
 secret/

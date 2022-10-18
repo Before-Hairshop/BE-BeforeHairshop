@@ -49,6 +49,11 @@ dependencies {
 	// JWT
 	implementation 'com.auth0:java-jwt:3.19.2'
 
+	// firebase sdk
+	implementation 'com.google.firebase:firebase-admin:6.8.1'
+	// okhttp
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+
 	// devtools
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

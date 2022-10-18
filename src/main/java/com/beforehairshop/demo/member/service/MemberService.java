@@ -25,6 +25,8 @@ import com.beforehairshop.demo.member.repository.MemberProfileDesiredHairstyleIm
 import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.recommend.domain.RecommendRequest;
+import com.beforehairshop.demo.recommend.repository.RecommendRequestRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +53,8 @@ public class MemberService {
     private final MemberProfileDesiredHairstyleImageRepository memberProfileDesiredHairstyleImageRepository;
 
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
+
+    private final RecommendRequestRepository recommendRequestRepository;
 
     @Transactional
     public BigInteger save(MemberSaveRequestDto requestDto) {
@@ -497,6 +501,13 @@ public class MemberService {
         }
 
         memberProfile.setMatchingActivationFlag(MatchingFlagKind.DEACTIVATION_CODE.getId());
+
+        List<RecommendRequest> recommendRequestList = recommendRequestRepository.findByFromRecommendRequestProfileAndStatus(
+                memberProfile, StatusKind.NORMAL.getId()
+        );
+        if (recommendRequestList != null) {
+            recommendRequestRepository.deleteAll(recommendRequestList);
+        }
 
         return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
     }

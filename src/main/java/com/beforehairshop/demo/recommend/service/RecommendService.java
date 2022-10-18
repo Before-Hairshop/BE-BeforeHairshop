@@ -14,13 +14,16 @@ import com.beforehairshop.demo.member.repository.MemberProfileRepository;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.recommend.domain.Recommend;
 import com.beforehairshop.demo.recommend.domain.RecommendImage;
+import com.beforehairshop.demo.recommend.domain.RecommendRequest;
 import com.beforehairshop.demo.recommend.dto.RecommendDto;
 import com.beforehairshop.demo.recommend.dto.RecommendImageDto;
 import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendSaveRequestDto;
+import com.beforehairshop.demo.recommend.dto.response.RecommendDetailImageResponseDto;
 import com.beforehairshop.demo.recommend.dto.response.RecommendDetailResponseDto;
 import com.beforehairshop.demo.recommend.repository.RecommendImageRepository;
 import com.beforehairshop.demo.recommend.repository.RecommendRepository;
+import com.beforehairshop.demo.recommend.repository.RecommendRequestRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,7 @@ public class RecommendService {
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
     private final RecommendRepository recommendRepository;
     private final RecommendImageRepository recommendImageRepository;
+    private final RecommendRequestRepository recommendRequestRepository;
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) {
@@ -69,6 +73,16 @@ public class RecommendService {
         Recommend recommend = new Recommend(hairDesignerProfile, memberProfile, recommendSaveRequestDto, StatusKind.NORMAL.getId());
         memberProfile.getRecommendedSet().add(recommend);
         hairDesignerProfile.getRecommendSet().add(recommend);
+
+        RecommendRequest recommendRequest = recommendRequestRepository.findByToRecommendRequestProfileAndFromRecommendRequestProfileAndStatus(
+                hairDesignerProfile, memberProfile, StatusKind.NORMAL.getId()
+        ).orElse(null);
+
+        if (recommendRequest != null) {
+            memberProfile.getFromRecommendRequestSet().remove(recommendRequest);
+            hairDesignerProfile.getToRecommendRequestSet().remove(recommendRequest);
+            recommendRequestRepository.delete(recommendRequest);
+        }
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
@@ -225,9 +239,11 @@ public class RecommendService {
                     .collect(Collectors.toList());
         }
 
-
-        return makeResult(HttpStatus.OK, new RecommendDetailResponseDto(
-                new RecommendDto(recommend)
+        return makeResult(HttpStatus.OK, new RecommendDetailImageResponseDto(
+                recommend.getRecommenderProfile().getHairDesigner().getId()
+                , recommend.getRecommenderProfile().getName()
+                , recommend.getRecommenderProfile().getImageUrl()
+                , new RecommendDto(recommend)
                 ,recommendImageDtoList
         ));
     }
@@ -246,11 +262,20 @@ public class RecommendService {
                 , memberProfile.getLatitude(), memberProfile.getLongitude()
                 , StatusKind.NORMAL.getId());
 
-        List<RecommendDto> recommendDtoList = recommendList.stream()
-                .map(RecommendDto::new)
-                .collect(Collectors.toList());
+        if (recommendList == null)
+            return makeResult(HttpStatus.OK, null);
 
-        return makeResult(HttpStatus.OK, recommendDtoList);
+        List<RecommendDetailResponseDto> recommendDetailResponseDtoList
+                = recommendList.stream()
+                .map(recommend -> new RecommendDetailResponseDto(
+                        recommend.getRecommenderProfile().getHairDesigner().getId()
+                        , recommend.getRecommenderProfile().getName()
+                        , recommend.getRecommenderProfile().getImageUrl()
+                        , new RecommendDto(recommend)
+                )).collect(Collectors.toList());
+
+
+        return makeResult(HttpStatus.OK, recommendDetailResponseDtoList);
     }
 
     @Transactional
@@ -297,10 +322,14 @@ public class RecommendService {
 
         if (recommendList == null)
             return makeResult(HttpStatus.OK, null);
-        else
-            return makeResult(HttpStatus.OK
-                    , recommendList.stream()
-                            .map(RecommendDto::new)
-                            .collect(Collectors.toList()));
+
+        List<RecommendDetailResponseDto> recommendDetailResponseDtoList = recommendList.stream()
+                .map(recommend -> new RecommendDetailResponseDto(recommend.getRecommenderProfile().getHairDesigner().getId()
+                        , recommend.getRecommenderProfile().getName()
+                        , recommend.getRecommenderProfile().getImageUrl()
+                        , new RecommendDto(recommend))).collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, recommendDetailResponseDtoList);
+
     }
 }

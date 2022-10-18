@@ -12,10 +12,11 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecommendDetailResponseDto {
+public class RecommendDetailImageResponseDto {
     private BigInteger designerId;
     private String designerName;
     private String designerImage;
 
     private RecommendDto recommendDto;
+    private List<RecommendImageDto> recommendImageDtoList;
 }

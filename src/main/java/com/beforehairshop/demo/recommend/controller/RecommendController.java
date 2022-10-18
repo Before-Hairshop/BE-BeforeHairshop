@@ -7,6 +7,8 @@ import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.recommend.dto.RecommendDto;
 import com.beforehairshop.demo.recommend.dto.patch.RecommendPatchRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendSaveRequestDto;
+import com.beforehairshop.demo.recommend.dto.response.RecommendDetailImageResponseDto;
+import com.beforehairshop.demo.recommend.dto.response.RecommendDetailResponseDto;
 import com.beforehairshop.demo.recommend.service.RecommendService;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +40,7 @@ public class RecommendController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천서 조회 성공"
-                    , content = @Content(schema = @Schema(implementation = RecommendDto.class))),
+                    , content = @Content(schema = @Schema(implementation = RecommendDetailImageResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 추천서 ID 이다."
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
@@ -54,15 +56,15 @@ public class RecommendController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천받은 추천서들 조회 성공"
-                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = RecommendDto.class)))),
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = RecommendDetailResponseDto.class)))),
             @ApiResponse(responseCode = "404", description = "해당 유저는 프로필을 등록한 상태가 아닙니다."
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "[일반유저 - 모든 추천서(수락, 대기, 거절)] (위치 순서 : 10km 안) 추천받은 스타일 추천서 조회 API")
-    @GetMapping("list_by_location")
+    @Operation(summary = "[일반유저 - 모든 추천서(수락 : 2, 대기 : 1, 거절 : 0)] (위치 순서 : 10km 안) 추천받은 스타일 추천서 조회 API")
+    @GetMapping("list_by_user")
     public ResponseEntity<ResultDto> findManyByUser(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return recommendService.findManyByMe(principalDetails.getMember());
     }
@@ -70,7 +72,7 @@ public class RecommendController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "내가 작성한 추천서들 조회 성공"
-                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = RecommendDto.class)))),
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = RecommendDetailResponseDto.class)))),
             @ApiResponse(responseCode = "400", description = "해당 유저가 디자이너가 아닙니다"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "해당 유저의 디자이너 프로필이 없습니다"
@@ -79,7 +81,7 @@ public class RecommendController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-    @Operation(summary = "[디자이너 - 모든 추천서(수락, 대기, 거절)] 내가 작성한 스타일 추천서 조회 API")
+    @Operation(summary = "[디자이너 - 모든 추천서(수락 : 2, 대기 : 1, 거절 : 0)] 내가 작성한 스타일 추천서 조회 API")
     @GetMapping("list_by_designer")
     public ResponseEntity<ResultDto> findManyByDesigner(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return recommendService.findManyByDesigner(principalDetails.getMember());

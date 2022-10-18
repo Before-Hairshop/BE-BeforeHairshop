@@ -174,7 +174,7 @@ public class MemberProfileController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "유저 프로필 매칭 비활성화 API")
+    @Operation(summary = "유저 프로필 매칭 비활성화 API (스타일 추천 요청서도 삭제된다)")
     @PatchMapping("/deactivate_matching")
     public ResponseEntity<ResultDto> patchMyProfileDeactivateMatchingFlag(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.patchMyProfileDeactivateMatchingFlag(principalDetails.getMember());

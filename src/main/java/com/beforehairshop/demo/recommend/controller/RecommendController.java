@@ -61,7 +61,7 @@ public class RecommendController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "[일반유저 - 모든 추천서(수락, 대기, 거절)] (위치 순서 : 10km 안) 추천받은 스타일 추천서 조회 API")
+    @Operation(summary = "[일반유저 - 모든 추천서(수락 : 2, 대기 : 1, 거절 : 0)] (위치 순서 : 10km 안) 추천받은 스타일 추천서 조회 API")
     @GetMapping("list_by_location")
     public ResponseEntity<ResultDto> findManyByUser(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return recommendService.findManyByMe(principalDetails.getMember());
@@ -79,7 +79,7 @@ public class RecommendController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-    @Operation(summary = "[디자이너 - 모든 추천서(수락, 대기, 거절)] 내가 작성한 스타일 추천서 조회 API")
+    @Operation(summary = "[디자이너 - 모든 추천서(수락 : 2, 대기 : 1, 거절 : 0)] 내가 작성한 스타일 추천서 조회 API")
     @GetMapping("list_by_designer")
     public ResponseEntity<ResultDto> findManyByDesigner(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return recommendService.findManyByDesigner(principalDetails.getMember());

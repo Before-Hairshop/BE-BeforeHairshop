@@ -3,12 +3,14 @@ package com.beforehairshop.demo.recommend.controller;
 import com.amazonaws.Response;
 import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.member.dto.MemberDto;
+import com.beforehairshop.demo.member.dto.MemberProfileDto;
 import com.beforehairshop.demo.recommend.domain.RecommendRequest;
 import com.beforehairshop.demo.recommend.dto.RecommendRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendRequestSaveRequestDto;
 import com.beforehairshop.demo.recommend.service.RecommendRequestService;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,13 +47,24 @@ public class RecommendRequestController {
 //    public ResponseEntity<ResultDto> findManyByUser(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 //        return recommendRequestService.findManyByUser(principalDetails.getMember());
 //    }
-//
-//    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
-//    @Operation(summary = "[디자이너] 본인에게 추천서롤 요청한 유저들의 프로필 리스트")
-//    @GetMapping("list_by_designer")
-//    public ResponseEntity<ResultDto> findManyByDesigner(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        return recommendRequestService.findManyByDesigner(principalDetails.getMember());
-//    }
+
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "[디자이너] 내게 추천 요청서 작성한 유저들의 프로필 리스트 조회 성공"
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = MemberProfileDto.class)))),
+            @ApiResponse(responseCode = "404", description = "디자이너 프로필이 등록되어 있지 않다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "503", description = "해당 유저는 디자이너가 아닙니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("hasAnyRole('DESIGNER', 'ADMIN')")
+    @Operation(summary = "[디자이너] 본인에게 추천서롤 요청한 유저들의 프로필 리스트")
+    @GetMapping("list_by_designer")
+    public ResponseEntity<ResultDto> findManyByDesigner(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return recommendRequestService.findManyByDesigner(principalDetails.getMember());
+    }
 
 
     @ApiResponses({
@@ -60,6 +73,8 @@ public class RecommendRequestController {
             @ApiResponse(responseCode = "204", description = "스타일 추천 요청서 저장에 필요한 정보가 부족하다"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 디자이너 프로필 ID 가 입력되었다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "409", description = "이미 해당 디자이너에게 요청서를 보냈습니다."
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "503", description = "유저 프로필이 등록되어 있지 않아 스타일 추천 요청서를 작성할 수 없다."
                     , content = @Content(schema = @Schema(implementation = String.class))),

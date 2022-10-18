@@ -18,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "*")
 @Tag(name = "모든 유저 관련 Controller")
 @AllArgsConstructor
 @RequestMapping("/api/v1/members")

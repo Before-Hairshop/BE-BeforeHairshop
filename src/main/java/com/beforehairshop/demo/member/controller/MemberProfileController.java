@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @Tag(name = "일반 고객 프로필 관련 Controller")
 @AllArgsConstructor
 @RequestMapping("/api/v1/members/profiles")

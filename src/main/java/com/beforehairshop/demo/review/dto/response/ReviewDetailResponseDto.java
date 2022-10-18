@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewDetailResponseDto {
+    private String name;
     private ReviewDto reviewDto;
     private List<ReviewHashtagDto> hashtagDtoList;
     private List<ReviewImageDto> imageDtoList;

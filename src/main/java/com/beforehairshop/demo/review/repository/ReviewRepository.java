@@ -15,7 +15,7 @@ public interface ReviewRepository extends JpaRepository<Review, BigInteger> {
     Optional<Review> findByIdAndStatus(BigInteger id, Integer status);
     List<Review> findAllByHairDesignerProfileIdAndStatus(BigInteger hairDesignerProfileId, Integer Status, Pageable pageable);
 
-    @Query(value = "SELECT ROUND(AVG(total_rating) , 1) FROM REVIEW \n" +
+    @Query(value = "SELECT ROUND(AVG(total_rating) , 1) FROM review \n" +
             "WHERE hair_designer_profile_id = ?1 AND status = ?2 \n" +
             "GROUP BY hair_designer_profile_id;"
             , nativeQuery = true)

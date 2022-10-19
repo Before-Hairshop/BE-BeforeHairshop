@@ -6,6 +6,7 @@ import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.dto.MemberProfileDto;
 import com.beforehairshop.demo.member.dto.patch.MemberProfilePatchRequestDto;
 import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
+import com.beforehairshop.demo.member.dto.response.MemberProfileDetailResponseDto;
 import com.beforehairshop.demo.member.dto.response.MemberProfileImageResponseDto;
 import com.beforehairshop.demo.member.service.MemberService;
 import com.beforehairshop.demo.response.ResultDto;
@@ -22,6 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
@@ -43,6 +45,22 @@ public class MemberProfileController {
     @GetMapping("")
     public ResponseEntity<ResultDto> findMyProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.findMyProfile(principalDetails.getMember());
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 조회 성공"
+                    , content = @Content(schema = @Schema(implementation = MemberProfileDetailResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "잘못된 프로필 ID가 입력되었다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
+    @Operation(summary = "유저 프로필 상세 조회 API (프로필 id)")
+    @GetMapping("/detail")
+    public ResponseEntity<ResultDto> findMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "member_profile_id")BigInteger memberProfileId) {
+        return memberService.findMemberProfile(principalDetails.getMember(), memberProfileId);
     }
 
     @ApiResponses(value = {

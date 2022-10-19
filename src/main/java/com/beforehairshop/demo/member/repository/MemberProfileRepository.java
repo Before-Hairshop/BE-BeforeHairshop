@@ -17,4 +17,7 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfile, Bi
             "ORDER BY distance asc LIMIT 5 OFFSET ?3 ;",
             nativeQuery = true)
     List<MemberProfile> findManyByLocationAndMatchingFlagAndStatus(Float designer_latitude, Float designer_longitude,  int pageOffset, Integer status);
+
+    Optional<MemberProfile> findByIdAndStatus(BigInteger memberProfileId, Integer id);
+
 }

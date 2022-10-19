@@ -539,4 +539,35 @@ public class MemberService {
         log.info("[DELETE] /api/v1/members/profiles - 200 (프로필 삭제 완료)");
         return makeResult(HttpStatus.OK, "유저 프로필 삭제 완료");
     }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findMemberProfile(Member member, BigInteger memberProfileId) {
+        if (member == null) {
+            log.error("[GET] /api/v1/members/profiles/detail - 504(세션 만료)");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+        }
+
+        MemberProfile memberProfile = memberProfileRepository.findByIdAndStatus(memberProfileId, StatusKind.NORMAL.getId()).orElse(null);
+        if (memberProfile == null) {
+            log.error("[GET] /api/v1/members/profiles/detail - 404(해당 ID를 가지는 프로필 없음)");
+            return makeResult(HttpStatus.NOT_FOUND, "잘못된 프로필 ID 입니다.");
+        }
+
+        List<MemberProfileDesiredHairstyleImage> memberProfileDesiredHairstyleImageList
+                = memberProfileDesiredHairstyleImageRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
+
+        if (memberProfileDesiredHairstyleImageList == null || memberProfileDesiredHairstyleImageList.size() == 0) {
+            return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(
+                    new MemberProfileDto(memberProfile), null
+            ));
+        }
+
+        List<MemberProfileDesiredHairstyleImageDto> imageDtoList
+                = memberProfileDesiredHairstyleImageList.stream().map(MemberProfileDesiredHairstyleImageDto::new).collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(
+                new MemberProfileDto(memberProfile)
+                , imageDtoList
+        ));
+    }
 }

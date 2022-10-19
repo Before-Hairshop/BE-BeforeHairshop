@@ -403,16 +403,19 @@ public class MemberService {
         }
 
         // 원하는 스타일 이미지 중 삭제할 이미지 삭제
-        for (int i = 0; i < deleteImageUrlList.length; i++) {
-            MemberProfileDesiredHairstyleImage desiredHairstyleImage
-                    = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(deleteImageUrlList[i], StatusKind.NORMAL.getId()).orElse(null);
 
-            if (desiredHairstyleImage == null) {
-                log.error("[PATCH] /api/v1/members/profiles/image - 400 (잘못된 이미지 URL로 삭제하려 함) : image url = " + deleteImageUrlList[i]);
-                return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
+        if (deleteImageUrlList != null) {
+            for (String s : deleteImageUrlList) {
+                MemberProfileDesiredHairstyleImage desiredHairstyleImage
+                        = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(s, StatusKind.NORMAL.getId()).orElse(null);
+
+                if (desiredHairstyleImage == null) {
+                    log.error("[PATCH] /api/v1/members/profiles/image - 400 (잘못된 이미지 URL로 삭제하려 함) : image url = " + s);
+                    return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
+                }
+                memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
+                memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
             }
-            memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
-            memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
         }
 
         // 추가할 이미지의 pre signed url 만들어서 리턴해준다.

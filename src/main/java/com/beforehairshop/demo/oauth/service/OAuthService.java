@@ -26,7 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -79,6 +81,16 @@ public class OAuthService {
     @Transactional
     public ResponseEntity<ResultDto> signInApple(AppleUserSaveRequestDto saveRequestDto) {
         return null;
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> logout(Member member, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        session.invalidate();
+        // 시큐리티 인증정보 없애기
+        SecurityContextHolder.getContext().setAuthentication(null);
+
+        return makeResult(HttpStatus.OK, "세션 삭제 완료");
     }
 
 //    private final List<SocialOAuth> socialOAuthList;

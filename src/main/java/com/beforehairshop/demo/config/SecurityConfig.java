@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
 @Configuration
 @EnableWebSecurity  // 스프링 시큐리티 필터(SecurityConfig.java) 가 스프링 필터체인에 등록된다.
@@ -45,6 +46,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
+
+//        http
+//                .logout(logout -> logout
+//                        .logoutUrl("/api/v1/oauth/logout")
+//                        .addLogoutHandler(new SecurityContextLogoutHandler())
+//                );
 
         http.authorizeRequests()
                 .antMatchers("/api/v1/users/**").authenticated()    //인증만 되면 들어갈 수 있는 주소!

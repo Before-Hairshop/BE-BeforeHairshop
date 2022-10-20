@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.oauth.controller;
 
+import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.member.service.MemberService;
 import com.beforehairshop.demo.oauth.dto.post.AppleUserSaveRequestDto;
 import com.beforehairshop.demo.oauth.dto.post.KakaoUserSaveRequestDto;
@@ -11,9 +12,11 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.RelationSupport;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Tag(name = "모든 유저 관련 Controller")
@@ -34,6 +37,12 @@ public class OAuthController {
     @Operation(summary = "애플 로그인 API")
     public ResponseEntity<ResultDto> signInApple(@RequestBody AppleUserSaveRequestDto saveRequestDto) {
         return oAuthService.signInApple(saveRequestDto);
+    }
+
+    @PatchMapping("logout")
+    @Operation(summary = "로그아웃 (세션 삭제)")
+    public ResponseEntity<ResultDto> logout(@AuthenticationPrincipal PrincipalDetails principalDetails, HttpServletRequest request) {
+        return oAuthService.logout(principalDetails.getMember(), request);
     }
 
 

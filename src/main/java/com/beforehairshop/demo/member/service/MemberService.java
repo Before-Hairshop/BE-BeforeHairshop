@@ -403,16 +403,19 @@ public class MemberService {
         }
 
         // 원하는 스타일 이미지 중 삭제할 이미지 삭제
-        for (int i = 0; i < deleteImageUrlList.length; i++) {
-            MemberProfileDesiredHairstyleImage desiredHairstyleImage
-                    = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(deleteImageUrlList[i], StatusKind.NORMAL.getId()).orElse(null);
 
-            if (desiredHairstyleImage == null) {
-                log.error("[PATCH] /api/v1/members/profiles/image - 400 (잘못된 이미지 URL로 삭제하려 함) : image url = " + deleteImageUrlList[i]);
-                return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
+        if (deleteImageUrlList != null) {
+            for (String s : deleteImageUrlList) {
+                MemberProfileDesiredHairstyleImage desiredHairstyleImage
+                        = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(s, StatusKind.NORMAL.getId()).orElse(null);
+
+                if (desiredHairstyleImage == null) {
+                    log.error("[PATCH] /api/v1/members/profiles/image - 400 (잘못된 이미지 URL로 삭제하려 함) : image url = " + s);
+                    return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
+                }
+                memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
+                memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
             }
-            memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
-            memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
         }
 
         // 추가할 이미지의 pre signed url 만들어서 리턴해준다.
@@ -538,5 +541,36 @@ public class MemberService {
         memberProfileRepository.delete(memberProfile);
         log.info("[DELETE] /api/v1/members/profiles - 200 (프로필 삭제 완료)");
         return makeResult(HttpStatus.OK, "유저 프로필 삭제 완료");
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findMemberProfile(Member member, BigInteger memberProfileId) {
+        if (member == null) {
+            log.error("[GET] /api/v1/members/profiles/detail - 504(세션 만료)");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+        }
+
+        MemberProfile memberProfile = memberProfileRepository.findByIdAndStatus(memberProfileId, StatusKind.NORMAL.getId()).orElse(null);
+        if (memberProfile == null) {
+            log.error("[GET] /api/v1/members/profiles/detail - 404(해당 ID를 가지는 프로필 없음)");
+            return makeResult(HttpStatus.NOT_FOUND, "잘못된 프로필 ID 입니다.");
+        }
+
+        List<MemberProfileDesiredHairstyleImage> memberProfileDesiredHairstyleImageList
+                = memberProfileDesiredHairstyleImageRepository.findByMemberProfileAndStatus(memberProfile, StatusKind.NORMAL.getId());
+
+        if (memberProfileDesiredHairstyleImageList == null || memberProfileDesiredHairstyleImageList.size() == 0) {
+            return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(
+                    new MemberProfileDto(memberProfile), null
+            ));
+        }
+
+        List<MemberProfileDesiredHairstyleImageDto> imageDtoList
+                = memberProfileDesiredHairstyleImageList.stream().map(MemberProfileDesiredHairstyleImageDto::new).collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, new MemberProfileDetailResponseDto(
+                new MemberProfileDto(memberProfile)
+                , imageDtoList
+        ));
     }
 }

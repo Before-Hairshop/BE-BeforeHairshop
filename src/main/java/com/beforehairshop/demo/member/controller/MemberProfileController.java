@@ -4,6 +4,7 @@ import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.dto.MemberProfileDto;
+import com.beforehairshop.demo.member.dto.patch.MemberProfileImagePatchRequestDto;
 import com.beforehairshop.demo.member.dto.patch.MemberProfilePatchRequestDto;
 import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
 import com.beforehairshop.demo.member.dto.response.MemberProfileDetailResponseDto;
@@ -159,13 +160,8 @@ public class MemberProfileController {
     @Operation(summary = "유저-본인 프로필 수정 API(이미지)")
     @PatchMapping("/image")
     public ResponseEntity<ResultDto> patchMyProfileImage(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(name = "front_image_flag") Integer frontImageFlag
-            , @RequestParam(name = "side_image_flag") Integer sideImageFlag
-            , @RequestParam(name = "back_image_flag") Integer backImageFlag
-            , @RequestParam(name = "add_desired_hairstyle_image_count") Integer addDesiredHairstyleImageCount
-            , String[] deleteDesiredImageUrlList) {
-        return memberService.patchMyProfileImage(principalDetails.getMember(), frontImageFlag, sideImageFlag, backImageFlag
-                , addDesiredHairstyleImageCount, deleteDesiredImageUrlList,  amazonS3Service);
+            , @RequestBody MemberProfileImagePatchRequestDto imagePatchRequestDto) {
+        return memberService.patchMyProfileImage(principalDetails.getMember(), imagePatchRequestDto, amazonS3Service);
     }
 
     @ApiResponses(value = {

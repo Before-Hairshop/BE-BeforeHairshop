@@ -17,6 +17,7 @@ import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.dto.MemberProfileDesiredHairstyleImageDto;
 import com.beforehairshop.demo.member.dto.MemberProfileDto;
+import com.beforehairshop.demo.member.dto.patch.MemberProfileImagePatchRequestDto;
 import com.beforehairshop.demo.member.dto.patch.MemberProfilePatchRequestDto;
 import com.beforehairshop.demo.member.dto.post.MemberProfileSaveRequestDto;
 import com.beforehairshop.demo.member.dto.post.MemberSaveRequestDto;
@@ -375,8 +376,7 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> patchMyProfileImage(Member member, Integer frontImageFlag, Integer sideImageFlag, Integer backImageFlag
-            , Integer addDesiredHairstyleImageCount, String[] deleteImageUrlList, AmazonS3Service amazonS3Service) {
+    public ResponseEntity<ResultDto> patchMyProfileImage(Member member, MemberProfileImagePatchRequestDto imagePatchRequestDto, AmazonS3Service amazonS3Service) {
         if (member == null) {
             log.error("[PATCH] /api/v1/members/profiles/image - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
@@ -391,10 +391,10 @@ public class MemberService {
 
         // 원하는 스타일 이미지 중 삭제할 이미지 삭제
 
-        if (deleteImageUrlList != null) {
+        if (imagePatchRequestDto.getDeleteDesiredImageUrlList() != null) {
 
             List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList = new ArrayList<>();
-            for (String s : deleteImageUrlList) {
+            for (String s : imagePatchRequestDto.getDeleteDesiredImageUrlList()) {
                 MemberProfileDesiredHairstyleImage desiredHairstyleImage
                         = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(s, StatusKind.NORMAL.getId()).orElse(null);
 
@@ -416,22 +416,22 @@ public class MemberService {
 
         String frontPreSignedUrl = null, sidePreSignedUrl = null, backPreSignedUrl = null;
 
-        if (frontImageFlag == 1) {
+        if (imagePatchRequestDto.getFrontImageFlag() == 1) {
             frontPreSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfUserS3Path(member.getId(), "front"));
         }
 
-        if (sideImageFlag == 1) {
+        if (imagePatchRequestDto.getSideImageFlag() == 1) {
             sidePreSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfUserS3Path(member.getId(), "side"));
             memberProfile.setSideImageUrl(cloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "side"));
         }
-        if (backImageFlag == 1) {
+        if (imagePatchRequestDto.getBackImageFlag() == 1) {
             backPreSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfUserS3Path(member.getId(), "back"));
             memberProfile.setBackImageUrl(cloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "back"));
         }
 
         // 추가할 이미지의 pre signed url 만들어서 리턴해준다.
         List<String> desiredHairstyleImagePreSignedUrlList = new ArrayList<>();
-        for (int i = 0; i < addDesiredHairstyleImageCount; i++) {
+        for (int i = 0; i < imagePatchRequestDto.getAddDesiredHairstyleImageCount(); i++) {
             MemberProfileDesiredHairstyleImage imageEntity
                     = MemberProfileDesiredHairstyleImage.builder()
                     .memberProfile(memberProfile)

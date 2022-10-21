@@ -15,6 +15,7 @@ import com.beforehairshop.demo.review.dto.ReviewDto;
 import com.beforehairshop.demo.review.dto.ReviewHashtagDto;
 import com.beforehairshop.demo.review.dto.ReviewImageDto;
 import com.beforehairshop.demo.review.dto.patch.ReviewHashtagPatchRequestDto;
+import com.beforehairshop.demo.review.dto.patch.ReviewImagePatchRequestDto;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import com.beforehairshop.demo.review.dto.save.ReviewHashtagSaveRequestDto;
@@ -218,12 +219,12 @@ public class ReviewService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> patchImage(Member member, BigInteger reviewId
-            , String[] deleteImageUrlList, Integer reviewImageCount, AmazonS3Service amazonS3Service) {
+    public ResponseEntity<ResultDto> patchImage(Member member, ReviewImagePatchRequestDto imagePatchRequestDto
+            , AmazonS3Service amazonS3Service) {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        Review review = reviewRepository.findById(reviewId).orElse(null);
+        Review review = reviewRepository.findById(imagePatchRequestDto.getReviewId()).orElse(null);
         if (review == null)
             return makeResult(HttpStatus.NOT_FOUND, "잘못된 리뷰 ID 가 입력되었습니다");
 
@@ -232,9 +233,9 @@ public class ReviewService {
         }
 
         // 삭제할 이미지 삭제
-        if (deleteImageUrlList != null) {
+        if (imagePatchRequestDto.getDeleteImageUrlList() != null) {
             List<ReviewImage> reviewImageList = new ArrayList<>();
-            for (String imageUrl : deleteImageUrlList) {
+            for (String imageUrl : imagePatchRequestDto.getDeleteImageUrlList()) {
                 ReviewImage reviewImage
                         = reviewImageRepository.findByImageUrlAndStatus(imageUrl, StatusKind.NORMAL.getId()).orElse(null);
 
@@ -252,7 +253,7 @@ public class ReviewService {
 
         // 프론트엔드에서 요청한 이미지의 개수만큼 presigned url 을 만들어 리턴한다.
         List<String> reviewImagePreSignedUrlList = new ArrayList<>();
-        for (int i = 0; i < reviewImageCount; i++) {
+        for (int i = 0; i < imagePatchRequestDto.getAddReviewImageCount(); i++) {
             ReviewImage reviewImage = ReviewImage.builder()
                     .review(review)
                     .imageUrl(null)

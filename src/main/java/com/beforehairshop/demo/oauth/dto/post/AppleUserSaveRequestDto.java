@@ -19,10 +19,14 @@ public class AppleUserSaveRequestDto {
 
     public Member toEntity(String username) {
         return Member.builder()
+                .name("임시 USER")
                 .email(email)
                 .provider(SocialLoginType.APPLE.getProvider())
                 .username(username)
+                .designerFlag(0)
+                .premiumFlag(0)
                 .status(StatusKind.ABNORMAL.getId())
+                .role("ROLE_USER")
                 .build();
     }
 }

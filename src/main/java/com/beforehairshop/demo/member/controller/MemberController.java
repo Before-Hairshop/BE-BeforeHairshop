@@ -30,11 +30,11 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "유저 조회 성공 (세션)", content = @Content(schema = @Schema(implementation = MemberDto.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료", content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DESIGNER')")
     @GetMapping("session")
     @Operation(summary = "본인 정보 조회 API (세션)")
     public ResponseEntity<ResultDto> findMeBySession(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return memberService.findMeBySession(principalDetails.getMember());
+
+        return memberService.findMeBySession(principalDetails);
     }
 
     @ApiResponses(value = {

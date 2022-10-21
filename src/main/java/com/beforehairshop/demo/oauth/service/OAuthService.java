@@ -26,7 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -47,8 +49,19 @@ public class OAuthService {
                 createUsernameInKakao(saveRequestDto.getProviderId())
         );
 
-        if (member != null)
+        if (member != null) {
+            List<GrantedAuthority> preUpdatedAuthorities = new ArrayList<>();
+            preUpdatedAuthorities.add(new SimpleGrantedAuthority(member.getRole()));
+
+            Authentication preAuthentication = new UsernamePasswordAuthenticationToken(
+                    new PrincipalDetails(member)
+                    , null
+                    , preUpdatedAuthorities
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(preAuthentication);
             return makeResult(HttpStatus.FOUND, new MemberDto(member));
+        }
 
         Member newMember = saveRequestDto.toEntity(createUsernameInKakao(saveRequestDto.getProviderId()));
         newMember = memberRepository.save(newMember);
@@ -78,7 +91,49 @@ public class OAuthService {
 
     @Transactional
     public ResponseEntity<ResultDto> signInApple(AppleUserSaveRequestDto saveRequestDto) {
-        return null;
+        Member member = memberRepository.findByUsername(
+                createUsernameInApple(saveRequestDto.getProviderId())
+        );
+
+        if (member != null) {
+            List<GrantedAuthority> preUpdatedAuthorities = new ArrayList<>();
+            preUpdatedAuthorities.add(new SimpleGrantedAuthority(member.getRole()));
+
+            Authentication preAuthentication = new UsernamePasswordAuthenticationToken(
+                    new PrincipalDetails(member)
+                    , null
+                    , preUpdatedAuthorities
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(preAuthentication);
+            return makeResult(HttpStatus.FOUND, new MemberDto(member));
+        }
+
+        Member newMember = saveRequestDto.toEntity(createUsernameInApple(saveRequestDto.getProviderId()));
+        newMember = memberRepository.save(newMember);
+
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                new PrincipalDetails(newMember)
+                , null
+                , updatedAuthorities
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return makeResult(HttpStatus.OK, new MemberDto(newMember));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> logout(Member member, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        session.invalidate();
+        // 시큐리티 인증정보 없애기
+        SecurityContextHolder.getContext().setAuthentication(null);
+
+        return makeResult(HttpStatus.OK, "세션 삭제 완료");
     }
 
 //    private final List<SocialOAuth> socialOAuthList;

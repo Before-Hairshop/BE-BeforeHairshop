@@ -5,6 +5,7 @@ import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.dto.ReviewDto;
+import com.beforehairshop.demo.review.dto.patch.ReviewImagePatchRequestDto;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
@@ -89,10 +90,8 @@ public class ReviewController {
     @Operation(summary = "리뷰 수정(이미지)")
     @PatchMapping("image")
     public ResponseEntity<ResultDto> patchImage(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam("review_id") BigInteger reviewId
-            , @RequestParam("add_review_image_count") Integer reviewImageCount
-            , String[] deleteImageUrlList) {
-        return reviewService.patchImage(principalDetails.getMember(), reviewId, deleteImageUrlList, reviewImageCount, amazonS3Service);
+            , @RequestBody ReviewImagePatchRequestDto imagePatchRequestDto) {
+        return reviewService.patchImage(principalDetails.getMember(), imagePatchRequestDto, amazonS3Service);
     }
 
 

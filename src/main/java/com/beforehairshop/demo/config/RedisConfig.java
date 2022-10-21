@@ -11,6 +11,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -27,10 +28,13 @@ import java.time.Duration;
 @EnableRedisHttpSession
 public class RedisConfig {
     @Value("${spring.redis.host}")
-    public String host;
+    private String host;
 
     @Value("${spring.redis.port}")
-    public int port;
+    private int port;
+
+    @Value("${spring.redis.password}")
+    private String password;
 
 
     @Bean
@@ -45,13 +49,13 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         if (host.equals("localhost") || host.contains("ap-northeast-2.compute.amazonaws.com")) {
-            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-            configuration.setHostName(host);
-            configuration.setPort(port);
+            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
+            configuration.setPassword(RedisPassword.of(password));
             return new LettuceConnectionFactory(configuration);
         } else {
             RedisClusterConfiguration configuration = new RedisClusterConfiguration();
             configuration.clusterNode(host, port);
+            configuration.setPassword(password);
             return new LettuceConnectionFactory(configuration);
         }
     }

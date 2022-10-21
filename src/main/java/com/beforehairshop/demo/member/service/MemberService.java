@@ -387,6 +387,32 @@ public class MemberService {
             log.error("[PATCH] /api/v1/members/profiles/image - 404 (프로필이 등록되어 있지 않다) : member_id = " + member.getId());
             return makeResult(HttpStatus.NOT_FOUND, "해당 유저에게는 유저 프로필이 등록되어 있지 않습니다.");
         }
+
+        // 원하는 스타일 이미지 중 삭제할 이미지 삭제
+
+        if (deleteImageUrlList != null) {
+
+            List<MemberProfileDesiredHairstyleImage> desiredHairstyleImageList = new ArrayList<>();
+            for (String s : deleteImageUrlList) {
+                MemberProfileDesiredHairstyleImage desiredHairstyleImage
+                        = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(s, StatusKind.NORMAL.getId()).orElse(null);
+
+                if (desiredHairstyleImage == null) {
+                    log.error("[PATCH] /api/v1/members/profiles/image - 400 (잘못된 이미지 URL로 삭제하려 함) : image url = " + s);
+                    return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
+                }
+
+                desiredHairstyleImageList.add(desiredHairstyleImage);
+//                memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
+//                memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
+            }
+
+            for (MemberProfileDesiredHairstyleImage desiredHairstyleImage : desiredHairstyleImageList) {
+                memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
+                memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
+            }
+        }
+
         String frontPreSignedUrl = null, sidePreSignedUrl = null, backPreSignedUrl = null;
 
         if (frontImageFlag == 1) {
@@ -400,22 +426,6 @@ public class MemberService {
         if (backImageFlag == 1) {
             backPreSignedUrl = amazonS3Service.generatePreSignedUrl(cloudFrontUrlHandler.getProfileOfUserS3Path(member.getId(), "back"));
             memberProfile.setBackImageUrl(cloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "back"));
-        }
-
-        // 원하는 스타일 이미지 중 삭제할 이미지 삭제
-
-        if (deleteImageUrlList != null) {
-            for (String s : deleteImageUrlList) {
-                MemberProfileDesiredHairstyleImage desiredHairstyleImage
-                        = memberProfileDesiredHairstyleImageRepository.findByImageUrlAndStatus(s, StatusKind.NORMAL.getId()).orElse(null);
-
-                if (desiredHairstyleImage == null) {
-                    log.error("[PATCH] /api/v1/members/profiles/image - 400 (잘못된 이미지 URL로 삭제하려 함) : image url = " + s);
-                    return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image url 입니다.");
-                }
-                memberProfileDesiredHairstyleImageRepository.delete(desiredHairstyleImage);
-                memberProfile.getMemberProfileDesiredHairstyleImageSet().remove(desiredHairstyleImage);
-            }
         }
 
         // 추가할 이미지의 pre signed url 만들어서 리턴해준다.

@@ -232,15 +232,22 @@ public class ReviewService {
         }
 
         // 삭제할 이미지 삭제
-        for (int i = 0; i < deleteImageUrlList.length; i++) {
-            ReviewImage reviewImage
-                    = reviewImageRepository.findByImageUrlAndStatus(deleteImageUrlList[i], StatusKind.NORMAL.getId()).orElse(null);
+        if (deleteImageUrlList != null) {
+            List<ReviewImage> reviewImageList = new ArrayList<>();
+            for (String imageUrl : deleteImageUrlList) {
+                ReviewImage reviewImage
+                        = reviewImageRepository.findByImageUrlAndStatus(imageUrl, StatusKind.NORMAL.getId()).orElse(null);
 
-            if (reviewImage == null)
-                return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image 이다");
+                if (reviewImage == null)
+                    return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image 이다");
 
-            review.getReviewImageSet().remove(reviewImage);
+                reviewImageList.add(reviewImage);
+//            review.getReviewImageSet().remove(reviewImage);
 //            reviewImageRepository.delete(reviewImage);
+            }
+
+            for (ReviewImage reviewImage : reviewImageList)
+                review.getReviewImageSet().remove(reviewImage);
         }
 
         // 프론트엔드에서 요청한 이미지의 개수만큼 presigned url 을 만들어 리턴한다.

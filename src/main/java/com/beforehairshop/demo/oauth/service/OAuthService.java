@@ -63,7 +63,7 @@ public class OAuthService {
             return makeResult(HttpStatus.FOUND, new MemberDto(member));
         }
 
-        Member newMember = saveRequestDto.toEntity(createUsernameInApple(saveRequestDto.getProviderId()));
+        Member newMember = saveRequestDto.toEntity(createUsernameInKakao(saveRequestDto.getProviderId()));
         newMember = memberRepository.save(newMember);
 
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>();

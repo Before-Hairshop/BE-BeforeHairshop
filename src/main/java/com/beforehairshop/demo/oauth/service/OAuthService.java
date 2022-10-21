@@ -49,10 +49,21 @@ public class OAuthService {
                 createUsernameInKakao(saveRequestDto.getProviderId())
         );
 
-        if (member != null)
-            return makeResult(HttpStatus.FOUND, new MemberDto(member));
+        if (member != null) {
+            List<GrantedAuthority> preUpdatedAuthorities = new ArrayList<>();
+            preUpdatedAuthorities.add(new SimpleGrantedAuthority(member.getRole()));
 
-        Member newMember = saveRequestDto.toEntity(createUsernameInKakao(saveRequestDto.getProviderId()));
+            Authentication preAuthentication = new UsernamePasswordAuthenticationToken(
+                    new PrincipalDetails(member)
+                    , null
+                    , preUpdatedAuthorities
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(preAuthentication);
+            return makeResult(HttpStatus.FOUND, new MemberDto(member));
+        }
+
+        Member newMember = saveRequestDto.toEntity(createUsernameInApple(saveRequestDto.getProviderId()));
         newMember = memberRepository.save(newMember);
 
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
@@ -80,7 +91,39 @@ public class OAuthService {
 
     @Transactional
     public ResponseEntity<ResultDto> signInApple(AppleUserSaveRequestDto saveRequestDto) {
-        return null;
+        Member member = memberRepository.findByUsername(
+                createUsernameInApple(saveRequestDto.getProviderId())
+        );
+
+        if (member != null) {
+            List<GrantedAuthority> preUpdatedAuthorities = new ArrayList<>();
+            preUpdatedAuthorities.add(new SimpleGrantedAuthority(member.getRole()));
+
+            Authentication preAuthentication = new UsernamePasswordAuthenticationToken(
+                    new PrincipalDetails(member)
+                    , null
+                    , preUpdatedAuthorities
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(preAuthentication);
+            return makeResult(HttpStatus.FOUND, new MemberDto(member));
+        }
+
+        Member newMember = saveRequestDto.toEntity(createUsernameInApple(saveRequestDto.getProviderId()));
+        newMember = memberRepository.save(newMember);
+
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                new PrincipalDetails(newMember)
+                , null
+                , updatedAuthorities
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return makeResult(HttpStatus.OK, new MemberDto(newMember));
     }
 
     @Transactional

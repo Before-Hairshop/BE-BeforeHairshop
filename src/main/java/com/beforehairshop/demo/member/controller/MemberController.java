@@ -33,7 +33,8 @@ public class MemberController {
     @GetMapping("session")
     @Operation(summary = "본인 정보 조회 API (세션)")
     public ResponseEntity<ResultDto> findMeBySession(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return memberService.findMeBySession(principalDetails.getMember());
+
+        return memberService.findMeBySession(principalDetails);
     }
 
     @ApiResponses(value = {

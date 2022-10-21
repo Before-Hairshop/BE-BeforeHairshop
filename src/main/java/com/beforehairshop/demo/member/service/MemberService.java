@@ -1,5 +1,6 @@
 package com.beforehairshop.demo.member.service;
 
+import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.profile.MatchingFlagKind;
@@ -526,7 +527,11 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> findMeBySession(Member member) {
+    public ResponseEntity<ResultDto> findMeBySession(PrincipalDetails principalDetails) {
+        if (principalDetails == null)
+            return makeResult(HttpStatus.NOT_FOUND, "없음");
+
+        Member member = principalDetails.getMember();
         if (member == null) {
             log.error("[GET] /api/v1/members/session - 504(세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");

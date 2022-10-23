@@ -243,6 +243,7 @@ public class RecommendService {
                 recommend.getRecommenderProfile().getHairDesigner().getId()
                 , recommend.getRecommenderProfile().getName()
                 , recommend.getRecommenderProfile().getImageUrl()
+                , recommend.getRecommendedProfile().getPhoneNumber()
                 , new RecommendDto(recommend)
                 ,recommendImageDtoList
         ));

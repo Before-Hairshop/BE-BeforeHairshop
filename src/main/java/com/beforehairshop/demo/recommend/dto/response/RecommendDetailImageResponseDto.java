@@ -16,6 +16,7 @@ public class RecommendDetailImageResponseDto {
     private BigInteger designerId;
     private String designerName;
     private String designerImage;
+    private String userPhoneNumber;
 
     private RecommendDto recommendDto;
     private List<RecommendImageDto> recommendImageDtoList;

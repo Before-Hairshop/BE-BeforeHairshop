@@ -76,6 +76,10 @@ public class HairDesignerService {
         if (hairDesigner.getDesignerFlag() == 0)
             return makeResult(HttpStatus.BAD_REQUEST, "이 유저는 일반 유저입니다. 권한 변경을 먼저 해주시기 바랍니다.");
 
+        HairDesignerProfile existedHairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(hairDesigner, StatusKind.NORMAL.getId()).orElse(null);
+        if (existedHairDesignerProfile != null)
+            return makeResult(HttpStatus.CONFLICT, "이미 해당 유저에게 프로필이 존재합니다.");
+
         hairDesigner.setName(hairDesignerProfileSaveRequestDto.getName());
 
         HairDesignerProfile hairDesignerProfile = new HairDesignerProfile(hairDesigner, hairDesignerProfileSaveRequestDto, StatusKind.NORMAL.getId());

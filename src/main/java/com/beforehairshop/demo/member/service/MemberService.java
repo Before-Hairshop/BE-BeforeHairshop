@@ -588,4 +588,26 @@ public class MemberService {
                 , imageDtoList
         ));
     }
+
+    @Transactional
+    public ResponseEntity<ResultDto> delete(Member member) {
+        if (member == null) {
+            log.error("[DEL] /api/v1/members - 504(세션 만료)");
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+        }
+
+        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+
+        if (memberProfile != null)
+            memberProfileRepository.delete(memberProfile);
+
+        if (hairDesignerProfile != null)
+            hairDesignerProfileRepository.delete(hairDesignerProfile);
+
+
+        memberRepository.delete(member);
+
+        return makeResult(HttpStatus.OK, "삭제 완료");
+    }
 }

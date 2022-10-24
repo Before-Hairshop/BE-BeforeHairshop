@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -84,6 +85,16 @@ public class MemberController {
     @Operation(summary = "디자이너에서 유저로 권한 변경 API")
     public ResponseEntity<ResultDto> changeToUser(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.changeToUser(principalDetails.getMember());
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "dd", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "저장된 유저가 없습니다", content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("")
+    @DeleteMapping("")
+    public ResponseEntity<ResultDto> delete(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.delete(principalDetails.getMember());
     }
 
 //    @PostMapping("/sign_in/kakao")

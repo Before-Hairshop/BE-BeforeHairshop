@@ -115,6 +115,8 @@ public class HairDesignerController {
                     , content = @Content(schema = @Schema(implementation = HairDesignerProfileDto.class))),
             @ApiResponse(responseCode = "400", description = "조회하려는 유저는 일반 유저입니다. 디자이너로 권한 변경을 하고 등록해주시기 바랍니다."
                     , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "409", description = "이미 프로필이 존재합니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "삭제되었거나 유효하지 않은 유저입니다."
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"

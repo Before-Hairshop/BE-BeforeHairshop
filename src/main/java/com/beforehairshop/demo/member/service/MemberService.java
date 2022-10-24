@@ -34,9 +34,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -590,7 +593,7 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> delete(Member member) {
+    public ResponseEntity<ResultDto> delete(Member member, HttpServletRequest request) {
         if (member == null) {
             log.error("[DEL] /api/v1/members - 504(세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
@@ -607,6 +610,11 @@ public class MemberService {
 
 
         memberRepository.delete(member);
+
+        HttpSession session = request.getSession(false);
+        session.invalidate();
+        // 시큐리티 인증정보 없애기
+        SecurityContextHolder.getContext().setAuthentication(null);
 
         return makeResult(HttpStatus.OK, "삭제 완료");
     }

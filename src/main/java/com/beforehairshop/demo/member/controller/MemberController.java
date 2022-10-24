@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @CrossOrigin(origins = "*")
 @Tag(name = "모든 유저 관련 Controller")
@@ -94,8 +96,8 @@ public class MemberController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_DESIGNER')")
     @DeleteMapping("")
     @Operation(summary = "회원탈퇴 API")
-    public ResponseEntity<ResultDto> delete(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return memberService.delete(principalDetails.getMember());
+    public ResponseEntity<ResultDto> delete(@AuthenticationPrincipal PrincipalDetails principalDetails, HttpServletRequest request) {
+        return memberService.delete(principalDetails.getMember(), request);
     }
 
 //    @PostMapping("/sign_in/kakao")

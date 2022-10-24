@@ -91,8 +91,9 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "삭제 완료", content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료", content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @PreAuthorize("")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_DESIGNER')")
     @DeleteMapping("")
+    @Operation(summary = "회원탈퇴 API")
     public ResponseEntity<ResultDto> delete(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.delete(principalDetails.getMember());
     }

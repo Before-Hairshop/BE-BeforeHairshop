@@ -88,8 +88,8 @@ public class MemberController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "dd", content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "404", description = "저장된 유저가 없습니다", content = @Content(schema = @Schema(implementation = String.class)))
+            @ApiResponse(responseCode = "200", description = "삭제 완료", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료", content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("")
     @DeleteMapping("")

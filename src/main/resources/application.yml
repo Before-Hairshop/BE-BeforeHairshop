@@ -13,21 +13,3 @@ server:
 spring:
   profiles:
     default: dev
-
-cloud:
-  aws:
-    credentials:
-      access-key: AKIAWPNQAP77SDWADWV2
-      secret-key: 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
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
-    s3:
-      bucket: dev-s3-beforehairshop
-
-cloud.aws.sqs.response-queue.name: dev-inference-response-queue
-cloud.aws.sqs.request-queue.name: dev-inference-request-queue
-
-
-cloud.aws.cloudfront.domain: https://d2fbb7tycgdtir.cloudfront.net

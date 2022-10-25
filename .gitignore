@@ -156,6 +156,7 @@ aws-local.yml
 oauth-dev.yml
 aws-dev.yml
 
+application.yml
 application-local.yml
 application-dev.yml
 application-prod.yml

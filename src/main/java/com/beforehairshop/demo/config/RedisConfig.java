@@ -48,11 +48,16 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        if (host.equals("localhost") || host.contains("ap-northeast-2.compute.amazonaws.com")) {
+        if (host.equals("localhost")) {
+            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
+            return new LettuceConnectionFactory(configuration);
+        }
+        else if (host.contains("ap-northeast-2.compute.amazonaws.com")) {
             RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
             configuration.setPassword(RedisPassword.of(password));
             return new LettuceConnectionFactory(configuration);
-        } else {
+        }
+        else {
             RedisClusterConfiguration configuration = new RedisClusterConfiguration();
             configuration.clusterNode(host, port);
             configuration.setPassword(password);

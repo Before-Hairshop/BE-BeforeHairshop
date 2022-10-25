@@ -5,10 +5,17 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+
 
 public class S3Config {
+
     @Value("${cloud.aws.region}")
     private String region;
 

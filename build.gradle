@@ -36,6 +36,8 @@ dependencies {
 	// aws
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	implementation 'com.amazonaws:aws-java-sdk:1.12.305'
+	implementation 'org.springframework.cloud:spring-cloud-aws-messaging:2.2.6.RELEASE'
+
 
 	// data source
 	runtimeOnly 'mysql:mysql-connector-java'

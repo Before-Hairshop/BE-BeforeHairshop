@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -106,6 +107,12 @@ public class MemberController {
 //
 //    }
 
+
+    @PostMapping("user_feedback")
+    @Operation(summary = "유저 피드백 받는 API")
+    public ResponseEntity<ResultDto> createUserFeedback(@RequestParam(name = "member_id") BigInteger memberId, @RequestBody String feedback) {
+        return memberService.createUserFeedback(memberId, feedback);
+    }
 
 
 }

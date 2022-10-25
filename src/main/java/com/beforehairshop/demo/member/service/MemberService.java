@@ -32,17 +32,23 @@ import com.beforehairshop.demo.recommend.repository.RecommendRequestRepository;
 import com.beforehairshop.demo.response.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
@@ -51,6 +57,9 @@ import static com.beforehairshop.demo.response.ResultDto.makeResult;
 @Slf4j
 @RequiredArgsConstructor
 public class MemberService {
+
+    @Value("${slack.feedback.webhook.url}")
+    private String slackWebhookUrl;
 
     private final CloudFrontUrlHandler cloudFrontUrlHandler;
     private final MemberRepository memberRepository;
@@ -617,5 +626,19 @@ public class MemberService {
         SecurityContextHolder.getContext().setAuthentication(null);
 
         return makeResult(HttpStatus.OK, "삭제 완료");
+    }
+
+    public ResponseEntity<ResultDto> createUserFeedback(BigInteger memberId, String feedback) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("username", "유저 피드백"); //slack bot name
+        request.put("text", "피드백 보낸 유저의 ID(PK) : " + memberId + "\nContent : " + feedback); //전송할 메세지
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request);
+
+        restTemplate.exchange(slackWebhookUrl, HttpMethod.POST, entity, String.class);
+
+        return makeResult(HttpStatus.OK, "피드백 전송 완료");
     }
 }

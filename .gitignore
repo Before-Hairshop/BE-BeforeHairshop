@@ -156,10 +156,10 @@ aws-local.yml
 oauth-dev.yml
 aws-dev.yml
 
-application.yml
 application-local.yml
 application-dev.yml
 application-prod.yml
+application.yml
 
 # ==== Firebase Key ====
 firebase_service_key.json

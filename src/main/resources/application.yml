@@ -12,4 +12,4 @@ server:
       force: true
 spring:
   profiles:
-    default: dev
+    default: local

@@ -48,16 +48,12 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        if (host.equals("localhost")) {
-            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
-            return new LettuceConnectionFactory(configuration);
-        }
-        else if (host.contains("ap-northeast-2.compute.amazonaws.com")) {
+        if (host.contains("ap-northeast-2.compute.amazonaws.com") || host.contains("localhost")) {
             RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
             configuration.setPassword(RedisPassword.of(password));
             return new LettuceConnectionFactory(configuration);
         }
-        else {
+        else {   // ElastiCache 이용할 때 사용하는 코드
             RedisClusterConfiguration configuration = new RedisClusterConfiguration();
             configuration.clusterNode(host, port);
             configuration.setPassword(password);

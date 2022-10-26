@@ -21,6 +21,7 @@ import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerWorkingDaySaveR
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerDetailGetResponseDto;
 import com.beforehairshop.demo.hairdesigner.dto.patch.HairDesignerProfilePatchRequestDto;
 import com.beforehairshop.demo.hairdesigner.dto.post.HairDesignerProfileSaveRequestDto;
+import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerProfileAndDistanceAndHashtagDto;
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerProfileAndHashtagDto;
 import com.beforehairshop.demo.hairdesigner.dto.response.HairDesignerProfileImageResponseDto;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
@@ -46,6 +47,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.response.ResultDto.*;
@@ -176,10 +178,14 @@ public class HairDesignerService {
 
         }
 
-        List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList
+        List<HairDesignerProfileAndDistanceAndHashtagDto> hairDesignerProfileAndHashtagDtoList
                 = hairDesignerProfileList.stream()
-                .map(hairDesignerProfile1 -> new HairDesignerProfileAndHashtagDto(
+                .map(hairDesignerProfile1 -> new HairDesignerProfileAndDistanceAndHashtagDto(
                         new HairDesignerProfileDto(hairDesignerProfile1),
+
+                        calculateDistance(hairDesignerProfile1.getLatitude(), hairDesignerProfile1.getLongitude()
+                                , memberProfile.getLatitude(), memberProfile.getLongitude()),
+
                         reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile1.getId(), StatusKind.NORMAL.getId()),
 
                         hairDesignerProfile1.getHairDesignerHashtagSet().stream()
@@ -190,6 +196,41 @@ public class HairDesignerService {
 
         return makeResult(HttpStatus.OK, hairDesignerProfileAndHashtagDtoList);
 
+    }
+
+//    private double calculateDistance(Float lat1, Float lon1, Float lat2, Float lon2) {
+//        double dLat = Math.toRadians(lat2 - lat1);
+//        double dLon = Math.toRadians(lon2 - lon1);
+//
+//        double a = Math.sin(dLat/2)* Math.sin(dLat/2)+ Math.cos(Math.toRadians(lat1))* Math.cos(Math.toRadians(lat2))* Math.sin(dLon/2)* Math.sin(dLon/2);
+//        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+//        double d = EARTH_RADIUS * c;    // Distance in m
+//        return d;
+//    }
+
+    /**
+     * @return 소수점 1자리까지 반올림해서 리턴
+     */
+    private long calculateDistance(Float lat1, Float lon1, Float lat2, Float lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515 * 1609.344;
+
+        return (Math.round(dist));
+    }
+
+
+    // This function converts decimal degrees to radians
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    // This function converts radians to decimal degrees
+    private double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
     }
 
     @Transactional
@@ -356,7 +397,7 @@ public class HairDesignerService {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        if (member.getDesignerFlag() != 1 && member.getRole() != "ROLE_DESIGNER")
+        if (member.getDesignerFlag() != 1 && !member.getRole().equals("ROLE_DESIGNER"))
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 헤어 디자이너가 아닙니다.");
 
 

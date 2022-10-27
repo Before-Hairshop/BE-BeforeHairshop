@@ -542,6 +542,10 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> findMeBySession(PrincipalDetails principalDetails) {
+        if (principalDetails == null) {
+            log.error("[GET] /api/v1/members/session - 400 (세션 정보 없음)");
+            return makeResult(HttpStatus.NOT_FOUND, "세션 정보가 없다.");
+        }
         Member member = principalDetails.getMember();
         if (member == null) {
             log.error("[GET] /api/v1/members/session - 504(세션 만료)");

@@ -24,6 +24,7 @@ import com.beforehairshop.demo.review.repository.ReviewHashtagRepository;
 import com.beforehairshop.demo.review.repository.ReviewImageRepository;
 import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 import static com.beforehairshop.demo.response.ResultDto.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ReviewService {
     private final CloudFrontUrlHandler cloudFrontUrlHandler;
@@ -50,12 +52,14 @@ public class ReviewService {
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member member, ReviewSaveRequestDto reviewSaveRequestDto) {
-        if (member == null)
+        if (member == null) {
+            log.error("[POST] /api/v1/reviews - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
-        if (!saveDtoIsValid(reviewSaveRequestDto))
+        }
+        if (!saveDtoIsValid(reviewSaveRequestDto)) {
+            log.error("[POST] /api/v1/reviews - 204 (리뷰 저장에 필요한 정보 부족)");
             return makeResult(HttpStatus.NO_CONTENT, "리뷰 저장에 필요한 정보가 입력되지 않았습니다.");
-
+        }
         Member reviewer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member hairDesigner = memberRepository.findByIdAndStatus(reviewSaveRequestDto.getHairDesignerId(), StatusKind.NORMAL.getId()).orElse(null);
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
@@ -63,9 +67,10 @@ public class ReviewService {
         ).orElse(null);
 
         if (reviewer == null || hairDesigner == null || hairDesigner.getDesignerFlag() != 1
-                || hairDesignerProfile == null)
+                || hairDesignerProfile == null) {
+            log.error("[POST] /api/v1/reviews - 404 (리뷰 대상이 유효하지 않거나, 디자이너가 아니다)");
             return makeResult(HttpStatus.NOT_FOUND, "리뷰 대상이 유효하지 않거나, 헤어 디자이너가 아니다.");
-
+        }
         Review review = reviewRepository.save(new Review(reviewSaveRequestDto, reviewer, hairDesignerProfile, StatusKind.NORMAL.getId()));
 
         for (ReviewHashtagSaveRequestDto saveRequestDto : reviewSaveRequestDto.getHashtagList()) {
@@ -96,9 +101,10 @@ public class ReviewService {
 
     @Transactional
     public ResponseEntity<ResultDto> findManyByHairDesigner(Member member, BigInteger hairDesignerId, Pageable pageable) {
-        if (member == null)
+        if (member == null) {
+            log.error("[GET] /api/v1/reviews/list - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         List<Review> reviewList = reviewRepository.findAllByHairDesignerProfileIdAndStatus(
                 hairDesignerId
                 , StatusKind.NORMAL.getId()
@@ -132,16 +138,20 @@ public class ReviewService {
 
     @Transactional
     public ResponseEntity<ResultDto> patchOne(Member member, BigInteger reviewId, ReviewPatchRequestDto reviewPatchRequestDto) {
-        if (member == null)
+        if (member == null) {
+            log.error("[PATCH] /api/v1/reviews - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
-        if (review == null)
+        if (review == null) {
+            log.error("[PATCH] /api/v1/reviews - 400 (잘못된 리뷰 ID)");
             return makeResult(HttpStatus.BAD_REQUEST, "해당 id를 가지는 리뷰는 없습니다.");
+        }
 
-        if (!review.getReviewer().getId().equals(member.getId()))
+        if (!review.getReviewer().getId().equals(member.getId())) {
+            log.error("[PATCH] /api/v1/reviews - 503 (리뷰 수정할 권한이 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "해당 리뷰를 수정할 권한이 없는 유저입니다.");
-
+        }
         if (reviewPatchRequestDto.getTotalRating() != null)
             review.setTotalRating(reviewPatchRequestDto.getTotalRating());
 
@@ -181,16 +191,19 @@ public class ReviewService {
     public ResponseEntity<ResultDto> saveImage(Member reviewer, BigInteger reviewId
             , Integer reviewImageCount, AmazonS3Service amazonS3Service) {
 
-        if (reviewer == null)
+        if (reviewer == null) {
+            log.error("[POST] /api/v1/reviews/image - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
-        if (review == null)
+        if (review == null) {
+            log.error("[POST] /api/v1/reviews/image - 404 (잘못된 리뷰 ID)");
             return makeResult(HttpStatus.NOT_FOUND, "잘못된 리뷰 ID 입니다.");
-
-        if (!review.getReviewer().getId().equals(reviewer.getId()))
+        }
+        if (!review.getReviewer().getId().equals(reviewer.getId())) {
+            log.error("[POST] /api/v1/reviews/image - 503 (수정 권한 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "수정 권한이 없는 유저입니다.");
-
+        }
         List<String> reviewImagePreSignedList = new ArrayList<>();
         for (int i = 0; i < reviewImageCount; i++) {
             ReviewImage reviewImage
@@ -221,14 +234,17 @@ public class ReviewService {
     @Transactional
     public ResponseEntity<ResultDto> patchImage(Member member, ReviewImagePatchRequestDto imagePatchRequestDto
             , AmazonS3Service amazonS3Service) {
-        if (member == null)
+        if (member == null) {
+            log.error("[PATCH] /api/v1/reviews/image - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Review review = reviewRepository.findById(imagePatchRequestDto.getReviewId()).orElse(null);
-        if (review == null)
+        if (review == null) {
+            log.error("[PATCH] /api/v1/reviews/image - 404 (잘못된 리뷰 ID)");
             return makeResult(HttpStatus.NOT_FOUND, "잘못된 리뷰 ID 가 입력되었습니다");
-
+        }
         if (!review.getReviewer().getId().equals(member.getId())) {
+            log.error("[PATCH] /api/v1/reviews/image - 503 (수정 권한 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "수정 권한이 없는 유저입니다.");
         }
 
@@ -239,9 +255,10 @@ public class ReviewService {
                 ReviewImage reviewImage
                         = reviewImageRepository.findByImageUrlAndStatus(imageUrl, StatusKind.NORMAL.getId()).orElse(null);
 
-                if (reviewImage == null)
+                if (reviewImage == null) {
+                    log.error("[PATCH] /api/v1/reviews/image - 400 (존재하지 않는 이미지 URL 이다. 삭제불가)");
                     return makeResult(HttpStatus.BAD_REQUEST, "존재하지 않는 image 이다");
-
+                }
                 reviewImageList.add(reviewImage);
 //            review.getReviewImageSet().remove(reviewImage);
 //            reviewImageRepository.delete(reviewImage);
@@ -278,16 +295,19 @@ public class ReviewService {
 
     @Transactional
     public ResponseEntity<ResultDto> delete(Member member, BigInteger reviewId) {
-        if (member == null)
+        if (member == null) {
+            log.error("[DEL] /api/v1/reviews - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Review review = reviewRepository.findByIdAndStatus(reviewId, StatusKind.NORMAL.getId()).orElse(null);
-        if (review == null)
+        if (review == null) {
+            log.error("[DEL] /api/v1/reviews - 404 (잘못된 리뷰 ID)");
             return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 리뷰는 존재하지 않습니다.");
-
-        if (!review.getReviewer().getId().equals(member.getId()))
+        }
+        if (!review.getReviewer().getId().equals(member.getId())) {
+            log.error("[DEL] /api/v1/reviews - 503 (삭제할 권한이 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "삭제할 권한이 없는 유저입니다.");
-
+        }
         reviewRepository.delete(review);
 
         return makeResult(HttpStatus.OK, "삭제 완료");

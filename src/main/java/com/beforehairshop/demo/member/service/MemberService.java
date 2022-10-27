@@ -475,8 +475,10 @@ public class MemberService {
         }
 
         Member hairDesigner = memberRepository.findByIdAndStatus(designer.getId(), StatusKind.NORMAL.getId()).orElse(null);
-        if (hairDesigner == null || hairDesigner.getDesignerFlag() != 1)
+        if (hairDesigner == null || hairDesigner.getDesignerFlag() != 1) {
+            log.error("[GET] /api/v1/members/profiles/list_by_location - 400 (저장된 유저가 아니거나 디자이너가 아니다)");
             return makeResult(HttpStatus.BAD_REQUEST, "헤어 디자이너가 아니거나, 저장된 유저가 아닙니다.");
+        }
 
         HairDesignerProfile hairDesignerProfile
                 = hairDesignerProfileRepository.findByHairDesignerAndStatus(designer, StatusKind.NORMAL.getId()).orElse(null);
@@ -540,9 +542,6 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<ResultDto> findMeBySession(PrincipalDetails principalDetails) {
-        if (principalDetails == null)
-            return makeResult(HttpStatus.NOT_FOUND, "없음");
-
         Member member = principalDetails.getMember();
         if (member == null) {
             log.error("[GET] /api/v1/members/session - 504(세션 만료)");

@@ -56,20 +56,25 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) {
-        if (recommender == null)
+        if (recommender == null) {
+            log.error("[POST] /api/v1/recommend - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "당신의 세션이 만료되었습니다.");
-
+        }
         MemberProfile memberProfile = memberProfileRepository.findById(memberProfileId).orElse(null);
-        if (memberProfile == null)
+        if (memberProfile == null) {
+            log.error("[POST] /api/v1/recommend - 400 (추천을 받을 유저의 프로필이 없다)");
             return makeResult(HttpStatus.BAD_REQUEST, "추천을 받을 유저의 프로필이 없습니다.");
-
-        if (memberProfile.getMatchingActivationFlag() != 1)
-            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "추천을 받을 유저가 매칭을 비활성화시켰습니다.");
+        }
+        if (memberProfile.getMatchingActivationFlag() != 1) {
+            log.error("[POST] /api/v1/recommend - 503 (추천서를 받을 유저가 매칭을 비활성화했다)");
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "추천서를 받을 유저가 매칭을 비활성화시켰습니다.");
+        }
 
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(recommender, StatusKind.NORMAL.getId()).orElse(null);
-        if (hairDesignerProfile == null)
-            return makeResult(HttpStatus.NOT_FOUND, "추천을 보낼 디자이너의 프로필이 없습니다");
-
+        if (hairDesignerProfile == null) {
+            log.error("[POST] /api/v1/recommend - 404 (추천서를 보낼 디자이너의 프로필이 없다)");
+            return makeResult(HttpStatus.NOT_FOUND, "추천서를 보낼 디자이너의 프로필이 없습니다");
+        }
         Recommend recommend = new Recommend(hairDesignerProfile, memberProfile, recommendSaveRequestDto, StatusKind.NORMAL.getId());
         memberProfile.getRecommendedSet().add(recommend);
         hairDesignerProfile.getRecommendSet().add(recommend);
@@ -89,14 +94,16 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> saveImage(Member member, BigInteger recommendId, Integer imageCount, AmazonS3Service amazonS3Service) {
-        if (member == null)
+        if (member == null) {
+            log.error("[POST] /api/v1/recommend/image - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "사용자 세션이 만료되었습니다.");
-
+        }
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
 
-        if (recommend == null)
+        if (recommend == null) {
+            log.error("[POST] /api/v1/recommend/image - 400 (잘못된 추천서 ID)");
             return makeResult(HttpStatus.BAD_REQUEST, "Recommend Id 가 잘못된 값입니다.");
-
+        }
 
         List<String> recommendImagePreSignedUrlList = new ArrayList<>();
         for (int i = 0; i < imageCount; i++) {
@@ -127,18 +134,21 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> patch(Member member, BigInteger recommendId, RecommendPatchRequestDto patchDto) {
-        if (member == null)
+        if (member == null) {
+            log.error("[PATCH] /api/v1/recommend - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션이 만료되었습니다.");
-
+        }
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
                 member, StatusKind.NORMAL.getId()
         ).orElse(null);
 
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (hairDesignerProfile == null)
+        if (hairDesignerProfile == null) {
+            log.error("[PATCH] /api/v1/recommend - 404 (해당 ID를 가지는 추천서가 없다)");
             return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서가 없습니다.");
-
+        }
         if (recommend == null || !recommend.getRecommenderProfile().getId().equals(hairDesignerProfile.getId())) {
+            log.error("[PATCH] /api/v1/recommend - 400 (해당 유저는 해당 추천서를 수정할 권한이 없다)");
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저는 해당 추천서를 수정할 권한이 없습니다.");
         }
 
@@ -150,18 +160,21 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> patchImage(Member designer, BigInteger recommendId, Integer addImageCount, String[] deleteImageUrl, AmazonS3Service amazonS3Service) {
-        if (designer == null)
+        if (designer == null) {
+            log.error("[PATCH] /api/v1/recommend/image - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend == null)
+        if (recommend == null) {
+            log.error("[PATCH] /api/v1/recommend/image - 400 (해당 ID를 가지는 추천서가 없다)");
             return makeResult(HttpStatus.BAD_REQUEST, "해당 ID를 가지는 스타일 추천서는 없습니다.");
-
+        }
         for (int i = 0; i < deleteImageUrl.length; i++) {
             RecommendImage recommendImage = recommendImageRepository.findByImageUrlAndStatus(deleteImageUrl[i], StatusKind.NORMAL.getId()).orElse(null);
-            if (recommendImage == null)
+            if (recommendImage == null) {
+                log.error("[PATCH] /api/v1/recommend/image - 404 (해당 URL 을 가지는 이미지는 없다. 삭제불가)");
                 return makeResult(HttpStatus.NOT_FOUND, "해당 URL 을 가진 이미지는 없습니다.");
-
+            }
             recommend.getRecommendImageSet().remove(recommendImage);
 
             // recommendImageRepository.delete(recommendImage);
@@ -194,13 +207,15 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> acceptRecommend(Member member, BigInteger recommendId) {
-        if (member == null)
+        if (member == null) {
+            log.error("[PATCH] /api/v1/recommend/response/accept - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend == null)
+        if (recommend == null) {
+            log.error("[PATCH] /api/v1/recommend/response/accept - 400 (잘못된 추천서 ID)");
             return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
-
+        }
         recommend.acceptRecommend();
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
@@ -208,12 +223,15 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> rejectRecommend(Member member, BigInteger recommendId) {
-        if (member == null)
+        if (member == null) {
+            log.error("[PATCH] /api/v1/recommend/response/reject - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend == null)
+        if (recommend == null) {
+            log.error("[PATCH] /api/v1/recommend/response/reject - 400 (잘못된 추천서 ID)");
             return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
+        }
 
         recommend.rejectRecommend();
 
@@ -222,13 +240,15 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> findOne(Member member, BigInteger recommendId) {
-        if (member == null)
+        if (member == null) {
+            log.error("[GET] /api/v1/recommend/{recommend_id} - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend == null)
+        if (recommend == null) {
+            log.error("[GET] /api/v1/recommend/{recommend_id} - 400 (잘못된 추천서 ID)");
             return makeResult(HttpStatus.BAD_REQUEST, "잘못된 추천서 ID 입니다.");
-
+        }
         List<RecommendImageDto> recommendImageDtoList = new ArrayList<>();
         if (recommend.getRecommendImageSet() == null || recommend.getRecommendImageSet().size() == 0) {
             recommendImageDtoList = null;
@@ -252,13 +272,15 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> findManyByMe(Member member) {
-        if (member == null)
+        if (member == null) {
+            log.error("[GET] /api/v1/recommend/list_by_user - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
-        if (memberProfile == null)
+        if (memberProfile == null) {
+            log.error("[GET] /api/v1/recommend/list_by_user - 404 (프로필이 등록되어 있지 않다)");
             return makeResult(HttpStatus.NOT_FOUND, "프로필이 등록되어 있지 않습니다.");
-
+        }
         List<Recommend> recommendList = recommendRepository.findByRecommendedProfileAndStatusAndSortingByLocation(memberProfile.getId()
                 , memberProfile.getLatitude(), memberProfile.getLongitude()
                 , StatusKind.NORMAL.getId());
@@ -281,21 +303,25 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> delete(Member member, BigInteger recommendId) {
-        if (member == null)
+        if (member == null) {
+            log.error("[DEL] /api/v1/recommend - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         Recommend recommend = recommendRepository.findByIdAndStatus(recommendId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommend == null)
+        if (recommend == null) {
+            log.error("[DEL] /api/v1/recommend - 404 (잘못된 추천서 ID)");
             return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 추천서는 없습니다");
-
+        }
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
                 member, StatusKind.NORMAL.getId()
         ).orElse(null);
 
         if (hairDesignerProfile == null) {
+            log.error("[DEL] /api/v1/recommend - 400 (해당 디자이너의 프로필이 없다)");
             return makeResult(HttpStatus.BAD_REQUEST, "디자이너의 프로필이 없습니다.");
         }
         if (!recommend.getRecommenderProfile().getId().equals(hairDesignerProfile.getId())) {
+            log.error("[DEL] /api/v1/recommend - 503 (해당 유저는 추천서를 삭제할 권한이 없다)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "해당 유저는 추천서를 삭제할 권한이 없습니다");
         }
 
@@ -306,18 +332,22 @@ public class RecommendService {
 
     @Transactional
     public ResponseEntity<ResultDto> findManyByDesigner(Member member) {
-        if (member == null)
+        if (member == null) {
+            log.error("[GET] /api/v1/recommend/list_by_designer - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
-        if (member.getDesignerFlag() != 1 || !member.getRole().equals("ROLE_DESIGNER"))
+        }
+        if (member.getDesignerFlag() != 1 || !member.getRole().equals("ROLE_DESIGNER")) {
+            log.error("[GET] /api/v1/recommend/list_by_designer - 400 (해당 유저는 디자이너가 아니다)");
             return makeResult(HttpStatus.BAD_REQUEST, "해당 유저가 디자이너가 아닙니다.");
+        }
 
 
         HairDesignerProfile hairDesignerProfile
                 = hairDesignerProfileRepository.findByHairDesignerAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
-        if (hairDesignerProfile == null)
+        if (hairDesignerProfile == null) {
+            log.error("[GET] /api/v1/recommend/list_by_designer - 404 (해당 디자이너는 프로필이 없다)");
             return makeResult(HttpStatus.NOT_FOUND, "해당 유저의 헤어 디자이너 프로필이 없습니다.");
-
+        }
         List<Recommend> recommendList
                 = recommendRepository.findByRecommenderProfileAndStatusOrderByCreateDate(hairDesignerProfile, StatusKind.NORMAL.getId());
 

@@ -30,30 +30,30 @@ public class FCMService {
 
     public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException {
 
-        // See documentation on defining a message payload.
-//        Message message = Message.builder()
-//                .putData("score", "850")
-//                .putData("time", "2:45")
-//                .setToken(targetToken)
-//                .build();
-
+        //   See documentation on defining a message payload.
         Message message = Message.builder()
-                .setNotification(new Notification(
-                        title,
-                        body))
-                .setAndroidConfig(AndroidConfig.builder()
-                        .setTtl(3600 * 1000)
-                        .setNotification(AndroidNotification.builder()
-                                .setIcon(cloudFrontUrlHandler.getLogoUrl())
-                                .setColor("#f45342")
-                                .build())
-                        .build())
-                .setApnsConfig(ApnsConfig.builder()
-                        .setAps(Aps.builder()
-                                .setBadge(42)
-                                .build())
-                        .build())
+                .putData("title", title)
+                .putData("body", body)
+                .setToken(targetToken)
                 .build();
+
+//        Message message = Message.builder()
+//                .setNotification(new Notification(
+//                        title,
+//                        body))
+//                .setAndroidConfig(AndroidConfig.builder()
+//                        .setTtl(3600 * 1000)
+//                        .setNotification(AndroidNotification.builder()
+//                                .setIcon(cloudFrontUrlHandler.getLogoUrl())
+//                                .setColor("#f45342")
+//                                .build())
+//                        .build())
+//                .setApnsConfig(ApnsConfig.builder()
+//                        .setAps(Aps.builder()
+//                                .setBadge(42)
+//                                .build())
+//                        .build())
+//                .build();
 
         // Send a message to the device corresponding to the provided
         // registration token.

@@ -91,7 +91,7 @@ public class RecommendRequestService {
         return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
     }
 
-    private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException {
+    private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException, IOException {
 
         fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
 

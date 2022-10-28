@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 @RestController
@@ -30,7 +31,7 @@ public class RecommendResponseController {
     @Operation(summary = "스타일 추천서 수락 API")
     @PatchMapping("accept")
     public ResponseEntity<ResultDto> acceptRecommend(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(name = "recommend_id") BigInteger recommendId) throws FirebaseMessagingException {
+            , @RequestParam(name = "recommend_id") BigInteger recommendId) throws FirebaseMessagingException, IOException {
         return recommendService.acceptRecommend(principalDetails.getMember(), recommendId);
     }
 

@@ -59,7 +59,7 @@ public class RecommendService {
     private final FCMService fcmService;
 
     @Transactional
-    public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) throws FirebaseMessagingException {
+    public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) throws FirebaseMessagingException, IOException {
         if (recommender == null) {
             log.error("[POST] /api/v1/recommend - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "당신의 세션이 만료되었습니다.");
@@ -102,7 +102,7 @@ public class RecommendService {
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
 
-    private void sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, BigInteger memberId, String designerName) throws FirebaseMessagingException {
+    private void sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, BigInteger memberId, String designerName) throws FirebaseMessagingException, IOException {
         fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
 
 //        try {
@@ -228,7 +228,7 @@ public class RecommendService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> acceptRecommend(Member member, BigInteger recommendId) throws FirebaseMessagingException {
+    public ResponseEntity<ResultDto> acceptRecommend(Member member, BigInteger recommendId) throws FirebaseMessagingException, IOException {
         if (member == null) {
             log.error("[PATCH] /api/v1/recommend/response/accept - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
@@ -247,7 +247,7 @@ public class RecommendService {
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
 
-    private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException {
+    private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException, IOException {
 
         fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
 //      try {

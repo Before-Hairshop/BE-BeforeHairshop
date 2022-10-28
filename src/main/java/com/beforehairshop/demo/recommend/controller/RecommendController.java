@@ -28,6 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 @RestController
@@ -106,7 +107,7 @@ public class RecommendController {
     @PostMapping("")
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "member_profile_id") BigInteger memberProfileId
-            , @RequestBody RecommendSaveRequestDto recommendSaveRequestDto) throws FirebaseMessagingException {
+            , @RequestBody RecommendSaveRequestDto recommendSaveRequestDto) throws FirebaseMessagingException, IOException {
         return recommendService.save(principalDetails.getMember(), memberProfileId, recommendSaveRequestDto);
     }
 

@@ -41,9 +41,10 @@ public class FCMService {
     private final CloudFrontUrlHandler cloudFrontUrlHandler;
 
     public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
-
+        String firebaseConfigPath = "firebase_service_key.json";
+        
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new FileInputStream("firebase_service_key.json"))
+                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         FirebaseOptions options = FirebaseOptions.builder()

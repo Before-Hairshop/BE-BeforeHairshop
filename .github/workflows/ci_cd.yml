@@ -39,6 +39,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     
+    ## FCM key 파일 생성
+    - name: make firebase_service_key.json (prod & dev)
+      run: |
+        cd ./src/main/resources
+        touch ./firebase_service_key.json
+        echo "${{secrets.FCM_KEY}}" > ./firebase_service_key.json
+      shell: bash 
+
+
     ## ==== Prod 환경에서의 secret 파일 생성 ====
 
     ## create application.yml (in prod)

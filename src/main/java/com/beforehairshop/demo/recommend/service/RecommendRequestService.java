@@ -43,32 +43,37 @@ public class RecommendRequestService {
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member member, RecommendRequestSaveRequestDto saveRequestDto) {
-        if (member == null)
+        if (member == null) {
+            log.error("[POST] /api/v1/recommend/request - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
-        if (!saveDtoIsValid(saveRequestDto))
+        }
+        if (!saveDtoIsValid(saveRequestDto)) {
+            log.error("[POST] /api/v1/recommend/request - 204 (저장하기 위한 정보 부족)");
             return makeResult(HttpStatus.NO_CONTENT, "스타일 추천 요청서를 저장하기 위한 정보가 부족하다.");
-
+        }
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(
                 member, StatusKind.NORMAL.getId()
         ).orElse(null);
 
-        if (memberProfile == null)
+        if (memberProfile == null) {
+            log.error("[POST] /api/v1/recommend/request - 503 (프로필이 등록되어 있지 않아, 작성할 수 없다)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "유저 프로필이 등록되어 있지 않아 스타일 추천 요청서를 작성할 수 없다.");
-
+        }
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByIdAndStatus(
                 saveRequestDto.getHairDesignerProfileId(), StatusKind.NORMAL.getId()
         ).orElse(null);
 
-        if (hairDesignerProfile == null)
+        if (hairDesignerProfile == null) {
+            log.error("[POST] /api/v1/recommend/request - 400 (잘못된 프로필 ID)");
             return makeResult(HttpStatus.BAD_REQUEST, "잘못된 디자이너 프로필 ID 가 입력되었다.");
-
+        }
         RecommendRequest checkRequest = recommendRequestRepository.findByToRecommendRequestProfileAndFromRecommendRequestProfileAndStatus(
                 hairDesignerProfile, memberProfile, StatusKind.NORMAL.getId()
         ).orElse(null);
 
         // 이게 말이 되나?? 이렇게 되면, 프로필 수정하고 추천 요청서를 다시 작성할 수가 없다... 흠,, 말이 안 됨
         if (checkRequest != null) {
+            log.error("[POST] /api/v1/recommend/request - 409 (이미 추천 요청서를 보냈다)");
             return makeResult(HttpStatus.CONFLICT, "이미 추천 요청서를 보냈다.");
         }
 
@@ -101,20 +106,24 @@ public class RecommendRequestService {
 
     @Transactional
     public ResponseEntity<ResultDto> delete(Member member, BigInteger recommendRequestId) {
-        if (member == null)
+        if (member == null) {
+            log.error("[DEL] /api/v1/recommend/request - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
-
+        }
         RecommendRequest recommendRequest = recommendRequestRepository.findByIdAndStatus(recommendRequestId, StatusKind.NORMAL.getId()).orElse(null);
-        if (recommendRequest == null)
+        if (recommendRequest == null) {
+            log.error("[DEL] /api/v1/recommend/request - 404 (잘못된 추천 요청서 ID)");
             return makeResult(HttpStatus.NOT_FOUND, "잘못된 추천 요청서 ID 입니다.");
-
+        }
         MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
-        if (memberProfile == null)
+        if (memberProfile == null) {
+            log.error("[DEL] /api/v1/recommend/request - 404 (프로필이 존재하지 않는다)");
             return makeResult(HttpStatus.NOT_FOUND, "유저 프로필이 존재하지 않습니다.");
-
-        if (!recommendRequest.getFromRecommendRequestProfile().getId().equals(memberProfile.getId()))
+        }
+        if (!recommendRequest.getFromRecommendRequestProfile().getId().equals(memberProfile.getId())) {
+            log.error("[DEL] /api/v1/recommend/request - 503 (추천 요청서를 삭제할 권한이 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "해당 추천 요청서를 삭제할 권한이 없는 유저입니다.");
-
+        }
         recommendRequestRepository.delete(recommendRequest);
 
         return makeResult(HttpStatus.OK, "삭제 완료");

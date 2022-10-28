@@ -24,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 @RestController
@@ -85,7 +86,7 @@ public class RecommendRequestController {
     @Operation(summary = "스타일 추천 요청서 저장 API")
     @PostMapping("")
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestBody RecommendRequestSaveRequestDto saveRequestDto) {
+            , @RequestBody RecommendRequestSaveRequestDto saveRequestDto) throws IOException {
         return recommendRequestService.save(principalDetails.getMember(), saveRequestDto);
     }
 

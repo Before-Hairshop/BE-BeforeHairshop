@@ -42,7 +42,7 @@ public class FCMService {
 
     public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
         String firebaseConfigPath = "firebase_service_key.json";
-        
+
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
@@ -52,6 +52,8 @@ public class FCMService {
                 .build();
 
         FirebaseApp.initializeApp(options);
+
+        log.info("[단계0] google credential 확보");
 
         //   See documentation on defining a message payload.
         Message message = Message.builder()
@@ -80,7 +82,14 @@ public class FCMService {
 
         // Send a message to the device corresponding to the provided
         // registration token.
+
+        log.info("[단계1] 메시지 생성");
+
+
         String response = FirebaseMessaging.getInstance().send(message);
+
+        log.info("[단계2] 메시지 보내고 response 받기");
+
 
 //        String message = makeMessage(targetToken, title, body);
 //        log.info("[단계0] 알림 기능 - 알림으로 보내는 message 값 :" + message);

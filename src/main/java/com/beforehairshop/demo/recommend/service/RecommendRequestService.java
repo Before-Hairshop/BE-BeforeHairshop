@@ -42,7 +42,7 @@ public class RecommendRequestService {
 
 
     @Transactional
-    public ResponseEntity<ResultDto> save(Member member, RecommendRequestSaveRequestDto saveRequestDto) {
+    public ResponseEntity<ResultDto> save(Member member, RecommendRequestSaveRequestDto saveRequestDto) throws IOException {
         if (member == null) {
             log.error("[POST] /api/v1/recommend/request - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
@@ -90,14 +90,17 @@ public class RecommendRequestService {
         return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
     }
 
-    private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) {
-        try {
-            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
-        }
-        catch (IOException exception) {
-            log.error("[POST] /api/v1/recommend/request - FCM push notification fail (member id : " + designerId + ")");
-            log.error(exception.getStackTrace().toString());
-        }
+    private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) throws IOException {
+
+        fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
+
+//        try {
+//            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
+//        }
+//        catch (IOException exception) {
+//            log.error("[POST] /api/v1/recommend/request - FCM push notification fail (member id : " + designerId + ")");
+//            log.error(exception.getStackTrace().toString());
+//        }
     }
 
     private boolean saveDtoIsValid(RecommendRequestSaveRequestDto saveRequestDto) {

@@ -5,6 +5,7 @@ import com.amazonaws.services.xray.model.Http;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.fcm.service.FCMService;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
@@ -33,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,7 @@ public class RecommendService {
     private final RecommendRepository recommendRepository;
     private final RecommendImageRepository recommendImageRepository;
     private final RecommendRequestRepository recommendRequestRepository;
+    private final FCMService fcmService;
 
     @Transactional
     public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) {
@@ -89,7 +92,23 @@ public class RecommendService {
             recommendRequestRepository.delete(recommendRequest);
         }
 
+        // FCM push notification
+
+        sendFCMMessageToMemberBySavingRecommend(memberProfile.getMember().getDeviceToken()
+                , memberProfile.getMember().getId()
+                , hairDesignerProfile.getName());
+
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+    private void sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, BigInteger memberId, String designerName) {
+        try {
+            fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+        }
+        catch (IOException exception) {
+            log.error("[POST] /api/v1/recommend - FCM push notification fail (member id : " + memberId + ")");
+            log.error(exception.getStackTrace().toString());
+        }
     }
 
     @Transactional
@@ -218,7 +237,21 @@ public class RecommendService {
         }
         recommend.acceptRecommend();
 
+        sendFCMMessageToDesignerByAcceptRecommend(recommend.getRecommenderProfile().getHairDesigner().getDeviceToken()
+                , member.getName()
+                , recommend.getRecommenderProfile().getHairDesigner().getId());
+
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+    private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) {
+        try {
+            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+        }
+        catch (IOException exception) {
+            log.error("[PATCH] /api/v1/recommend/response/accept - FCM push notification fail (member id : " + designerId + ")");
+            log.error(exception.getStackTrace().toString());
+        }
     }
 
     @Transactional

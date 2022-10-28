@@ -19,7 +19,8 @@ import java.util.List;
 @Slf4j
 public class FCMService {
 
-    private String API_URL = "https://fcm.googleapis.com/v1/projects/프로젝트id/messages:send";
+
+    private String API_URL = "https://fcm.googleapis.com/v1/projects/before-hairshop-ccec7/messages:send";
     private final ObjectMapper objectMapper;
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException {

@@ -31,6 +31,8 @@ public class Member implements Serializable {
     @Column(columnDefinition = "VARCHAR(200) DEFAULT NULL")
     private String provider; // KAKAO, GOOGLE...
 
+    private String deviceToken;
+
     private String username;
     private String password;
     private String role; // ROLE_USER, ROLE_DESIGNER, ROLE_ADMIN

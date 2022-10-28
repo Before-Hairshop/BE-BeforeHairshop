@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -42,10 +43,11 @@ public class FCMService {
 
     public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
         String firebaseConfigPath = "firebase_service_key.json";
+        String[] SCOPES = { "https://www.googleapis.com/auth/firebase.messaging" };
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+                .createScoped(Arrays.asList(SCOPES));
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(googleCredentials)

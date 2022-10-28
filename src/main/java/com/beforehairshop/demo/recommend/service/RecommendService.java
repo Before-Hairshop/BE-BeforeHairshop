@@ -103,13 +103,15 @@ public class RecommendService {
     }
 
     private void sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, BigInteger memberId, String designerName) throws FirebaseMessagingException {
-        try {
-            fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
-        }
-        catch (FirebaseMessagingException exception) {
-            log.error("[POST] /api/v1/recommend - FCM push notification fail (member id : " + memberId + ")");
-            log.error(exception.getStackTrace().toString());
-        }
+        fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+
+//        try {
+//            fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+//        }
+//        catch (FirebaseMessagingException exception) {
+//            log.error("[POST] /api/v1/recommend - FCM push notification fail (member id : " + memberId + ")");
+//            log.error(exception.getStackTrace().toString());
+//        }
     }
 
     @Transactional
@@ -246,13 +248,15 @@ public class RecommendService {
     }
 
     private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException {
-        try {
-            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
-        }
-        catch (FirebaseMessagingException exception) {
-            log.error("[PATCH] /api/v1/recommend/response/accept - FCM push notification fail (member id : " + designerId + ")");
-            log.error(exception.getStackTrace().toString());
-        }
+
+        fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+//      try {
+//            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+//        }
+//        catch (FirebaseMessagingException exception) {
+//            log.error("[PATCH] /api/v1/recommend/response/accept - FCM push notification fail (member id : " + designerId + ")");
+//            log.error(exception.getStackTrace().toString());
+//        }
     }
 
     @Transactional

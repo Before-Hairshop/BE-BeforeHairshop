@@ -246,7 +246,7 @@ public class RecommendService {
 
     private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) {
         try {
-            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
         }
         catch (IOException exception) {
             log.error("[PATCH] /api/v1/recommend/response/accept - FCM push notification fail (member id : " + designerId + ")");

@@ -13,18 +13,22 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class FCMService {
 
 
     private String API_URL = "https://fcm.googleapis.com/v1/projects/before-hairshop-ccec7/messages:send";
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException {
         String message = makeMessage(targetToken, title, body);
+        log.info("[단계0] 알림 기능 - 알림으로 보내는 message 값 :" + message);
+//        Map respMap = objectMapper.readValue(message, Map.class);
+//
+//        log.info("==[단계1] send message ==");
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
@@ -36,7 +40,11 @@ public class FCMService {
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
 
+        log.info("[단계1] 알림 기능 - request 생성");
+
         Response response = client.newCall(request).execute();
+
+        log.info("[단계2] 알림 기능 - response 로 받은 값 :" + response.body());
 
         log.info(response.body().string());
     }

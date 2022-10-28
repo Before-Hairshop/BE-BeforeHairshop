@@ -4,6 +4,7 @@ import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.recommend.service.RecommendService;
 import com.beforehairshop.demo.response.ResultDto;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class RecommendResponseController {
     @Operation(summary = "스타일 추천서 수락 API")
     @PatchMapping("accept")
     public ResponseEntity<ResultDto> acceptRecommend(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestParam(name = "recommend_id") BigInteger recommendId) {
+            , @RequestParam(name = "recommend_id") BigInteger recommendId) throws FirebaseMessagingException {
         return recommendService.acceptRecommend(principalDetails.getMember(), recommendId);
     }
 

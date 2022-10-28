@@ -14,6 +14,7 @@ import com.beforehairshop.demo.recommend.dto.RecommendRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendRequestSaveRequestDto;
 import com.beforehairshop.demo.recommend.repository.RecommendRequestRepository;
 import com.beforehairshop.demo.response.ResultDto;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class RecommendRequestService {
 
 
     @Transactional
-    public ResponseEntity<ResultDto> save(Member member, RecommendRequestSaveRequestDto saveRequestDto) throws IOException {
+    public ResponseEntity<ResultDto> save(Member member, RecommendRequestSaveRequestDto saveRequestDto) throws IOException, FirebaseMessagingException {
         if (member == null) {
             log.error("[POST] /api/v1/recommend/request - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
@@ -90,7 +91,7 @@ public class RecommendRequestService {
         return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
     }
 
-    private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) throws IOException {
+    private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException {
 
         fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
 

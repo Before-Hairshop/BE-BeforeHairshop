@@ -5,20 +5,15 @@ import com.beforehairshop.demo.fcm.dto.FCMMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.common.net.HttpHeaders;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +23,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 @Service
@@ -42,8 +36,10 @@ public class FCMService {
     private final CloudFrontUrlHandler cloudFrontUrlHandler;
 
     public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
-        String firebaseConfigPath = "firebase_service_key.json";
+        String firebaseConfigPath = "firebase-service-key.json";
         String[] SCOPES = { "https://www.googleapis.com/auth/firebase.messaging" };
+
+        log.info("[단계0] FCM 메시지 send 함수 호출");
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
@@ -55,7 +51,7 @@ public class FCMService {
 
         FirebaseApp.initializeApp(options);
 
-        log.info("[단계0] google credential 확보");
+        log.info("[단계1] google credential 확보");
 
         //   See documentation on defining a message payload.
         Message message = Message.builder()
@@ -85,12 +81,12 @@ public class FCMService {
         // Send a message to the device corresponding to the provided
         // registration token.
 
-        log.info("[단계1] 메시지 생성");
+        log.info("[단계2] 메시지 생성");
 
 
         String response = FirebaseMessaging.getInstance().send(message);
 
-        log.info("[단계2] 메시지 보내고 response 받기");
+        log.info("[단계3] 메시지 보내고 response 받기");
 
 
 //        String message = makeMessage(targetToken, title, body);
@@ -138,7 +134,7 @@ public class FCMService {
     }
 
 //    private String getAccessToken() throws IOException {
-//        String firebaseConfigPath = "firebase_service_key.json";
+//        String firebaseConfigPath = "firebase-service-key.json";
 //
 //        GoogleCredentials googleCredentials = GoogleCredentials
 //                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
@@ -152,7 +148,7 @@ public class FCMService {
     // [START retrieve_access_token]
     private String getAccessToken() throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new FileInputStream("firebase_service_key.json"))
+                .fromStream(new FileInputStream("firebase-service-key.json"))
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshAccessToken();

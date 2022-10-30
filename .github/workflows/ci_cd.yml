@@ -38,14 +38,6 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-    
-    ## FCM key 파일 생성
-    - name: make firebase_service_key.json (prod & dev)
-      run: |
-        cd ./src/main/resources
-        touch ./firebase_service_key.json
-        echo "${{secrets.FCM_KEY}}" > ./firebase_service_key.json
-      shell: bash 
 
 
     ## ==== Prod 환경에서의 secret 파일 생성 ====
@@ -125,8 +117,16 @@ jobs:
         echo "${{secrets.OAUTH_DEV}}" > ./oauth-dev.yml
       shell: bash
 
+      ## FCM key 파일 생성
+    - name: make firebase-service-key.json (prod & dev)
+      run: |
+        cd ./src/main/resources
+        ls -a .
+        touch ./firebase-service-key.json
+        echo "${{secrets.FCM_KEY}}" > ./firebase-service-key.json
+      shell: bash
 
-    ## gradle build
+      ## gradle build
     - name: Build with Gradle
       run: ./gradlew build -x test
     

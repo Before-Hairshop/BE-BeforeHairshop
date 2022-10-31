@@ -22,5 +22,7 @@ public class RecommendDetailResponseDto {
     private String customerImage;
     private String customerPhoneNumber;
 
+    private long distance;
+
     private RecommendDto recommendDto;
 }

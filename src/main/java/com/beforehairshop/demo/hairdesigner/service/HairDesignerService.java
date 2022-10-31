@@ -221,7 +221,7 @@ public class HairDesignerService {
 //    }
 
     /**
-     * @return 소수점 1자리까지 반올림해서 리턴
+     * @return m 단위로 리턴
      */
     private long calculateDistance(Float lat1, Float lon1, Float lat2, Float lon2) {
         double theta = lon1 - lon2;

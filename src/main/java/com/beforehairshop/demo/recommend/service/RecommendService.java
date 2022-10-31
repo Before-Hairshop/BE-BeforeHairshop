@@ -337,6 +337,7 @@ public class RecommendService {
                         , recommend.getRecommendedProfile().getName()
                         , recommend.getRecommendedProfile().getFrontImageUrl()
                         , recommend.getRecommendedProfile().getPhoneNumber()
+                        , calculateDistance(memberProfile.getLatitude(), memberProfile.getLongitude(), recommend.getRecommenderProfile().getLatitude(), recommend.getRecommenderProfile().getLongitude())
                         , new RecommendDto(recommend)
                 )).collect(Collectors.toList());
 
@@ -407,9 +408,32 @@ public class RecommendService {
                         , recommend.getRecommendedProfile().getName()
                         , recommend.getRecommendedProfile().getFrontImageUrl()
                         , recommend.getRecommendedProfile().getPhoneNumber()
+                        , calculateDistance(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude(), recommend.getRecommendedProfile().getLatitude(), recommend.getRecommendedProfile().getLongitude())
                         , new RecommendDto(recommend))).collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, recommendDetailResponseDtoList);
 
+    }
+
+    private long calculateDistance(Float lat1, Float lon1, Float lat2, Float lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515 * 1609.344;
+
+        return (Math.round(dist));
+    }
+
+
+    // This function converts decimal degrees to radians
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    // This function converts radians to decimal degrees
+    private double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
     }
 }

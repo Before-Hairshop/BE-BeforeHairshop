@@ -76,18 +76,17 @@ public class FCMService {
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
 
-        log.info("[단계1] 알림 기능 - request 생성");
+       // log.info("[단계1] 알림 기능 - request 생성");
 
         Response response = client.newCall(request).execute();
 
-        log.info("[단계2] 알림 기능 - response 로 받은 값 :" + response.body());
+      //  log.info("[단계2] 알림 기능 - response 로 받은 값 :" + response.body());
 
         log.info(response.body().string());
     }
 
     public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
 
-        log.info("[단계1] google credential 확보");
 
         //   See documentation on defining a message payload.
         Message message = Message.builder()
@@ -96,11 +95,11 @@ public class FCMService {
                 .setToken(targetToken)
                 .build();
 
-        log.info("[단계2] 메시지 생성");
+        // log.info("[단계1] 메시지 생성");
         String response = FirebaseMessaging.getInstance(FirebaseApp.getInstance("beforehairshop")).send(message);
-        log.info("[단계3] 메시지 보내고 response 받기");
+        log.info("FCM 메시지 보내기 성공");
 
-        log.info(response);
+       // log.info(response);
 //        try {
 //            String response = FirebaseMessaging.getInstance(FirebaseApp.getInstance("beforehairshop")).sendAsync(message).get();
 //

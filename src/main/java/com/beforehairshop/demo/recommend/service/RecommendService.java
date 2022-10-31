@@ -332,6 +332,11 @@ public class RecommendService {
                         recommend.getRecommenderProfile().getHairDesigner().getId()
                         , recommend.getRecommenderProfile().getName()
                         , recommend.getRecommenderProfile().getImageUrl()
+                        , recommend.getRecommenderProfile().getPhoneNumber()
+
+                        , recommend.getRecommendedProfile().getName()
+                        , recommend.getRecommendedProfile().getFrontImageUrl()
+                        , recommend.getRecommendedProfile().getPhoneNumber()
                         , new RecommendDto(recommend)
                 )).collect(Collectors.toList());
 
@@ -393,9 +398,15 @@ public class RecommendService {
             return makeResult(HttpStatus.OK, null);
 
         List<RecommendDetailResponseDto> recommendDetailResponseDtoList = recommendList.stream()
-                .map(recommend -> new RecommendDetailResponseDto(recommend.getRecommenderProfile().getHairDesigner().getId()
+                .map(recommend -> new RecommendDetailResponseDto(
+                        recommend.getRecommenderProfile().getHairDesigner().getId()
                         , recommend.getRecommenderProfile().getName()
                         , recommend.getRecommenderProfile().getImageUrl()
+                        , recommend.getRecommenderProfile().getPhoneNumber()
+
+                        , recommend.getRecommendedProfile().getName()
+                        , recommend.getRecommendedProfile().getFrontImageUrl()
+                        , recommend.getRecommendedProfile().getPhoneNumber()
                         , new RecommendDto(recommend))).collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, recommendDetailResponseDtoList);

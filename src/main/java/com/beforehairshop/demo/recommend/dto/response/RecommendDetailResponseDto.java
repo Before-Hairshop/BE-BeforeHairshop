@@ -16,6 +16,11 @@ public class RecommendDetailResponseDto {
     private BigInteger designerId;
     private String designerName;
     private String designerImage;
+    private String designerPhoneNumber;
+
+    private String customerName;
+    private String customerImage;
+    private String customerPhoneNumber;
 
     private RecommendDto recommendDto;
 }

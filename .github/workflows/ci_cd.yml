@@ -119,11 +119,12 @@ jobs:
 
     ## FCM key 파일 생성
     - name: make firebase-service-key.json
-      id: make-firebase-service-key.json
+      id: create-json
       uses: jsdaniell/create-json@1.1.2
       with:
-        name: "./src/main/resources/firebase-service-key.json"
+        name: "firebase-service-key.json"
         json: ${{ secrets.FCM_KEY }}
+        dir: "./src/main/resources/"
 
 #    - name: make firebase-service-key.json (prod & dev)
 #      run: |

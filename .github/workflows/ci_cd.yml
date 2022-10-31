@@ -117,14 +117,21 @@ jobs:
         echo "${{secrets.OAUTH_DEV}}" > ./oauth-dev.yml
       shell: bash
 
-      ## FCM key 파일 생성
-    - name: make firebase-service-key.json (prod & dev)
-      run: |
-        cd ./src/main/resources
-        ls -a .
-        touch ./firebase-service-key.json
-        echo "${{secrets.FCM_KEY}}" > ./firebase-service-key.json
-      shell: bash
+    ## FCM key 파일 생성
+    - name: make firebase-service-key.json
+      id: make-firebase-service-key.json
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        name: "./src/main/resources/firebase-service-key.json"
+        json: ${{ secrets.FCM_KEY }}
+
+#    - name: make firebase-service-key.json (prod & dev)
+#      run: |
+#        cd ./src/main/resources
+#        ls -a .
+#        touch ./firebase-service-key.json
+#        echo "${{secrets.FCM_KEY}}" > ./firebase-service-key.json
+#      shell: bash
 
       ## gradle build
     - name: Build with Gradle

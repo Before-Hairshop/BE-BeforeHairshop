@@ -5,16 +5,19 @@ import com.beforehairshop.demo.fcm.dto.FCMMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.common.net.HttpHeaders;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.Message;
 
+import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +27,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -31,11 +35,12 @@ import java.util.Scanner;
 public class FCMService {
 
 
-    private String API_URL = "https://fcm.googleapis.com/v1/projects/before-hairshop-ccec7/messages:send";
+    private String API_URL = "https://fcm.googleapis.com/v1/projects/689635962511/messages:send";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final CloudFrontUrlHandler cloudFrontUrlHandler;
 
-    public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
+    @PostConstruct
+    public void initialize() throws IOException {
         String firebaseConfigPath = "firebase-service-key.json";
         String[] SCOPES = { "https://www.googleapis.com/auth/firebase.messaging" };
 
@@ -45,11 +50,42 @@ public class FCMService {
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(Arrays.asList(SCOPES));
 
+        googleCredentials.refresh();
+
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(googleCredentials)
                 .build();
 
-        FirebaseApp.initializeApp(options);
+        FirebaseApp.initializeApp(options, "beforehairshop");
+    }
+
+    public void sendMessageToV2(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
+        String message = makeMessage(targetToken, title, body);
+        log.info("[단계0] 알림 기능 - 알림으로 보내는 message 값 :" + message);
+//        Map respMap = objectMapper.readValue(message, Map.class);
+//
+//        log.info("==[단계1] send message ==");
+
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
+
+        Request request = new Request.Builder()
+                .url(API_URL)
+                .post(requestBody)
+                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+                .build();
+
+        log.info("[단계1] 알림 기능 - request 생성");
+
+        Response response = client.newCall(request).execute();
+
+        log.info("[단계2] 알림 기능 - response 로 받은 값 :" + response.body());
+
+        log.info(response.body().string());
+    }
+
+    public void sendMessageTo(String targetToken, String title, String body) throws FirebaseMessagingException, IOException {
 
         log.info("[단계1] google credential 확보");
 
@@ -60,58 +96,20 @@ public class FCMService {
                 .setToken(targetToken)
                 .build();
 
-//        Message message = Message.builder()
-//                .setNotification(new Notification(
-//                        title,
-//                        body))
-//                .setAndroidConfig(AndroidConfig.builder()
-//                        .setTtl(3600 * 1000)
-//                        .setNotification(AndroidNotification.builder()
-//                                .setIcon(cloudFrontUrlHandler.getLogoUrl())
-//                                .setColor("#f45342")
-//                                .build())
-//                        .build())
-//                .setApnsConfig(ApnsConfig.builder()
-//                        .setAps(Aps.builder()
-//                                .setBadge(42)
-//                                .build())
-//                        .build())
-//                .build();
-
-        // Send a message to the device corresponding to the provided
-        // registration token.
-
         log.info("[단계2] 메시지 생성");
-
-
-        String response = FirebaseMessaging.getInstance().send(message);
-
+        String response = FirebaseMessaging.getInstance(FirebaseApp.getInstance("beforehairshop")).send(message);
         log.info("[단계3] 메시지 보내고 response 받기");
 
-
-//        String message = makeMessage(targetToken, title, body);
-//        log.info("[단계0] 알림 기능 - 알림으로 보내는 message 값 :" + message);
-////        Map respMap = objectMapper.readValue(message, Map.class);
-////
-////        log.info("==[단계1] send message ==");
+        log.info(response);
+//        try {
+//            String response = FirebaseMessaging.getInstance(FirebaseApp.getInstance("beforehairshop")).sendAsync(message).get();
 //
-//        OkHttpClient client = new OkHttpClient();
-//        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
-//
-//        Request request = new Request.Builder()
-//                .url(API_URL)
-//                .post(requestBody)
-//                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-//                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
-//                .build();
-//
-//        log.info("[단계1] 알림 기능 - request 생성");
-//
-//        Response response = client.newCall(request).execute();
-//
-//        log.info("[단계2] 알림 기능 - response 로 받은 값 :" + response.body());
-//
-//        log.info(response.body().string());
+//        } catch (ExecutionException e1) {
+//            e1.printStackTrace();
+//        } catch (InterruptedException e2) {
+//            e2.printStackTrace();
+//        }
+//        log.info("[단계3] 메시지 보내고 response 받기");
     }
 
     // 파라미터를 FCM이 요구하는 body 형태로 만들어준다.
@@ -148,10 +146,11 @@ public class FCMService {
     // [START retrieve_access_token]
     private String getAccessToken() throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new FileInputStream("firebase-service-key.json"))
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+                .fromStream(new ClassPathResource("firebase-service-key.json").getInputStream())
+                .createScoped(List.of("https://www.googleapis.com/auth/firebase.messaging"));
 
-        googleCredentials.refreshAccessToken();
+        googleCredentials.refresh();
+        //googleCredentials.refreshAccessToken();
 
         return googleCredentials.getAccessToken().getTokenValue();
     }

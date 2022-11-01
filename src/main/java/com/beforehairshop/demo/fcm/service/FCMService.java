@@ -2,6 +2,7 @@ package com.beforehairshop.demo.fcm.service;
 
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.fcm.dto.FCMMessage;
+import com.beforehairshop.demo.response.ResultDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.Message;
 
@@ -28,6 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+
+import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @Service
 @Slf4j
@@ -226,4 +231,30 @@ public class FCMService {
         return stringBuilder.toString();
     }
 
+    public ResponseEntity<ResultDto> sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName) {
+        try {
+            sendMessageTo(designerDeviceToken, "스타일 추천을 요청하는 유저가 있습니다.", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
+            return makeResult(HttpStatus.OK, "FCM 메시지 전송 성공");
+        } catch (FirebaseMessagingException | IOException e) {
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "FCM 메시지 전송 실패");
+        }
+    }
+
+    public ResponseEntity<ResultDto> sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName) {
+        try {
+            sendMessageTo(designerDeviceToken, "스타일 추천서가 수락되었습니다.",  memberName + " 님이 제안했던 스타일 추천서를 수락하셨습니다.");
+            return makeResult(HttpStatus.OK, "FCM 메시지 전송 성공");
+        } catch (FirebaseMessagingException | IOException e) {
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "FCM 메시지 전송 실패");
+        }
+    }
+
+    public ResponseEntity<ResultDto> sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, String designerName) {
+        try {
+            sendMessageTo(memberDeviceToken, "스타일 추천서가 도착했습니다.", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+            return makeResult(HttpStatus.OK, "FCM 메시지 전송 성공");
+        } catch (FirebaseMessagingException | IOException e) {
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "FCM 메시지 전송 실패");
+        }
+    }
 }

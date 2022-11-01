@@ -162,6 +162,7 @@ application.yml
 
 # ==== Firebase Key ====
 firebase_service_key.json
+firebase-service-key.json
 
 # ==================== Springboot ====================
 secret/

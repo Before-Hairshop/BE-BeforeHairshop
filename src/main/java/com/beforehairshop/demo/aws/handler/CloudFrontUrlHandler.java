@@ -88,4 +88,8 @@ public class CloudFrontUrlHandler {
     public String getRecommendImageUrl(BigInteger styleRecommendId, BigInteger styleRecommendImageId) {
         return CLOUD_FRONT_DOMAIN_NAME + "/recommend/" + styleRecommendId + "/" + styleRecommendImageId + ".png";
     }
+
+    public String getLogoUrl() {
+        return CLOUD_FRONT_DOMAIN_NAME + "/logo.png";
+    }
 }

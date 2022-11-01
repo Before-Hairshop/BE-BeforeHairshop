@@ -5,6 +5,7 @@ import com.amazonaws.services.xray.model.Http;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.member.StatusKind;
+import com.beforehairshop.demo.fcm.service.FCMService;
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
 import com.beforehairshop.demo.hairdesigner.handler.PageOffsetHandler;
 import com.beforehairshop.demo.hairdesigner.repository.HairDesignerProfileRepository;
@@ -25,6 +26,7 @@ import com.beforehairshop.demo.recommend.repository.RecommendImageRepository;
 import com.beforehairshop.demo.recommend.repository.RecommendRepository;
 import com.beforehairshop.demo.recommend.repository.RecommendRequestRepository;
 import com.beforehairshop.demo.response.ResultDto;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +56,10 @@ public class RecommendService {
     private final RecommendRepository recommendRepository;
     private final RecommendImageRepository recommendImageRepository;
     private final RecommendRequestRepository recommendRequestRepository;
+    private final FCMService fcmService;
 
     @Transactional
-    public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) {
+    public ResponseEntity<ResultDto> save(Member recommender, BigInteger memberProfileId, RecommendSaveRequestDto recommendSaveRequestDto) throws FirebaseMessagingException, IOException {
         if (recommender == null) {
             log.error("[POST] /api/v1/recommend - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "당신의 세션이 만료되었습니다.");
@@ -89,7 +93,25 @@ public class RecommendService {
             recommendRequestRepository.delete(recommendRequest);
         }
 
+        // FCM push notification
+
+        sendFCMMessageToMemberBySavingRecommend(memberProfile.getMember().getDeviceToken()
+                , memberProfile.getMember().getId()
+                , hairDesignerProfile.getName());
+
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+    private void sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, BigInteger memberId, String designerName) throws FirebaseMessagingException, IOException {
+        fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+
+//        try {
+//            fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+//        }
+//        catch (FirebaseMessagingException exception) {
+//            log.error("[POST] /api/v1/recommend - FCM push notification fail (member id : " + memberId + ")");
+//            log.error(exception.getStackTrace().toString());
+//        }
     }
 
     @Transactional
@@ -206,7 +228,7 @@ public class RecommendService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> acceptRecommend(Member member, BigInteger recommendId) {
+    public ResponseEntity<ResultDto> acceptRecommend(Member member, BigInteger recommendId) throws FirebaseMessagingException, IOException {
         if (member == null) {
             log.error("[PATCH] /api/v1/recommend/response/accept - 504 (세션 만료)");
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
@@ -218,7 +240,23 @@ public class RecommendService {
         }
         recommend.acceptRecommend();
 
+        sendFCMMessageToDesignerByAcceptRecommend(recommend.getRecommenderProfile().getHairDesigner().getDeviceToken()
+                , member.getName()
+                , recommend.getRecommenderProfile().getHairDesigner().getId());
+
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+    }
+
+    private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException, IOException {
+
+        fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+//      try {
+//            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+//        }
+//        catch (FirebaseMessagingException exception) {
+//            log.error("[PATCH] /api/v1/recommend/response/accept - FCM push notification fail (member id : " + designerId + ")");
+//            log.error(exception.getStackTrace().toString());
+//        }
     }
 
     @Transactional
@@ -294,6 +332,12 @@ public class RecommendService {
                         recommend.getRecommenderProfile().getHairDesigner().getId()
                         , recommend.getRecommenderProfile().getName()
                         , recommend.getRecommenderProfile().getImageUrl()
+                        , recommend.getRecommenderProfile().getPhoneNumber()
+
+                        , recommend.getRecommendedProfile().getName()
+                        , recommend.getRecommendedProfile().getFrontImageUrl()
+                        , recommend.getRecommendedProfile().getPhoneNumber()
+                        , calculateDistance(memberProfile.getLatitude(), memberProfile.getLongitude(), recommend.getRecommenderProfile().getLatitude(), recommend.getRecommenderProfile().getLongitude())
                         , new RecommendDto(recommend)
                 )).collect(Collectors.toList());
 
@@ -355,12 +399,41 @@ public class RecommendService {
             return makeResult(HttpStatus.OK, null);
 
         List<RecommendDetailResponseDto> recommendDetailResponseDtoList = recommendList.stream()
-                .map(recommend -> new RecommendDetailResponseDto(recommend.getRecommenderProfile().getHairDesigner().getId()
+                .map(recommend -> new RecommendDetailResponseDto(
+                        recommend.getRecommenderProfile().getHairDesigner().getId()
                         , recommend.getRecommenderProfile().getName()
                         , recommend.getRecommenderProfile().getImageUrl()
+                        , recommend.getRecommenderProfile().getPhoneNumber()
+
+                        , recommend.getRecommendedProfile().getName()
+                        , recommend.getRecommendedProfile().getFrontImageUrl()
+                        , recommend.getRecommendedProfile().getPhoneNumber()
+                        , calculateDistance(hairDesignerProfile.getLatitude(), hairDesignerProfile.getLongitude(), recommend.getRecommendedProfile().getLatitude(), recommend.getRecommendedProfile().getLongitude())
                         , new RecommendDto(recommend))).collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, recommendDetailResponseDtoList);
 
+    }
+
+    private long calculateDistance(Float lat1, Float lon1, Float lat2, Float lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515 * 1609.344;
+
+        return (Math.round(dist));
+    }
+
+
+    // This function converts decimal degrees to radians
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    // This function converts radians to decimal degrees
+    private double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
     }
 }

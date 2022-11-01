@@ -11,6 +11,7 @@ import com.beforehairshop.demo.recommend.dto.response.RecommendDetailImageRespon
 import com.beforehairshop.demo.recommend.dto.response.RecommendDetailResponseDto;
 import com.beforehairshop.demo.recommend.service.RecommendService;
 import com.beforehairshop.demo.response.ResultDto;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,6 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 @RestController
@@ -105,7 +107,7 @@ public class RecommendController {
     @PostMapping("")
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "member_profile_id") BigInteger memberProfileId
-            , @RequestBody RecommendSaveRequestDto recommendSaveRequestDto) {
+            , @RequestBody RecommendSaveRequestDto recommendSaveRequestDto) throws FirebaseMessagingException, IOException {
         return recommendService.save(principalDetails.getMember(), memberProfileId, recommendSaveRequestDto);
     }
 

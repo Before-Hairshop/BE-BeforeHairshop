@@ -9,6 +9,7 @@ import com.beforehairshop.demo.recommend.dto.RecommendRequestDto;
 import com.beforehairshop.demo.recommend.dto.post.RecommendRequestSaveRequestDto;
 import com.beforehairshop.demo.recommend.service.RecommendRequestService;
 import com.beforehairshop.demo.response.ResultDto;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +25,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 @RestController
@@ -85,7 +87,7 @@ public class RecommendRequestController {
     @Operation(summary = "스타일 추천 요청서 저장 API")
     @PostMapping("")
     public ResponseEntity<ResultDto> save(@AuthenticationPrincipal PrincipalDetails principalDetails
-            , @RequestBody RecommendRequestSaveRequestDto saveRequestDto) {
+            , @RequestBody RecommendRequestSaveRequestDto saveRequestDto) throws IOException, FirebaseMessagingException {
         return recommendRequestService.save(principalDetails.getMember(), saveRequestDto);
     }
 

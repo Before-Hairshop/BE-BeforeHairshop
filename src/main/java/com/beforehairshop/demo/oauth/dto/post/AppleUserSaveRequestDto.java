@@ -16,12 +16,14 @@ public class AppleUserSaveRequestDto {
     private String providerId;
     private String email;
     private String accessToken;
+    private String deviceToken;
 
     public Member toEntity(String username) {
         return Member.builder()
                 .name("임시 USER")
                 .email(email)
                 .provider(SocialLoginType.APPLE.getProvider())
+                .deviceToken(deviceToken)
                 .username(username)
                 .designerFlag(0)
                 .premiumFlag(0)

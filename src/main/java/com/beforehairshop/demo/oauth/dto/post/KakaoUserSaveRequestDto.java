@@ -16,12 +16,14 @@ public class KakaoUserSaveRequestDto {
     private String providerId;
     private String email;
     private String accessToken;
+    private String deviceToken;
 
     public Member toEntity(String username) {
         return Member.builder()
                 .name("임시 USER")
                 .email(email)
                 .provider(SocialLoginType.KAKAO.getProvider())
+                .deviceToken(deviceToken)
                 .username(username)
                 .designerFlag(0)
                 .premiumFlag(0)

@@ -95,15 +95,20 @@ public class RecommendService {
 
         // FCM push notification
 
-        sendFCMMessageToMemberBySavingRecommend(memberProfile.getMember().getDeviceToken()
-                , memberProfile.getMember().getId()
-                , hairDesignerProfile.getName());
+        try {
+            sendFCMMessageToMemberBySavingRecommend(memberProfile.getMember().getDeviceToken()
+                    , memberProfile.getMember().getId()
+                    , hairDesignerProfile.getName());
+        } catch (Exception e) {
+            log.error("[POST] /api/v1/recommend - 푸시알림 실패");
+            return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+        }
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
 
     private void sendFCMMessageToMemberBySavingRecommend(String memberDeviceToken, BigInteger memberId, String designerName) throws FirebaseMessagingException, IOException {
-        fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
+        fcmService.sendMessageTo(memberDeviceToken, "스타일 추천서가 도착했습니다.", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
 
 //        try {
 //            fcmService.sendMessageTo(memberDeviceToken, "비포헤어샵", designerName + " 디자이너 님의 스타일 추천서가 도착했으니 확인해보세요.");
@@ -240,16 +245,20 @@ public class RecommendService {
         }
         recommend.acceptRecommend();
 
-        sendFCMMessageToDesignerByAcceptRecommend(recommend.getRecommenderProfile().getHairDesigner().getDeviceToken()
-                , member.getName()
-                , recommend.getRecommenderProfile().getHairDesigner().getId());
-
+        try {
+            sendFCMMessageToDesignerByAcceptRecommend(recommend.getRecommenderProfile().getHairDesigner().getDeviceToken()
+                    , member.getName()
+                    , recommend.getRecommenderProfile().getHairDesigner().getId());
+        } catch (Exception e) {
+            log.error("[PATCH] /api/v1/recommend/response/accept - 푸시알림 실패");
+            return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+        }
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
 
     private void sendFCMMessageToDesignerByAcceptRecommend(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException, IOException {
 
-        fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
+        fcmService.sendMessageTo(designerDeviceToken, "스타일 추천서가 수락되었습니다.",  memberName + " 님이 제안했던 스타일 추천서를 수락하셨습니다.");
 //      try {
 //            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵",  memberName + " 님이 디자이너님이 제안하신 스타일 추천서를 수락하셨습니다!");
 //        }

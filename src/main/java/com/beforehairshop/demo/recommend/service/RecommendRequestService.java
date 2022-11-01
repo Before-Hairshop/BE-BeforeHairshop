@@ -84,16 +84,21 @@ public class RecommendRequestService {
         hairDesignerProfile.addToRecommendRequest(recommendRequest);
         memberProfile.addFromRecommendRequest(recommendRequest);
 
-        sendFCMMessageToDesignerBySavingRecommendRequest(hairDesignerProfile.getHairDesigner().getDeviceToken()
-                , memberProfile.getName()
-                , hairDesignerProfile.getHairDesigner().getId());
+        try {
+            sendFCMMessageToDesignerBySavingRecommendRequest(hairDesignerProfile.getHairDesigner().getDeviceToken()
+                    , memberProfile.getName()
+                    , hairDesignerProfile.getHairDesigner().getId());
+        } catch (Exception e) {
+            log.error("[POST] /api/v1/recommend/request - 푸시 알림 실패");
+            return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
+        }
 
         return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
     }
 
     private void sendFCMMessageToDesignerBySavingRecommendRequest(String designerDeviceToken, String memberName, BigInteger designerId) throws FirebaseMessagingException, IOException {
 
-        fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
+        fcmService.sendMessageTo(designerDeviceToken, "스타일 추천을 요청하는 유저가 있습니다.", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");
 
 //        try {
 //            fcmService.sendMessageTo(designerDeviceToken, "비포헤어샵", "'" + memberName + "' 님이 디자이너님에게 스타일 추천서를 요청하셨습니다. 확인해보세요!");

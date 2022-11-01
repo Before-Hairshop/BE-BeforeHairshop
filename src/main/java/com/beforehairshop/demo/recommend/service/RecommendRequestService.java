@@ -84,14 +84,14 @@ public class RecommendRequestService {
         hairDesignerProfile.addToRecommendRequest(recommendRequest);
         memberProfile.addFromRecommendRequest(recommendRequest);
 
-//        try {
-//            sendFCMMessageToDesignerBySavingRecommendRequest(hairDesignerProfile.getHairDesigner().getDeviceToken()
-//                    , memberProfile.getName()
-//                    , hairDesignerProfile.getHairDesigner().getId());
-//        } catch (Exception e) {
-//            log.error("[POST] /api/v1/recommend/request - 푸시 알림 실패");
-//            return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
-//        }
+        try {
+            sendFCMMessageToDesignerBySavingRecommendRequest(hairDesignerProfile.getHairDesigner().getDeviceToken()
+                    , memberProfile.getName()
+                    , hairDesignerProfile.getHairDesigner().getId());
+        } catch (Exception e) {
+            log.error("[POST] /api/v1/recommend/request - 푸시 알림 실패");
+            return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
+        }
 
         return makeResult(HttpStatus.OK, new RecommendRequestDto(recommendRequest));
     }

@@ -93,16 +93,16 @@ public class RecommendService {
             recommendRequestRepository.delete(recommendRequest);
         }
 
-//        // FCM push notification
-//
-//        try {
-//            sendFCMMessageToMemberBySavingRecommend(memberProfile.getMember().getDeviceToken()
-//                    , memberProfile.getMember().getId()
-//                    , hairDesignerProfile.getName());
-//        } catch (Exception e) {
-//            log.error("[POST] /api/v1/recommend - 푸시알림 실패");
-//            return makeResult(HttpStatus.OK, new RecommendDto(recommend));
-//        }
+        // FCM push notification
+
+        try {
+            sendFCMMessageToMemberBySavingRecommend(memberProfile.getMember().getDeviceToken()
+                    , memberProfile.getMember().getId()
+                    , hairDesignerProfile.getName());
+        } catch (Exception e) {
+            log.error("[POST] /api/v1/recommend - 푸시알림 실패");
+            return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+        }
 
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
@@ -245,14 +245,14 @@ public class RecommendService {
         }
         recommend.acceptRecommend();
 
-//        try {
-//            sendFCMMessageToDesignerByAcceptRecommend(recommend.getRecommenderProfile().getHairDesigner().getDeviceToken()
-//                    , member.getName()
-//                    , recommend.getRecommenderProfile().getHairDesigner().getId());
-//        } catch (Exception e) {
-//            log.error("[PATCH] /api/v1/recommend/response/accept - 푸시알림 실패");
-//            return makeResult(HttpStatus.OK, new RecommendDto(recommend));
-//        }
+        try {
+            sendFCMMessageToDesignerByAcceptRecommend(recommend.getRecommenderProfile().getHairDesigner().getDeviceToken()
+                    , member.getName()
+                    , recommend.getRecommenderProfile().getHairDesigner().getId());
+        } catch (Exception e) {
+            log.error("[PATCH] /api/v1/recommend/response/accept - 푸시알림 실패");
+            return makeResult(HttpStatus.OK, new RecommendDto(recommend));
+        }
         return makeResult(HttpStatus.OK, new RecommendDto(recommend));
     }
 

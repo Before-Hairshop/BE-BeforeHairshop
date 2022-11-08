@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,11 +60,13 @@ public class Review {
     private int status;
 
     @OneToMany(mappedBy = "review"
+            , fetch = FetchType.LAZY
             , cascade = CascadeType.ALL
             , orphanRemoval = true)
     private Set<ReviewHashtag> reviewHashtagSet = new HashSet<>();
 
     @OneToMany(mappedBy = "review"
+            , fetch = FetchType.LAZY
             , cascade = CascadeType.ALL
             , orphanRemoval = true)
     private Set<ReviewImage> reviewImageSet = new HashSet<>();

@@ -77,7 +77,7 @@ public class MemberProfile {
     @OneToMany(mappedBy = "recommendedProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Recommend> recommendedSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "memberProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "memberProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberProfileDesiredHairstyleImage> memberProfileDesiredHairstyleImageSet = new HashSet<>();
 
     @OneToMany(mappedBy = "fromRecommendRequestProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

@@ -27,7 +27,7 @@ public class AIController {
 
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "추론 성공"
+            @ApiResponse(responseCode = "200", description = "이미지 저장 성공 (presigned url 발급)"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
                     , content = @Content(schema = @Schema(implementation = String.class)))
@@ -35,8 +35,22 @@ public class AIController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
     @Operation(summary = "유저 이미지 등록 (S3의 PreSigned_url 발급)")
     @PostMapping("")
-    public ResponseEntity<ResultDto> saveMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return aiService.saveMemberImage(principalDetails.getMember());
+    public ResponseEntity<ResultDto> saveVirtualMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return aiService.saveVirtualMemberImage(principalDetails.getMember());
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이미지 삭제 성공 (presigned url 발급)"
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
+    @Operation(summary = "유저 이미지 등록 (S3의 PreSigned_url 발급)")
+    @DeleteMapping("")
+    public ResponseEntity<ResultDto> deleteVirtualMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "virtual_member_image_url") String virtualMemberImageUrl) {
+        return aiService.deleteVirtualMemberImage(principalDetails.getMember(), virtualMemberImageUrl);
     }
 
 

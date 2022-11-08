@@ -1,5 +1,7 @@
 package com.beforehairshop.demo.member.service;
 
+import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
+import com.beforehairshop.demo.ai.repository.VirtualMemberImageRepository;
 import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.auth.handler.PrincipalDetailsUpdater;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
@@ -27,6 +29,8 @@ import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.recommend.domain.RecommendRequest;
 import com.beforehairshop.demo.recommend.repository.RecommendRequestRepository;
 import com.beforehairshop.demo.response.ResultDto;
+import com.beforehairshop.demo.review.domain.Review;
+import com.beforehairshop.demo.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +73,8 @@ public class MemberService {
     private final HairDesignerProfileRepository hairDesignerProfileRepository;
 
     private final RecommendRequestRepository recommendRequestRepository;
+    private final ReviewRepository reviewRepository;
+    private final VirtualMemberImageRepository virtualMemberImageRepository;
 
 
     @Transactional
@@ -650,6 +656,11 @@ public class MemberService {
         if (hairDesignerProfile != null)
             hairDesignerProfileRepository.delete(hairDesignerProfile);
 
+        List<Review> reviewList = reviewRepository.findByReviewerAndStatus(member, StatusKind.NORMAL.getId());
+        reviewRepository.deleteAll(reviewList);
+
+        List<VirtualMemberImage> virtualMemberImageList = virtualMemberImageRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId());
+        virtualMemberImageRepository.deleteAll(virtualMemberImageList);
 
         memberRepository.delete(member);
 

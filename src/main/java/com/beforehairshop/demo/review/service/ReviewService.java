@@ -152,6 +152,8 @@ public class ReviewService {
             log.error("[PATCH] /api/v1/reviews - 503 (리뷰 수정할 권한이 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "해당 리뷰를 수정할 권한이 없는 유저입니다.");
         }
+
+
         if (reviewPatchRequestDto.getTotalRating() != null)
             review.setTotalRating(reviewPatchRequestDto.getTotalRating());
 
@@ -308,6 +310,7 @@ public class ReviewService {
             log.error("[DEL] /api/v1/reviews - 503 (삭제할 권한이 없는 유저)");
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "삭제할 권한이 없는 유저입니다.");
         }
+
         reviewRepository.delete(review);
 
         return makeResult(HttpStatus.OK, "삭제 완료");

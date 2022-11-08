@@ -6,12 +6,14 @@ import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
 import com.beforehairshop.demo.ai.model.MessagePayload;
 import com.beforehairshop.demo.ai.repository.VirtualMemberImageRepository;
 import com.beforehairshop.demo.constant.ai.InferenceStatusKind;
+import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.fcm.service.FCMService;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.recommend.dto.RecommendDto;
 import com.beforehairshop.demo.response.ResultDto;
 import com.google.firebase.messaging.FirebaseMessagingException;
+import jdk.jshell.Snippet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
@@ -23,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import static com.beforehairshop.demo.log.LogFormat.makeErrorLog;
+import static com.beforehairshop.demo.log.LogFormat.makeSuccessLog;
 import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @Service
@@ -72,7 +76,7 @@ public class AIService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> saveMemberImage(Member member) {
+    public ResponseEntity<ResultDto> saveVirtualMemberImage(Member member) {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
@@ -132,6 +136,29 @@ public class AIService {
 
     private void sendFCMMessageToMemberBySuccessInference(String memberDeviceToken) throws FirebaseMessagingException, IOException {
         fcmService.sendMessageTo(memberDeviceToken, "AI 가 가상 헤어스타일링 이미지를 생성했습니다!", "가상 헤어스타일링 결과를 보고 어울리는 머리를 찾아보세요!");
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> deleteVirtualMemberImage(Member member, String virtualMemberImageUrl) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        VirtualMemberImage virtualMemberImage = virtualMemberImageRepository.findByImageUrlAndStatus(virtualMemberImageUrl
+                , StatusKind.NORMAL.getId()).orElse(null);
+        if (virtualMemberImage == null) {
+            log.error(makeErrorLog(400, "/api/v1/virtual_hairstyling", "DELETE", "잘못된 이미지 url 입니다"));
+            return makeResult(HttpStatus.BAD_REQUEST, "잘못된 이미지 url 입니다");
+        }
+
+        if (!virtualMemberImage.getMember().getId().equals(member.getId())) {
+            log.error(makeErrorLog(503, "/api/v1/virtual_hairstyling", "DELETE", "삭제 권한 없음"));
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "삭제 권한이 없는 유저");
+        }
+
+        virtualMemberImageRepository.delete(virtualMemberImage);
+
+        log.info(makeSuccessLog(200, "/api/v1/virtual_hairstyling", "DELETE", "삭제 성공"));
+        return makeResult(HttpStatus.OK, "삭제 완료");
     }
 }
 

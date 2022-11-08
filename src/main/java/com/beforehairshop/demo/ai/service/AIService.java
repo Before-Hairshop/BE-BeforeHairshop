@@ -2,9 +2,9 @@ package com.beforehairshop.demo.ai.service;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.beforehairshop.demo.ai.domain.MemberImage;
+import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
 import com.beforehairshop.demo.ai.model.MessagePayload;
-import com.beforehairshop.demo.ai.repository.MemberImageRepository;
+import com.beforehairshop.demo.ai.repository.VirtualMemberImageRepository;
 import com.beforehairshop.demo.constant.ai.InferenceStatusKind;
 import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.response.ResultDto;
@@ -23,7 +23,7 @@ import static com.beforehairshop.demo.response.ResultDto.makeResult;
 @Service
 @Slf4j
 public class AIService {
-    private final MemberImageRepository memberImageRepository;
+    private final VirtualMemberImageRepository virtualMemberImageRepository;
 
     private final QueueMessagingTemplate queueMessagingTemplate;
     private final MessageSender messageSender;
@@ -31,8 +31,8 @@ public class AIService {
 
 
     @Autowired
-    public AIService(MemberImageRepository memberImageRepository, AmazonSQS amazonSqs, MessageSender messageSender) {
-        this.memberImageRepository = memberImageRepository;
+    public AIService(VirtualMemberImageRepository virtualMemberImageRepository, AmazonSQS amazonSqs, MessageSender messageSender) {
+        this.virtualMemberImageRepository = virtualMemberImageRepository;
         this.queueMessagingTemplate = new QueueMessagingTemplate((AmazonSQSAsync) amazonSqs);
         this.messageSender = messageSender;
     }
@@ -44,13 +44,13 @@ public class AIService {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        MemberImage memberImage = memberImageRepository.findById(memberImageId).orElse(null);
-        if (memberImage == null)
+        VirtualMemberImage virtualMemberImage = virtualMemberImageRepository.findById(memberImageId).orElse(null);
+        if (virtualMemberImage == null)
             return makeResult(HttpStatus.NOT_FOUND, "해당 ID를 가지는 유저의 이미지는 없습니다.");
 
-        if (memberImage.getInferenceStatus().equals(InferenceStatusKind.SUCCESS.getId()))
+        if (virtualMemberImage.getInferenceStatus().equals(InferenceStatusKind.SUCCESS.getId()))
             return makeResult(HttpStatus.CONFLICT, "이미 추론이 완료된 프로필입니다.");
-        else if (memberImage.getInferenceStatus().equals(InferenceStatusKind.FAIL.getId()))
+        else if (virtualMemberImage.getInferenceStatus().equals(InferenceStatusKind.FAIL.getId()))
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "추론이 불가능한 프로필입니다");
 
         sendMessageToRequestQueue(member.getId(), memberImageId);
@@ -75,34 +75,23 @@ public class AIService {
         return null;
     }
 
-
-    private void getMessage() {
-        MessagePayload messagePayload = queueMessagingTemplate.receiveAndConvert("dev-inference-response-queue", MessagePayload.class);
-        System.out.println("Response SQS 로부터 받은 메시지 : " + messagePayload);
-    }
-
-    private void sendMessage(MessagePayload messagePayload) {
-        log.info("Request SQS 에 message 를 전달합니다 : " + messagePayload);
-        queueMessagingTemplate.convertAndSend("dev-inference-request-queue", messagePayload);
-    }
-
     @Transactional
     public void processByInferenceResult(MessagePayload messagePayload) {
 
         log.info(messagePayload.toString());
-        MemberImage memberImage = memberImageRepository.findByIdAndInferenceStatus(
+        VirtualMemberImage virtualMemberImage = virtualMemberImageRepository.findByIdAndInferenceStatus(
                 messagePayload.getMemberImageId(), InferenceStatusKind.WAIT.getId()
         ).orElse(null);
-        if (memberImage == null) return;
+        if (virtualMemberImage == null) return;
 
         if (messagePayload.getResult().equals("fail")) {
-            memberImage.setInferenceStatus(InferenceStatusKind.FAIL.getId());
+            virtualMemberImage.setInferenceStatus(InferenceStatusKind.FAIL.getId());
             /**
              * FCM 통해서, 실패 알림 보내기
              */
         }
         else if (messagePayload.getResult().equals("success")) {
-            memberImage.setInferenceStatus(InferenceStatusKind.SUCCESS.getId());
+            virtualMemberImage.setInferenceStatus(InferenceStatusKind.SUCCESS.getId());
             /**
              * FCM 통해서, 성공 알림 보내기
              */

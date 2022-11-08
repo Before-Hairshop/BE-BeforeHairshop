@@ -19,7 +19,7 @@ import java.util.Date;
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberImage {
+public class VirtualMemberImage {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;

@@ -14,5 +14,5 @@ import java.math.BigInteger;
 public class MessagePayload {
     private String result;
     private BigInteger memberId;
-    private BigInteger memberImageId;
+    private BigInteger virtualMemberImageId;
 }

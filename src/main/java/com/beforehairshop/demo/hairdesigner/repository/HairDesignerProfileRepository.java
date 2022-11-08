@@ -24,4 +24,9 @@ public interface HairDesignerProfileRepository extends JpaRepository<HairDesigne
             "ORDER BY distance asc LIMIT 5 OFFSET ?3 ;",
             nativeQuery = true)
     List<HairDesignerProfile> findManyByLocationAndStatus(Float member_latitude, Float member_longitude, int pageOffset, Integer status);
+
+    // 바꿔야하는 부분
+    List<HairDesignerProfile> findAllByStatus(Integer status, Pageable pageable);
+
+
 }

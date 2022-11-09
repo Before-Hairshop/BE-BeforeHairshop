@@ -1,9 +1,13 @@
 package com.beforehairshop.demo.member.domain;
 
+import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
 import com.beforehairshop.demo.recommend.domain.Recommend;
+import com.beforehairshop.demo.recommend.domain.RecommendRequest;
+import com.beforehairshop.demo.review.domain.Review;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -57,5 +61,4 @@ public class Member implements Serializable {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
-
 }

@@ -1,6 +1,7 @@
 package com.beforehairshop.demo.review.repository;
 
 import com.beforehairshop.demo.hairdesigner.domain.HairDesignerProfile;
+import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.review.domain.Review;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,4 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, BigInteger> {
             "GROUP BY hair_designer_profile_id;"
             , nativeQuery = true)
     Float calculateByHairDesignerProfileIdAndStatus(BigInteger hairDesignerProfileId, Integer status);
+
+    List<Review> findByReviewerAndStatus(Member member, Integer status);
+
 }

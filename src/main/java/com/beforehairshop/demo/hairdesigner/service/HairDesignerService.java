@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.beforehairshop.demo.log.LogFormat.makeErrorLog;
 import static com.beforehairshop.demo.response.ResultDto.*;
 
 @Service
@@ -444,5 +445,23 @@ public class HairDesignerService {
         }
 
         return makeResult(HttpStatus.OK, new HairDesignerProfileDto(hairDesignerProfile));
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> findManyByRating(Member member, Pageable pageable) {
+        if (member == null) {
+            log.error(makeErrorLog(504, "/api/v1/hair_designers/list_by_rating", "GET", "세션 만료"));
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+        }
+
+        List<HairDesignerProfile> hairDesignerProfileList = hairDesignerProfileRepository.findAllByStatus(StatusKind.NORMAL.getId(), pageable);
+
+        List<HairDesignerProfileAndHashtagDto> hairDesignerProfileAndHashtagDtoList = hairDesignerProfileList.stream()
+                .map(hairDesignerProfile -> new HairDesignerProfileAndHashtagDto(new HairDesignerProfileDto(hairDesignerProfile)
+                        , reviewRepository.calculateByHairDesignerProfileIdAndStatus(hairDesignerProfile.getId(), StatusKind.NORMAL.getId())
+                        , hairDesignerProfile.getHairDesignerHashtagSet().stream().map(HairDesignerHashtagDto::new).collect(Collectors.toList())))
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, hairDesignerProfileAndHashtagDtoList);
     }
 }

@@ -106,9 +106,25 @@ public class HairDesignerController {
     @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
     @Operation(summary = "(위치 순서 : 10km 안) - 헤어 디자이너 목록 조회")
     @GetMapping("list_by_location")
-    public ResponseEntity<ResultDto> findMany(@AuthenticationPrincipal PrincipalDetails principalDetails
+    public ResponseEntity<ResultDto> findManyByLocation(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(value = "page_number", required = true) Integer pageNumber) {
         return hairDesignerService.findManyByLocation(principalDetails.getMember(), pageNumber);
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "별점 순으로 디자이너 프로필 조회 (프로필 없어도, 조회 성공(null 반환))"
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = HairDesignerProfileAndDistanceAndHashtagDto.class)))),
+            @ApiResponse(responseCode = "400", description = "조회하려는 유저의 프로필이 등록되어 있지 않습니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("hasAnyRole('USER', 'DESIGNER', 'ADMIN')")
+    @Operation(summary = "(별점 순) - 헤어 디자이너 목록 조회")
+    @GetMapping("list_by_rating")
+    public ResponseEntity<ResultDto> findManyByRating(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @PageableDefault(size = 5) Pageable pageable) {
+        return hairDesignerService.findManyByRating(principalDetails.getMember(), pageable);
     }
 
     @ApiResponses(value = {

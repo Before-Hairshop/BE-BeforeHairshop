@@ -9,6 +9,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -19,7 +20,7 @@ import java.util.Date;
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberImage {
+public class VirtualMemberImage {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;

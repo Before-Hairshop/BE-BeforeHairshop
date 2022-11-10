@@ -86,6 +86,18 @@ public class AIController {
         return aiService.inference(principalDetails.getMember(), virtualMemberImageId);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추론 성공"
+                    , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @Operation(summary = "(테스트) AI를 이용한 가상 헤어스타일링 결과 추론")
+    @PostMapping("inference_test")
+    public ResponseEntity<ResultDto> inferenceTest(@RequestParam(name = "memberId")BigInteger memberId, @RequestParam(name = "virtual_member_image_id")BigInteger virtualMemberImageId) {
+        return aiService.inferenceTest(memberId, virtualMemberImageId);
+    }
+
 //    @ApiResponses(value = {
 //            @ApiResponse(responseCode = "200", description = "추론 성공"
 //                    , content = @Content(schema = @Schema(implementation = String.class))),

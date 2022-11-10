@@ -160,7 +160,7 @@ public class AIService {
     }
 
     private void sendFCMMessageToMemberBySuccessInference(String memberDeviceToken) throws FirebaseMessagingException, IOException {
-        fcmService.sendMessageTo(memberDeviceToken, "AI 가 가상 헤어스타일링 이미지를 생성했습니다!", "가상 헤어스타일링 결과를 보고 어울리는 머리를 찾아보세요!");
+        fcmService.sendMessageTo(memberDeviceToken, "AI 가 가상 헤어스타일링 이미지를 생성했습니다. 확인해보세요!", "가상 헤어스타일링 결과를 보고 어울리는 머리를 찾아보세요!");
     }
 
     @Transactional
@@ -199,6 +199,12 @@ public class AIService {
                 .collect(Collectors.toList());
 
         return makeResult(HttpStatus.OK, virtualMemberImageResponseDtoList);
+    }
+
+    public ResponseEntity<ResultDto> inferenceTest(BigInteger memberId, BigInteger virtualMemberImageId) {
+        sendMessageToRequestQueue(memberId, virtualMemberImageId);
+
+        return makeResult(HttpStatus.OK, "추론 요청 성공");
     }
 }
 

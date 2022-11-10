@@ -100,6 +100,10 @@ public class OAuthService {
         );
 
         if (member != null) {
+            if (member.getDeviceToken() == null || !member.getDeviceToken().equals(saveRequestDto.getDeviceToken())) {
+                member.setDeviceToken(saveRequestDto.getDeviceToken());
+            }
+
             List<GrantedAuthority> preUpdatedAuthorities = new ArrayList<>();
             preUpdatedAuthorities.add(new SimpleGrantedAuthority(member.getRole()));
 

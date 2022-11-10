@@ -92,4 +92,12 @@ public class CloudFrontUrlHandler {
     public String getLogoUrl() {
         return CLOUD_FRONT_DOMAIN_NAME + "/logo.jpg";
     }
+
+    public String getVirtualMemberImageS3Path(BigInteger memberId, BigInteger virtualMemberImageId) {
+        return "ai_input/" + memberId + "/" + virtualMemberImageId + ".jpg";
+    }
+
+    public String getVirtualMemberImageUrl(BigInteger memberId, BigInteger virtualMemberImageId) {
+        return CLOUD_FRONT_DOMAIN_NAME + "/ai_input/" + memberId + "/" + virtualMemberImageId + ".jpg";
+    }
 }

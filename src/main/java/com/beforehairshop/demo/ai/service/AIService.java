@@ -5,6 +5,8 @@ import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
 import com.beforehairshop.demo.ai.model.MessagePayload;
 import com.beforehairshop.demo.ai.repository.VirtualMemberImageRepository;
+import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
+import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.constant.ai.InferenceStatusKind;
 import com.beforehairshop.demo.constant.member.StatusKind;
 import com.beforehairshop.demo.fcm.service.FCMService;
@@ -14,6 +16,7 @@ import com.beforehairshop.demo.recommend.dto.RecommendDto;
 import com.beforehairshop.demo.response.ResultDto;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import jdk.jshell.Snippet;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
@@ -34,6 +37,7 @@ import static com.beforehairshop.demo.response.ResultDto.makeResult;
 public class AIService {
     private final VirtualMemberImageRepository virtualMemberImageRepository;
     private final MemberRepository memberRepository;
+    private final CloudFrontUrlHandler cloudFrontUrlHandler;
 
     private final QueueMessagingTemplate queueMessagingTemplate;
     private final MessageSender messageSender;
@@ -42,12 +46,13 @@ public class AIService {
 
 
     @Autowired
-    public AIService(VirtualMemberImageRepository virtualMemberImageRepository, AmazonSQS amazonSqs, MessageSender messageSender, FCMService fcmService, MemberRepository memberRepository) {
+    public AIService(VirtualMemberImageRepository virtualMemberImageRepository, AmazonSQS amazonSqs, MessageSender messageSender, FCMService fcmService, MemberRepository memberRepository, CloudFrontUrlHandler cloudFrontUrlHandler) {
         this.virtualMemberImageRepository = virtualMemberImageRepository;
         this.queueMessagingTemplate = new QueueMessagingTemplate((AmazonSQSAsync) amazonSqs);
         this.messageSender = messageSender;
         this.fcmService = fcmService;
         this.memberRepository = memberRepository;
+        this.cloudFrontUrlHandler = cloudFrontUrlHandler;
     }
 
 
@@ -76,11 +81,27 @@ public class AIService {
     }
 
     @Transactional
-    public ResponseEntity<ResultDto> saveVirtualMemberImage(Member member) {
+    public ResponseEntity<ResultDto> saveVirtualMemberImage(Member member, AmazonS3Service amazonS3Service) {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        return null;
+        VirtualMemberImage virtualMemberImage = VirtualMemberImage.builder()
+                .imageUrl(null)
+                .inferenceStatus(InferenceStatusKind.WAIT.getId())
+                .status(StatusKind.NORMAL.getId())
+                .build();
+
+        virtualMemberImage = virtualMemberImageRepository.save(virtualMemberImage);
+
+        String preSignedUrl = amazonS3Service.generatePreSignedUrl(
+                cloudFrontUrlHandler.getVirtualMemberImageS3Path(member.getId(), virtualMemberImage.getId())
+        );
+
+        virtualMemberImage.setImageUrl(
+                cloudFrontUrlHandler.getVirtualMemberImageUrl(member.getId(), virtualMemberImage.getId())
+        );
+
+        return makeResult(HttpStatus.OK, preSignedUrl);
     }
 
     @Transactional

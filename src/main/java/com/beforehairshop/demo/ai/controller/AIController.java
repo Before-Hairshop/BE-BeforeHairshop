@@ -2,6 +2,7 @@ package com.beforehairshop.demo.ai.controller;
 
 import com.beforehairshop.demo.ai.service.AIService;
 import com.beforehairshop.demo.auth.PrincipalDetails;
+import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.response.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +25,7 @@ import java.math.BigInteger;
 @RequestMapping("/api/v1/virtual_hairstyling")
 public class AIController {
     private final AIService aiService;
+    private final AmazonS3Service amazonS3Service;
 
 
     @ApiResponses(value = {
@@ -36,7 +38,7 @@ public class AIController {
     @Operation(summary = "유저 이미지 등록 (S3의 PreSigned_url 발급)")
     @PostMapping("")
     public ResponseEntity<ResultDto> saveVirtualMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return aiService.saveVirtualMemberImage(principalDetails.getMember());
+        return aiService.saveVirtualMemberImage(principalDetails.getMember(), amazonS3Service);
     }
 
     @ApiResponses(value = {
@@ -46,7 +48,7 @@ public class AIController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
-    @Operation(summary = "유저 이미지 등록 (S3의 PreSigned_url 발급)")
+    @Operation(summary = "유저 이미지 삭제")
     @DeleteMapping("")
     public ResponseEntity<ResultDto> deleteVirtualMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "virtual_member_image_url") String virtualMemberImageUrl) {

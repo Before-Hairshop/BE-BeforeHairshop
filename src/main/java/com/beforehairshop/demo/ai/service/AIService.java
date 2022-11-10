@@ -3,6 +3,7 @@ package com.beforehairshop.demo.ai.service;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
+import com.beforehairshop.demo.ai.dto.VirtualMemberImageResponseDto;
 import com.beforehairshop.demo.ai.model.MessagePayload;
 import com.beforehairshop.demo.ai.repository.VirtualMemberImageRepository;
 import com.beforehairshop.demo.aws.handler.CloudFrontUrlHandler;
@@ -27,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.beforehairshop.demo.log.LogFormat.makeErrorLog;
 import static com.beforehairshop.demo.log.LogFormat.makeSuccessLog;
@@ -181,6 +184,21 @@ public class AIService {
 
         log.info(makeSuccessLog(200, "/api/v1/virtual_hairstyling", "DELETE", "삭제 성공"));
         return makeResult(HttpStatus.OK, "삭제 완료");
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> getMyVirtualMemberImageList(Member member) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        List<VirtualMemberImage> virtualMemberImageList
+                = virtualMemberImageRepository.findByMemberAndStatusOrderByCreateDateAsc(member, StatusKind.NORMAL.getId());
+
+        List<VirtualMemberImageResponseDto> virtualMemberImageResponseDtoList = virtualMemberImageList.stream()
+                .map(VirtualMemberImageResponseDto::new)
+                .collect(Collectors.toList());
+
+        return makeResult(HttpStatus.OK, virtualMemberImageResponseDtoList);
     }
 }
 

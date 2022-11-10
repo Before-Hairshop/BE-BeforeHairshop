@@ -1,10 +1,13 @@
 package com.beforehairshop.demo.ai.controller;
 
+import com.beforehairshop.demo.ai.dto.VirtualMemberImageResponseDto;
 import com.beforehairshop.demo.ai.service.AIService;
 import com.beforehairshop.demo.auth.PrincipalDetails;
 import com.beforehairshop.demo.aws.service.AmazonS3Service;
 import com.beforehairshop.demo.response.ResultDto;
+import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +32,19 @@ public class AIController {
 
 
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이미지 목록 조회 성공"
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = VirtualMemberImageResponseDto.class)))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
+    @Operation(summary = "가상 헤어스타일링용 유저 이미지 목록 조회")
+    @GetMapping("")
+    public ResponseEntity<ResultDto> getMyVirtualMemberImageList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return aiService.getMyVirtualMemberImageList(principalDetails.getMember());
+    }
+
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이미지 저장 성공 (presigned url 발급)"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
@@ -42,7 +58,7 @@ public class AIController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이미지 삭제 성공 (presigned url 발급)"
+            @ApiResponse(responseCode = "200", description = "이미지 삭제 성공"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"
                     , content = @Content(schema = @Schema(implementation = String.class)))

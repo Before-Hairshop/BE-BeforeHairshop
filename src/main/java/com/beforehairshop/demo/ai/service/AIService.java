@@ -86,6 +86,7 @@ public class AIService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
         VirtualMemberImage virtualMemberImage = VirtualMemberImage.builder()
+                .member(member)
                 .imageUrl(null)
                 .inferenceStatus(InferenceStatusKind.WAIT.getId())
                 .status(StatusKind.NORMAL.getId())

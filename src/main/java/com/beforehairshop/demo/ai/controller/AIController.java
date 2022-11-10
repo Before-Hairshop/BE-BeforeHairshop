@@ -35,7 +35,7 @@ public class AIController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
-    @Operation(summary = "유저 이미지 등록 (S3의 PreSigned_url 발급)")
+    @Operation(summary = "가상 헤어스타일링용 유저 이미지 등록 (S3의 PreSigned_url 발급)")
     @PostMapping("")
     public ResponseEntity<ResultDto> saveVirtualMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return aiService.saveVirtualMemberImage(principalDetails.getMember(), amazonS3Service);
@@ -48,7 +48,7 @@ public class AIController {
                     , content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
-    @Operation(summary = "유저 이미지 삭제")
+    @Operation(summary = "가상 헤어스타일링용 유저 이미지 삭제")
     @DeleteMapping("")
     public ResponseEntity<ResultDto> deleteVirtualMemberImage(@AuthenticationPrincipal PrincipalDetails principalDetails
             , @RequestParam(name = "virtual_member_image_url") String virtualMemberImageUrl) {

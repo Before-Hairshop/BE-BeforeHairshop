@@ -3,6 +3,7 @@ package com.beforehairshop.demo.ai.service;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.beforehairshop.demo.ai.domain.VirtualMemberImage;
+import com.beforehairshop.demo.ai.dto.VirtualMemberImagePostResponseDto;
 import com.beforehairshop.demo.ai.dto.VirtualMemberImageResponseDto;
 import com.beforehairshop.demo.ai.model.MessagePayload;
 import com.beforehairshop.demo.ai.repository.VirtualMemberImageRepository;
@@ -107,7 +108,7 @@ public class AIService {
                 cloudFrontUrlHandler.getVirtualMemberImageUrl(member.getId(), virtualMemberImage.getId())
         );
 
-        return makeResult(HttpStatus.OK, preSignedUrl);
+        return makeResult(HttpStatus.OK, new VirtualMemberImagePostResponseDto(virtualMemberImage.getId(), preSignedUrl));
     }
 
     @Transactional

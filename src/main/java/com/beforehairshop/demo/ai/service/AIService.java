@@ -15,6 +15,7 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.repository.MemberRepository;
 import com.beforehairshop.demo.recommend.dto.RecommendDto;
 import com.beforehairshop.demo.response.ResultDto;
+import com.google.api.Http;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import jdk.jshell.Snippet;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -205,6 +207,29 @@ public class AIService {
         sendMessageToRequestQueue(memberId, virtualMemberImageId);
 
         return makeResult(HttpStatus.OK, "추론 요청 성공");
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> getInferenceResultList(Member member, BigInteger virtualMemberImageId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        VirtualMemberImage virtualMemberImage = virtualMemberImageRepository.findById(virtualMemberImageId).orElse(null);
+        if (virtualMemberImage == null)
+            return makeResult(HttpStatus.BAD_REQUEST, "잘못된 유저 이미지 ID 입니다.");
+
+        if (!virtualMemberImage.getMember().getId().equals(member.getId())) {
+            return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "조회할 권한이 없는 유저입니다");
+        }
+
+        List<String> resultImageList = new ArrayList<>();
+        for (int i = 1; i < 6; i++) {
+            resultImageList.add(
+                    cloudFrontUrlHandler.getInferenceResultImageUrl(member.getId(), virtualMemberImageId, i)
+            );
+        }
+
+        return makeResult(HttpStatus.OK, resultImageList);
     }
 }
 

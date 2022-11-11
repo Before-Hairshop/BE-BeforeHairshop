@@ -45,6 +45,20 @@ public class AIController {
     }
 
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "inference 된 result 이미지 목록 조회 성공"
+                    , content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))),
+            @ApiResponse(responseCode = "504", description = "세션 만료"
+                    , content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DESIGNER', 'ROLE_ADMIN')")
+    @Operation(summary = "가상 헤어스타일링 결과 이미지 목록 조회")
+    @GetMapping("inference_result")
+    public ResponseEntity<ResultDto> getInferenceResultList(@AuthenticationPrincipal PrincipalDetails principalDetails
+            , @RequestParam(name = "virtual_member_image_id") BigInteger virtualMemberImageId) {
+        return aiService.getInferenceResultList(principalDetails.getMember(), virtualMemberImageId);
+    }
+
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이미지 저장 성공 (presigned url 발급)"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"

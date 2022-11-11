@@ -104,4 +104,8 @@ public class CloudFrontUrlHandler {
     public String getInferenceResultImageUrl(BigInteger memberId, BigInteger virtualMemberImageId, Integer referenceImageNumber) {
         return CLOUD_FRONT_DOMAIN_NAME + "/ai_result/" + memberId + "/" + virtualMemberImageId + "_" + referenceImageNumber + ".jpg";
     }
+
+    public String getPreInferenceResultImageUrl(Integer preInputImageId, Integer referenceImageNumber) {
+        return CLOUD_FRONT_DOMAIN_NAME + "/ai_result_pre/" + preInputImageId + "_" + referenceImageNumber + ".jpg";
+    }
 }

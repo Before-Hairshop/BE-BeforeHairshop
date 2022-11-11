@@ -223,9 +223,24 @@ public class AIService {
         }
 
         List<String> resultImageList = new ArrayList<>();
-        for (int i = 1; i < 6; i++) {
+        for (int referenceImageNumber = 1; referenceImageNumber < 6; referenceImageNumber++) {
             resultImageList.add(
-                    cloudFrontUrlHandler.getInferenceResultImageUrl(member.getId(), virtualMemberImageId, i)
+                    cloudFrontUrlHandler.getInferenceResultImageUrl(member.getId(), virtualMemberImageId, referenceImageNumber)
+            );
+        }
+
+        return makeResult(HttpStatus.OK, resultImageList);
+    }
+
+    @Transactional
+    public ResponseEntity<ResultDto> getPreInferenceResultList(Member member, Integer preInputImageId) {
+        if (member == null)
+            return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
+
+        List<String> resultImageList = new ArrayList<>();
+        for (int referenceImageNumber = 1; referenceImageNumber < 6; referenceImageNumber++) {
+            resultImageList.add(
+                    cloudFrontUrlHandler.getPreInferenceResultImageUrl(preInputImageId, referenceImageNumber)
             );
         }
 

@@ -14,4 +14,6 @@ public interface VirtualMemberImageRepository extends JpaRepository<VirtualMembe
     Optional<VirtualMemberImage> findByImageUrlAndStatus(String virtualMemberImageUrl, Integer status);
 
     List<VirtualMemberImage> findByMemberAndStatus(Member member, Integer status);
+
+    List<VirtualMemberImage> findByMemberAndStatusOrderByCreateDateAsc(Member member, Integer status);
 }

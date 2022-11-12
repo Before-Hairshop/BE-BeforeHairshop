@@ -46,4 +46,8 @@ public class VirtualMemberImage {
     public void setInferenceStatus(Integer inferenceStatus) {
         this.inferenceStatus = inferenceStatus;
     }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

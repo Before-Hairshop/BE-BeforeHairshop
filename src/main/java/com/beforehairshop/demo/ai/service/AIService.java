@@ -223,6 +223,10 @@ public class AIService {
             return makeResult(HttpStatus.SERVICE_UNAVAILABLE, "조회할 권한이 없는 유저입니다");
         }
 
+        if (!virtualMemberImage.getInferenceStatus().equals(InferenceStatusKind.SUCCESS.getId())) {
+            return makeResult(HttpStatus.NOT_IMPLEMENTED, "inference 되지 않은 이미지입니다");
+        }
+
         List<String> resultImageList = new ArrayList<>();
         for (int referenceImageNumber = 1; referenceImageNumber < 6; referenceImageNumber++) {
             resultImageList.add(

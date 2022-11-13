@@ -49,6 +49,8 @@ public class AIController {
                     , content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))),
             @ApiResponse(responseCode = "400", description = "잘못된 유저 이미지 ID 입니다."
                     , content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "501", description = "inference 되지 않은 유저 이미지입니다."
+                    , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "503", description = "조회할 권한이 없는 유저입니다"
                     , content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "504", description = "세션 만료"

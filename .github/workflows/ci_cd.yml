@@ -5,11 +5,11 @@ on:
     # Sequence of patterns matched against refs/heads
     branches:    
       - main
-      - develop
+#      - develop
   pull_request:
     branches:    
       - main
-      - develop
+#      - develop
 
 permissions:
   contents: read

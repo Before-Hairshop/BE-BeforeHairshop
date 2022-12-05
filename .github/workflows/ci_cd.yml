@@ -81,41 +81,41 @@ jobs:
 
     ## ==== Dev 환경에서의 secret 파일 생성 ====
 
-    ## create application.yml (in dev)
-    - name: make application.yml (in dev)
-      if: contains(github.ref, 'develop')
-      run: |
-        cd ./src/main/resources
-        touch ./application.yml
-        echo "${{secrets.APPLICATION_IN_DEV}}" > ./application.yml
-      shell: bash    
-
-    ## create application-dev.yml
-    - name: make application-dev.yml
-      if: contains(github.ref, 'develop')
-      run: |
-        cd ./src/main/resources
-        touch ./application-dev.yml
-        echo "${{secrets.APPLICATION_DEV}}" > ./application-dev.yml
-      shell: bash
-
-    ## create aws-dev.yml
-    - name: make aws-dev.yml
-      if: contains(github.ref, 'develop')
-      run: |
-        cd ./src/main/resources
-        touch ./aws-dev.yml
-        echo "${{secrets.AWS_DEV}}" > ./aws-dev.yml
-      shell: bash
-
-    ## create oauth-dev.yml
-    - name: make oauth-dev.yml
-      if: contains(github.ref, 'develop')
-      run: |
-        cd ./src/main/resources
-        touch ./oauth-dev.yml
-        echo "${{secrets.OAUTH_DEV}}" > ./oauth-dev.yml
-      shell: bash
+#    ## create application.yml (in dev)
+#    - name: make application.yml (in dev)
+#      if: contains(github.ref, 'develop')
+#      run: |
+#        cd ./src/main/resources
+#        touch ./application.yml
+#        echo "${{secrets.APPLICATION_IN_DEV}}" > ./application.yml
+#      shell: bash
+#
+#    ## create application-dev.yml
+#    - name: make application-dev.yml
+#      if: contains(github.ref, 'develop')
+#      run: |
+#        cd ./src/main/resources
+#        touch ./application-dev.yml
+#        echo "${{secrets.APPLICATION_DEV}}" > ./application-dev.yml
+#      shell: bash
+#
+#    ## create aws-dev.yml
+#    - name: make aws-dev.yml
+#      if: contains(github.ref, 'develop')
+#      run: |
+#        cd ./src/main/resources
+#        touch ./aws-dev.yml
+#        echo "${{secrets.AWS_DEV}}" > ./aws-dev.yml
+#      shell: bash
+#
+#    ## create oauth-dev.yml
+#    - name: make oauth-dev.yml
+#      if: contains(github.ref, 'develop')
+#      run: |
+#        cd ./src/main/resources
+#        touch ./oauth-dev.yml
+#        echo "${{secrets.OAUTH_DEV}}" > ./oauth-dev.yml
+#      shell: bash
 
     ## FCM key 파일 생성
     - name: make firebase-service-key.json
@@ -148,13 +148,13 @@ jobs:
           docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}:bh-prod .
           docker push ${{ secrets.DOCKER_REPO }}:bh-prod
 
-    ## [DEV] docker build & push to develop
-    - name: (DEV) Docker build & push to dev
-      if: contains(github.ref, 'develop')
-      run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}:bh-dev .
-          docker push ${{ secrets.DOCKER_REPO }}:bh-dev
+#    ## [DEV] docker build & push to develop
+#    - name: (DEV) Docker build & push to dev
+#      if: contains(github.ref, 'develop')
+#      run: |
+#          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}:bh-dev .
+#          docker push ${{ secrets.DOCKER_REPO }}:bh-dev
 
     ## [PROD] deploy to prod (ap-northeast-2a)
     - name: (PROD) Deploy to prod (ap-northeast-2a)
@@ -173,55 +173,55 @@ jobs:
             docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
             docker image prune -f
 
-    ## [PROD] deploy to prod (ap-northeast-2c)
-    - name: (PROD) Deploy to prod (ap-northeast-2c)
-      uses: appleboy/ssh-action@master
-      id: deploy-prod-c
-      if: contains(github.ref, 'main')
-      with:
-        host: ${{ secrets.EC2_HOST_IN_C_PROD }}
-        username: ${{ secrets.EC2_IN_C_USERNAME }}
-        password: ${{ secrets.EC2_IN_C_PASSWORD }}
-        port: 22
-        script: |
-            sudo docker rm -f $(docker ps -aq)
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
-            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
-            docker image prune -f
-    
-    ## [DEV] deploy to develop (ap-northeast-2a)
-    - name: (DEV) Deploy to dev (ap-northeast-2a) 
-      uses: appleboy/ssh-action@master
-      id: deploy-dev-a
-      if: contains(github.ref, 'develop')
-      with:
-        host: ${{ secrets.EC2_HOST_IN_A_DEV }}
-        username: ${{ secrets.EC2_IN_A_USERNAME }}
-        password: ${{ secrets.EC2_IN_A_PASSWORD }}
-        port: 22
-        #key: ${{ secrets.PRIVATE_KEY }}
-        script: |
-            sudo docker rm -f $(docker ps -aq)
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
-            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-dev
-            docker image prune -f
-    
-    ## [DEV] deploy to develop (ap-northeast-2c)
-    - name: (DEV) Deploy to dev (ap-northeast-2c) 
-      uses: appleboy/ssh-action@master
-      id: deploy-dev-c
-      if: contains(github.ref, 'develop')
-      with:
-        host: ${{ secrets.EC2_HOST_IN_C_DEV }}
-        username: ${{ secrets.EC2_IN_C_USERNAME }}
-        password: ${{ secrets.EC2_IN_C_PASSWORD }}
-        port: 22
-        #key: ${{ secrets.PRIVATE_KEY }}
-        script: |
-            sudo docker rm -f $(docker ps -aq)
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
-            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-dev
-            docker image prune -f
+#    ## [PROD] deploy to prod (ap-northeast-2c)
+#    - name: (PROD) Deploy to prod (ap-northeast-2c)
+#      uses: appleboy/ssh-action@master
+#      id: deploy-prod-c
+#      if: contains(github.ref, 'main')
+#      with:
+#        host: ${{ secrets.EC2_HOST_IN_C_PROD }}
+#        username: ${{ secrets.EC2_IN_C_USERNAME }}
+#        password: ${{ secrets.EC2_IN_C_PASSWORD }}
+#        port: 22
+#        script: |
+#            sudo docker rm -f $(docker ps -aq)
+#            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#            docker pull ${{ secrets.DOCKER_REPO }}:bh-prod
+#            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
+#            docker image prune -f
+#
+#    ## [DEV] deploy to develop (ap-northeast-2a)
+#    - name: (DEV) Deploy to dev (ap-northeast-2a)
+#      uses: appleboy/ssh-action@master
+#      id: deploy-dev-a
+#      if: contains(github.ref, 'develop')
+#      with:
+#        host: ${{ secrets.EC2_HOST_IN_A_DEV }}
+#        username: ${{ secrets.EC2_IN_A_USERNAME }}
+#        password: ${{ secrets.EC2_IN_A_PASSWORD }}
+#        port: 22
+#        #key: ${{ secrets.PRIVATE_KEY }}
+#        script: |
+#            sudo docker rm -f $(docker ps -aq)
+#            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#            docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
+#            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-dev
+#            docker image prune -f
+#
+#    ## [DEV] deploy to develop (ap-northeast-2c)
+#    - name: (DEV) Deploy to dev (ap-northeast-2c)
+#      uses: appleboy/ssh-action@master
+#      id: deploy-dev-c
+#      if: contains(github.ref, 'develop')
+#      with:
+#        host: ${{ secrets.EC2_HOST_IN_C_DEV }}
+#        username: ${{ secrets.EC2_IN_C_USERNAME }}
+#        password: ${{ secrets.EC2_IN_C_PASSWORD }}
+#        port: 22
+#        #key: ${{ secrets.PRIVATE_KEY }}
+#        script: |
+#            sudo docker rm -f $(docker ps -aq)
+#            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#            docker pull ${{ secrets.DOCKER_REPO }}:bh-dev
+#            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-dev
+#            docker image prune -f

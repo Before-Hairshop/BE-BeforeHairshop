@@ -42,7 +42,7 @@
 ----
 
 ## 서비스 아키텍처
-<img width="600" src="https://user-images.githubusercontent.com/75842372/206499071-7a091207-e261-4d7b-9ea4-377a169328cd.png"/>
+<img width="600" src="https://user-images.githubusercontent.com/75842372/206893899-a22aee5c-aa9d-4110-85e8-3c2cb2757cee.png"/>
 
 ## 사용언어 및 개발환경
 - **Langauge** | Java

@@ -108,7 +108,7 @@ public class AIService {
                 cloudFrontUrlHandler.getVirtualMemberImageUrl(member.getId(), virtualMemberImage.getId())
         );
 
-        return makeResult(HttpStatus.OK, new VirtualMemberImagePostResponseDto(virtualMemberImage.getId(), preSignedUrl));
+        return makeResult(HttpStatus.SERVICE_UNAVAILABLE, new VirtualMemberImagePostResponseDto(virtualMemberImage.getId(), preSignedUrl));
     }
 
     @Transactional

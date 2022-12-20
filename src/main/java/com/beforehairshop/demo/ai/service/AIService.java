@@ -91,24 +91,24 @@ public class AIService {
         if (member == null)
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
 
-        VirtualMemberImage virtualMemberImage = VirtualMemberImage.builder()
-                .member(member)
-                .imageUrl(null)
-                .inferenceStatus(InferenceStatusKind.WAIT.getId())
-                .status(StatusKind.NORMAL.getId())
-                .build();
+//        VirtualMemberImage virtualMemberImage = VirtualMemberImage.builder()
+//                .member(member)
+//                .imageUrl(null)
+//                .inferenceStatus(InferenceStatusKind.WAIT.getId())
+//                .status(StatusKind.NORMAL.getId())
+//                .build();
+//
+//        virtualMemberImage = virtualMemberImageRepository.save(virtualMemberImage);
+//
+//        String preSignedUrl = amazonS3Service.generatePreSignedUrl(
+//                cloudFrontUrlHandler.getVirtualMemberImageS3Path(member.getId(), virtualMemberImage.getId())
+//        );
+//
+//        virtualMemberImage.setImageUrl(
+//                cloudFrontUrlHandler.getVirtualMemberImageUrl(member.getId(), virtualMemberImage.getId())
+//        );
 
-        virtualMemberImage = virtualMemberImageRepository.save(virtualMemberImage);
-
-        String preSignedUrl = amazonS3Service.generatePreSignedUrl(
-                cloudFrontUrlHandler.getVirtualMemberImageS3Path(member.getId(), virtualMemberImage.getId())
-        );
-
-        virtualMemberImage.setImageUrl(
-                cloudFrontUrlHandler.getVirtualMemberImageUrl(member.getId(), virtualMemberImage.getId())
-        );
-
-        return makeResult(HttpStatus.SERVICE_UNAVAILABLE, new VirtualMemberImagePostResponseDto(virtualMemberImage.getId(), preSignedUrl));
+        return makeResult(HttpStatus.SERVICE_UNAVAILABLE, new VirtualMemberImagePostResponseDto(BigInteger.valueOf(-1), "preSignedUrl"));
     }
 
     @Transactional

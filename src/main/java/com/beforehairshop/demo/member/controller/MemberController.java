@@ -102,12 +102,6 @@ public class MemberController {
         return memberService.delete(principalDetails.getMember(), request);
     }
 
-//    @PostMapping("/sign_in/kakao")
-//    @Operation(summary = "회원가입(카카오)")
-//    public ResponseEntity<ResultDto> signInKako(@RequestBody "member save dto") {
-//
-//    }
-
 
     @PostMapping("user_feedback")
     @Operation(summary = "유저 피드백 받는 API")

@@ -40,43 +40,43 @@ jobs:
           ${{ runner.os }}-gradle-
 
 
-    ## ==== Prod 환경에서의 secret 파일 생성 ====
+    # ## ==== Prod 환경에서의 secret 파일 생성 ====
 
-    ## create application.yml (in prod)
-    - name: make application.yml (in prod)
-      if: contains(github.ref, 'main')
-      run: |
-        cd ./src/main/resources
-        touch ./application.yml
-        echo "${{secrets.APPLICATION_IN_PROD}}" > ./application.yml
-      shell: bash    
+    # ## create application.yml (in prod)
+    # - name: make application.yml (in prod)
+    #   if: contains(github.ref, 'main')
+    #   run: |
+    #     cd ./src/main/resources
+    #     touch ./application.yml
+    #     echo "${{secrets.APPLICATION_IN_PROD}}" > ./application.yml
+    #   shell: bash    
 
-    ## create application-prod.yml
-    - name: make application-prod.yml
-      if: contains(github.ref, 'main')
-      run: |
-        cd ./src/main/resources
-        touch ./application-prod.yml
-        echo "${{secrets.APPLICATION_PROD}}" > ./application-prod.yml
-      shell: bash
+    # ## create application-prod.yml
+    # - name: make application-prod.yml
+    #   if: contains(github.ref, 'main')
+    #   run: |
+    #     cd ./src/main/resources
+    #     touch ./application-prod.yml
+    #     echo "${{secrets.APPLICATION_PROD}}" > ./application-prod.yml
+    #   shell: bash
 
-    ## create aws-prod.yml
-    - name: make aws-prod.yml
-      if: contains(github.ref, 'main')
-      run: |
-        cd ./src/main/resources
-        touch ./aws-prod.yml
-        echo "${{secrets.AWS_PROD}}" > ./aws-prod.yml
-      shell: bash
+    # ## create aws-prod.yml
+    # - name: make aws-prod.yml
+    #   if: contains(github.ref, 'main')
+    #   run: |
+    #     cd ./src/main/resources
+    #     touch ./aws-prod.yml
+    #     echo "${{secrets.AWS_PROD}}" > ./aws-prod.yml
+    #   shell: bash
 
-    ## create oauth-prod.yml
-    - name: make oauth-prod.yml
-      if: contains(github.ref, 'main')
-      run: |
-        cd ./src/main/resources
-        touch ./oauth-prod.yml
-        echo "${{secrets.OAUTH_PROD}}" > ./oauth-prod.yml
-      shell: bash
+    # ## create oauth-prod.yml
+    # - name: make oauth-prod.yml
+    #   if: contains(github.ref, 'main')
+    #   run: |
+    #     cd ./src/main/resources
+    #     touch ./oauth-prod.yml
+    #     echo "${{secrets.OAUTH_PROD}}" > ./oauth-prod.yml
+    #   shell: bash
 
 
     ## ==== Dev 환경에서의 secret 파일 생성 ====
@@ -117,14 +117,14 @@ jobs:
 #        echo "${{secrets.OAUTH_DEV}}" > ./oauth-dev.yml
 #      shell: bash
 
-    ## FCM key 파일 생성
-    - name: make firebase-service-key.json
-      id: create-json
-      uses: jsdaniell/create-json@1.1.2
-      with:
-        name: "firebase-service-key.json"
-        json: ${{ secrets.FCM_KEY }}
-        dir: "./src/main/resources/"
+    # ## FCM key 파일 생성
+    # - name: make firebase-service-key.json
+    #   id: create-json
+    #   uses: jsdaniell/create-json@1.1.2
+    #   with:
+    #     name: "firebase-service-key.json"
+    #     json: ${{ secrets.FCM_KEY }}
+    #     dir: "./src/main/resources/"
 
 #    - name: make firebase-service-key.json (prod & dev)
 #      run: |
@@ -134,19 +134,19 @@ jobs:
 #        echo "${{secrets.FCM_KEY}}" > ./firebase-service-key.json
 #      shell: bash
 
-      ## gradle build
-    - name: Build with Gradle
-      run: ./gradlew build -x test
+    #   ## gradle build
+    # - name: Build with Gradle
+    #   run: ./gradlew build -x test
     
     ## ============ CD ============
 
-    ## [PROD] docker build & push to production
-    - name: (PROD) Docker build & push to prod
-      if: contains(github.ref, 'main')
-      run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}:bh-prod .
-          docker push ${{ secrets.DOCKER_REPO }}:bh-prod
+    # ## [PROD] docker build & push to production
+    # - name: (PROD) Docker build & push to prod
+    #   if: contains(github.ref, 'main')
+    #   run: |
+    #       docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+    #       docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}:bh-prod .
+    #       docker push ${{ secrets.DOCKER_REPO }}:bh-prod
 
 #    ## [DEV] docker build & push to develop
 #    - name: (DEV) Docker build & push to dev
@@ -156,22 +156,22 @@ jobs:
 #          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}:bh-dev .
 #          docker push ${{ secrets.DOCKER_REPO }}:bh-dev
 
-    ## [PROD] deploy to prod (ap-northeast-2a)
-    - name: (PROD) Deploy to prod (ap-northeast-2a)
-      uses: appleboy/ssh-action@master
-      id: deploy-prod-a
-      if: contains(github.ref, 'main')
-      with:
-        host: ${{ secrets.EC2_HOST_IN_A_PROD }}
-        username: ${{ secrets.EC2_IN_A_USERNAME }}
-        password: ${{ secrets.EC2_IN_A_PASSWORD }}
-        port: 22
-        script: |
-            sudo docker rm -f $(docker ps -aq)
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
-            docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
-            docker image prune -f
+    # ## [PROD] deploy to prod (ap-northeast-2a)
+    # - name: (PROD) Deploy to prod (ap-northeast-2a)
+    #   uses: appleboy/ssh-action@master
+    #   id: deploy-prod-a
+    #   if: contains(github.ref, 'main')
+    #   with:
+    #     host: ${{ secrets.EC2_HOST_IN_A_PROD }}
+    #     username: ${{ secrets.EC2_IN_A_USERNAME }}
+    #     password: ${{ secrets.EC2_IN_A_PASSWORD }}
+    #     port: 22
+    #     script: |
+    #         sudo docker rm -f $(docker ps -aq)
+    #         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+    #         docker pull ${{ secrets.DOCKER_REPO }}:bh-prod 
+    #         docker run --name beforehairshop -p 8080:8080 --restart=always -d ${{ secrets.DOCKER_REPO }}:bh-prod
+    #         docker image prune -f
 
 #    ## [PROD] deploy to prod (ap-northeast-2c)
 #    - name: (PROD) Deploy to prod (ap-northeast-2c)

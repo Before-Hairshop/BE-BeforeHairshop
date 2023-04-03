@@ -40,7 +40,6 @@ class MemberServiceTest {
     @PersistenceContext
     EntityManager em;
 
-
     @Test
     public void findProfileTest() {
         Member member = new Member(BigInteger.valueOf(9));

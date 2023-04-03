@@ -6,6 +6,7 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -59,12 +60,14 @@ public class Review {
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "review"
             , fetch = FetchType.LAZY
             , cascade = CascadeType.ALL
             , orphanRemoval = true)
     private Set<ReviewHashtag> reviewHashtagSet = new HashSet<>();
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "review"
             , fetch = FetchType.LAZY
             , cascade = CascadeType.ALL

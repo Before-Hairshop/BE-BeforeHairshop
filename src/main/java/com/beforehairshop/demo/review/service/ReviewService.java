@@ -60,6 +60,7 @@ public class ReviewService {
             log.error("[POST] /api/v1/reviews - 204 (리뷰 저장에 필요한 정보 부족)");
             return makeResult(HttpStatus.NO_CONTENT, "리뷰 저장에 필요한 정보가 입력되지 않았습니다.");
         }
+
         Member reviewer = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
         Member hairDesigner = memberRepository.findByIdAndStatus(reviewSaveRequestDto.getHairDesignerId(), StatusKind.NORMAL.getId()).orElse(null);
         HairDesignerProfile hairDesignerProfile = hairDesignerProfileRepository.findByHairDesignerAndStatus(
@@ -77,18 +78,6 @@ public class ReviewService {
             ReviewHashtag reviewHashtag = new ReviewHashtag(saveRequestDto.getHashtag(), StatusKind.NORMAL.getId());
             review.addReviewHashtag(reviewHashtag);
         }
-
-//        reviewSaveRequestDto.getHashtagList().stream()
-//                        .map(reviewHashtagSaveRequestDto -> review.getReviewHashtagSet().add(
-//                                reviewHashtagSaveRequestDto.toEntity(review)
-//                        ));
-
-
-
-//        reviewHashtagRepository.saveAll(reviewSaveRequestDto.getHashtagList()
-//                .stream()
-//                .map(reviewHashtagSaveDto -> reviewHashtagSaveDto.toEntity(review))
-//                .collect(Collectors.toList()));
 
         return makeResult(HttpStatus.OK, new ReviewDto(review));
     }
@@ -123,7 +112,6 @@ public class ReviewService {
                     .map(ReviewImageDto::new)
                     .collect(Collectors.toList());
 
-            //Member reviewer = memberRepository.findByIdAndStatus(review.getReviewer().getId(), st)
             if (review.getReviewer().getName() == null)
                 continue;
 
@@ -131,6 +119,10 @@ public class ReviewService {
                     , new ReviewDto(review)
                     , hashtagDtoList
                     , imageDtoList));
+//            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
+//                    , new ReviewDto(review)
+//                    , review.getReviewHashtagSet().stream().map(ReviewHashtagDto::new).collect(Collectors.toList())
+//                    , review.getReviewImageSet().stream().map(ReviewImageDto::new).collect(Collectors.toList())));
         }
 
         return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);

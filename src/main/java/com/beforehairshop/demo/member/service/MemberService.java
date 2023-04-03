@@ -59,6 +59,7 @@ import static com.beforehairshop.demo.response.ResultDto.makeResult;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -125,7 +126,6 @@ public class MemberService {
                 && memberProfileSaveRequestDto.getTreatmentDate() != null && memberProfileSaveRequestDto.getPhoneNumber() != null;
     }
 
-    @Transactional
     public ResponseEntity<ResultDto> findMyProfile(Member member) {
         if (member == null) {
             log.error(makeLog("error", LocalDate.now(ZoneId.of("Asia/Seoul")), "fail"
@@ -573,7 +573,6 @@ public class MemberService {
         return makeResult(HttpStatus.OK, new MemberProfileDto(memberProfile));
     }
 
-    @Transactional
     public ResponseEntity<ResultDto> findMeBySession(PrincipalDetails principalDetails) {
         if (principalDetails == null) {
             log.error(makeErrorLog(404, "/api/v1/members/session", "GET", "세션 정보 없음"));
@@ -607,7 +606,6 @@ public class MemberService {
         return makeResult(HttpStatus.OK, "유저 프로필 삭제 완료");
     }
 
-    @Transactional
     public ResponseEntity<ResultDto> findMemberProfile(Member member, BigInteger memberProfileId) {
         if (member == null) {
             log.error(makeErrorLog(504, "/api/v1/members/profiles/detail", "GET", "세션 만료"));

@@ -19,6 +19,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Data
 @Builder
 @DynamicUpdate
 @DynamicInsert
@@ -61,4 +62,8 @@ public class Member implements Serializable {
 
     @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private int status;
+
+    public Member(BigInteger id) {
+        this.id = id;
+    }
 }

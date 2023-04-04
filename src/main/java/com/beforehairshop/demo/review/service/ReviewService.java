@@ -102,27 +102,27 @@ public class ReviewService {
 
         List<ReviewDetailResponseDto> reviewDetailResponseDtoList = new ArrayList<>();
         for (Review review : reviewList) {
-            List<ReviewHashtagDto> hashtagDtoList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
-                    .stream()
-                    .map(ReviewHashtagDto::new)
-                    .collect(Collectors.toList());
-
-            List<ReviewImageDto> imageDtoList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
-                    .stream()
-                    .map(ReviewImageDto::new)
-                    .collect(Collectors.toList());
-
-            if (review.getReviewer().getName() == null)
-                continue;
-
-            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
-                    , new ReviewDto(review)
-                    , hashtagDtoList
-                    , imageDtoList));
+//            List<ReviewHashtagDto> hashtagDtoList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
+//                    .stream()
+//                    .map(ReviewHashtagDto::new)
+//                    .collect(Collectors.toList());
+//
+//            List<ReviewImageDto> imageDtoList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
+//                    .stream()
+//                    .map(ReviewImageDto::new)
+//                    .collect(Collectors.toList());
+//
+//            if (review.getReviewer().getName() == null)
+//                continue;
+//
 //            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
 //                    , new ReviewDto(review)
-//                    , review.getReviewHashtagSet().stream().map(ReviewHashtagDto::new).collect(Collectors.toList())
-//                    , review.getReviewImageSet().stream().map(ReviewImageDto::new).collect(Collectors.toList())));
+//                    , hashtagDtoList
+//                    , imageDtoList));
+            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
+                    , new ReviewDto(review)
+                    , review.getReviewHashtagSet().stream().map(ReviewHashtagDto::new).collect(Collectors.toList())
+                    , review.getReviewImageSet().stream().map(ReviewImageDto::new).collect(Collectors.toList())));
         }
 
         return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);
@@ -159,11 +159,9 @@ public class ReviewService {
             review.setContent(reviewPatchRequestDto.getContent());
 
         if (reviewPatchRequestDto.getHashtagList() != null) {
-            // review hash tag 삭제
-            review.getReviewHashtagSet().clear();
-
+            // review hashtag 삭제
 //            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
-//            reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
+            reviewHashtagRepository.deleteAllInBatch(review.getReviewHashtagSet());
 
             // review hash tag 생성
             for (ReviewHashtagPatchRequestDto patchRequestDto : reviewPatchRequestDto.getHashtagList()) {
@@ -172,10 +170,6 @@ public class ReviewService {
                 review.addReviewHashtag(reviewHashtag);
             }
 
-//            reviewHashtagRepository.saveAll(reviewPatchRequestDto.getHashtagList()
-//                    .stream()
-//                    .map(reviewHashtagPatchRequestDto -> reviewHashtagPatchRequestDto.toEntity(review))
-//                    .collect(Collectors.toList()));
         }
 
         return makeResult(HttpStatus.OK, new ReviewDto(review));
@@ -258,8 +252,7 @@ public class ReviewService {
 //            reviewImageRepository.delete(reviewImage);
             }
 
-            for (ReviewImage reviewImage : reviewImageList)
-                review.getReviewImageSet().remove(reviewImage);
+            reviewImageRepository.deleteAllInBatch(reviewImageList);
         }
 
         // 프론트엔드에서 요청한 이미지의 개수만큼 presigned url 을 만들어 리턴한다.

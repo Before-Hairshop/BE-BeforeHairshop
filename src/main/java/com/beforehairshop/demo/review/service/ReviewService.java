@@ -102,27 +102,27 @@ public class ReviewService {
 
         List<ReviewDetailResponseDto> reviewDetailResponseDtoList = new ArrayList<>();
         for (Review review : reviewList) {
-            List<ReviewHashtagDto> hashtagDtoList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
-                    .stream()
-                    .map(ReviewHashtagDto::new)
-                    .collect(Collectors.toList());
-
-            List<ReviewImageDto> imageDtoList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
-                    .stream()
-                    .map(ReviewImageDto::new)
-                    .collect(Collectors.toList());
-
-            if (review.getReviewer().getName() == null)
-                continue;
-
-            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
-                    , new ReviewDto(review)
-                    , hashtagDtoList
-                    , imageDtoList));
+//            List<ReviewHashtagDto> hashtagDtoList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
+//                    .stream()
+//                    .map(ReviewHashtagDto::new)
+//                    .collect(Collectors.toList());
+//
+//            List<ReviewImageDto> imageDtoList = reviewImageRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId())
+//                    .stream()
+//                    .map(ReviewImageDto::new)
+//                    .collect(Collectors.toList());
+//
+//            if (review.getReviewer().getName() == null)
+//                continue;
+//
 //            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
 //                    , new ReviewDto(review)
-//                    , review.getReviewHashtagSet().stream().map(ReviewHashtagDto::new).collect(Collectors.toList())
-//                    , review.getReviewImageSet().stream().map(ReviewImageDto::new).collect(Collectors.toList())));
+//                    , hashtagDtoList
+//                    , imageDtoList));
+            reviewDetailResponseDtoList.add(new ReviewDetailResponseDto(review.getReviewer().getName()
+                    , new ReviewDto(review)
+                    , review.getReviewHashtagSet().stream().map(ReviewHashtagDto::new).collect(Collectors.toList())
+                    , review.getReviewImageSet().stream().map(ReviewImageDto::new).collect(Collectors.toList())));
         }
 
         return makeResult(HttpStatus.OK, reviewDetailResponseDtoList);

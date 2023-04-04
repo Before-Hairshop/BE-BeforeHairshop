@@ -4,6 +4,7 @@ import com.beforehairshop.demo.member.domain.Member;
 import com.beforehairshop.demo.member.dto.MemberDto;
 import com.beforehairshop.demo.member.service.MemberService;
 import com.beforehairshop.demo.response.ResultDto;
+import com.beforehairshop.demo.review.dto.ReviewDto;
 import com.beforehairshop.demo.review.dto.ReviewHashtagDto;
 import com.beforehairshop.demo.review.dto.ReviewImageDto;
 import com.beforehairshop.demo.review.dto.patch.ReviewHashtagPatchRequestDto;
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -86,28 +88,31 @@ class ReviewServiceTest {
         hashtagList.add(new ReviewHashtagSaveRequestDto("스포츠컷"));
         hashtagList.add(new ReviewHashtagSaveRequestDto("박서준컷"));
 
-        reviewService.save(new Member(findMemberDto.getId()), new ReviewSaveRequestDto(
+        ResponseEntity<ResultDto> response = reviewService.save(new Member(findMemberDto.getId()), new ReviewSaveRequestDto(
                 BigInteger.valueOf(1), 5, 5, 5, "테스트 콘텐츠!",  hashtagList
         ));
+
+        ReviewDto reviewDto = (ReviewDto) response.getBody().getResult();
+
+        assertThat(reviewDto.getReviewerId()).isEqualTo(9);
+        assertThat(reviewDto.getServiceRating()).isEqualTo(5);
+        assertThat(reviewDto.getTotalRating()).isEqualTo(5);
+        assertThat(reviewDto.getStyleRating()).isEqualTo(5);
+        assertThat(reviewDto.getContent()).isEqualTo("테스트 콘텐츠!");
     }
 
     @Test
     public void findReviews() {
-        ResponseEntity<ResultDto> response = reviewService.findManyByHairDesigner(new Member(BigInteger.valueOf(1)), BigInteger.valueOf(1), PageRequest.of(0, 3));
+        ResponseEntity<ResultDto> response = reviewService.findManyByHairDesigner(new Member(BigInteger.valueOf(1)), BigInteger.valueOf(1), PageRequest.of(0, 2));
         List<ReviewDetailResponseDto> reviewList = (List<ReviewDetailResponseDto>) response.getBody().getResult();
 
         for (ReviewDetailResponseDto responseDto : reviewList) {
-            System.out.println(responseDto.getReviewDto().getContent());
-            System.out.println("hashtag list's size : " + responseDto.getHashtagDtoList().size());
-            for (ReviewHashtagDto hashtagDto : responseDto.getHashtagDtoList()) {
-                System.out.println(" > hashtag : " + hashtagDto.getHashtag());
-            }
-            System.out.println("review image list's size : " + responseDto.getImageDtoList().size());
-            for (ReviewImageDto imageDto : responseDto.getImageDtoList()) {
-                System.out.println(" > image : " + imageDto.getImageUrl());
-            }
+            assertThat(responseDto.getHashtagDtoList().size()).isEqualTo(2);
+
+            assertThat(responseDto.getImageDtoList().size()).isEqualTo(0);
         }
 
+        assertThat(reviewList.size()).isEqualTo(2);
     }
 
     // (기존) 1008ms, 980ms => (delete batch) 829ms, 889ms
@@ -126,6 +131,14 @@ class ReviewServiceTest {
 
         em.flush();
         em.clear();
+
+        ReviewDto reviewDto = (ReviewDto) response.getBody().getResult();
+
+        assertThat(reviewDto.getContent()).isEqualTo("컨텐츠 수정후");
+        assertThat(reviewDto.getServiceRating()).isEqualTo(4);
+        assertThat(reviewDto.getTotalRating()).isEqualTo(4);
+        assertThat(reviewDto.getStyleRating()).isEqualTo(4);
+
     }
 
 

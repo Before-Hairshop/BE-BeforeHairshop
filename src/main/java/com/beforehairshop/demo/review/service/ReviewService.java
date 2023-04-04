@@ -252,8 +252,7 @@ public class ReviewService {
 //            reviewImageRepository.delete(reviewImage);
             }
 
-            for (ReviewImage reviewImage : reviewImageList)
-                review.getReviewImageSet().remove(reviewImage);
+            reviewImageRepository.deleteAllInBatch(reviewImageList);
         }
 
         // 프론트엔드에서 요청한 이미지의 개수만큼 presigned url 을 만들어 리턴한다.

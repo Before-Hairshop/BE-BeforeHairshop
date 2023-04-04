@@ -159,11 +159,9 @@ public class ReviewService {
             review.setContent(reviewPatchRequestDto.getContent());
 
         if (reviewPatchRequestDto.getHashtagList() != null) {
-            // review hash tag 삭제
-            review.getReviewHashtagSet().clear();
-
+            // review hashtag 삭제
 //            List<ReviewHashtag> reviewHashtagList = reviewHashtagRepository.findByReviewAndStatus(review, StatusKind.NORMAL.getId());
-//            reviewHashtagRepository.deleteAllInBatch(reviewHashtagList);
+            reviewHashtagRepository.deleteAllInBatch(review.getReviewHashtagSet());
 
             // review hash tag 생성
             for (ReviewHashtagPatchRequestDto patchRequestDto : reviewPatchRequestDto.getHashtagList()) {
@@ -172,10 +170,6 @@ public class ReviewService {
                 review.addReviewHashtag(reviewHashtag);
             }
 
-//            reviewHashtagRepository.saveAll(reviewPatchRequestDto.getHashtagList()
-//                    .stream()
-//                    .map(reviewHashtagPatchRequestDto -> reviewHashtagPatchRequestDto.toEntity(review))
-//                    .collect(Collectors.toList()));
         }
 
         return makeResult(HttpStatus.OK, new ReviewDto(review));

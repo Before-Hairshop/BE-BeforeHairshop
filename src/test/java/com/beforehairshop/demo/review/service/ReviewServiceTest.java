@@ -6,6 +6,8 @@ import com.beforehairshop.demo.member.service.MemberService;
 import com.beforehairshop.demo.response.ResultDto;
 import com.beforehairshop.demo.review.dto.ReviewHashtagDto;
 import com.beforehairshop.demo.review.dto.ReviewImageDto;
+import com.beforehairshop.demo.review.dto.patch.ReviewHashtagPatchRequestDto;
+import com.beforehairshop.demo.review.dto.patch.ReviewPatchRequestDto;
 import com.beforehairshop.demo.review.dto.response.ReviewDetailResponseDto;
 import com.beforehairshop.demo.review.dto.save.ReviewHashtagSaveRequestDto;
 import com.beforehairshop.demo.review.dto.save.ReviewSaveRequestDto;
@@ -108,8 +110,23 @@ class ReviewServiceTest {
 
     }
 
+    // (기존) 1008ms, 980ms => (delete batch) 829ms, 889ms
+    //
     @Test
-    public void ff() {
+    public void patchReview() {
+        ArrayList<ReviewHashtagPatchRequestDto> hashtagList = new ArrayList<>();
+        hashtagList.add(new ReviewHashtagPatchRequestDto("새로운컷1"));
+        hashtagList.add(new ReviewHashtagPatchRequestDto("새로운컷2"));
+        hashtagList.add(new ReviewHashtagPatchRequestDto("새로운컷3"));
 
+
+        ResponseEntity<ResultDto> response = reviewService.patchOne(new Member(BigInteger.valueOf(9)), BigInteger.valueOf(1), new ReviewPatchRequestDto(4, 4, 4, "컨텐츠 수정후",
+                hashtagList)
+        );
+
+        em.flush();
+        em.clear();
     }
+
+
 }

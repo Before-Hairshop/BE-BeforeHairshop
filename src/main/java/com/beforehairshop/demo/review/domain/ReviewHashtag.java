@@ -41,4 +41,10 @@ public class ReviewHashtag {
         this.hashtag = hashtag;
         this.status = status;
     }
+
+    public ReviewHashtag(String hashtag, Review review, Integer status) {
+        this.hashtag = hashtag;
+        this.review = review;
+        this.status = status;
+    }
 }

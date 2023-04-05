@@ -41,13 +41,25 @@ class MemberServiceTest {
     EntityManager em;
 
     @Test
-    public void findProfileTest() {
+    public void findMyProfileTest() {
         Member member = new Member(BigInteger.valueOf(9));
 
         ResponseEntity<ResultDto> profileResponse = memberService.findMyProfile(member);
         MemberProfileDetailResponseDto memberProfileDto = (MemberProfileDetailResponseDto) profileResponse.getBody().getResult();
 
         assertThat(memberProfileDto.getMemberProfileDto().getMemberId()).isEqualTo(9);
+    }
+
+    @Test
+    public void findMemberProfileBySomeone() {
+        Member someone = new Member(BigInteger.valueOf(1));
+
+        BigInteger memberProfileId = BigInteger.valueOf(1);
+        ResponseEntity<ResultDto> response = memberService.findMemberProfile(someone, memberProfileId);
+
+        MemberProfileDetailResponseDto responseDto = (MemberProfileDetailResponseDto) response.getBody().getResult();
+
+        assertThat(responseDto.getMemberProfileDto().getId()).isEqualTo(memberProfileId);
     }
 
 }

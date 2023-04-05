@@ -19,7 +19,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Data
 @Builder
 @DynamicUpdate
 @DynamicInsert

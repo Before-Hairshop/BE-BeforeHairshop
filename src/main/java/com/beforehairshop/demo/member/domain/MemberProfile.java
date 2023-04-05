@@ -29,7 +29,7 @@ public class MemberProfile {
     @Column(columnDefinition = "BIGINT")
     private BigInteger id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

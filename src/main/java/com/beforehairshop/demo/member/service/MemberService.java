@@ -371,7 +371,7 @@ public class MemberService {
             memberProfile.setBackImageUrl(cloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "back"));
         }
 
-        Member updatedMember = memberRepository.findByIdAndStatus(member.getId(), StatusKind.NORMAL.getId()).orElse(null);
+        Member updatedMember = memberProfile.getMember();
 
         updatedMember.setImageUrl(cloudFrontUrlHandler.getProfileOfUserImageUrl(member.getId(), "front"));
         PrincipalDetailsUpdater.setAuthenticationOfSecurityContext(updatedMember, "ROLE_USER");

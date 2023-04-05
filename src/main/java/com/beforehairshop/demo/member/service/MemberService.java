@@ -344,7 +344,7 @@ public class MemberService {
             return makeResult(HttpStatus.GATEWAY_TIMEOUT, "세션 만료");
         }
 
-        MemberProfile memberProfile = memberProfileRepository.findByMemberAndStatus(member, StatusKind.NORMAL.getId()).orElse(null);
+        MemberProfile memberProfile = memberProfileRepository.findMemberAndProfileByMemberAndStatusUsingFetchJoin(member, StatusKind.NORMAL.getId()).orElse(null);
         if (memberProfile == null) {
             log.error(makeErrorLog(400, "/api/v1/members/profiles/image","POST", "이미지 등록 전, 프로필 등록해야 함"));
             return makeResult(HttpStatus.BAD_REQUEST, "이미지 등록 전, 프로필을 등록해야 합니다");

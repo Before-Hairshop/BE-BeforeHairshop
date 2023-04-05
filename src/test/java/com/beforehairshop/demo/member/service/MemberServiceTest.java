@@ -74,7 +74,8 @@ class MemberServiceTest {
     @Test
     @DisplayName("MemberProfile 엔티티와 Member 엔티티를 fetch join 으로 조회되는지 테스트")
     public void memberAndMemberProfileByFetchJoinTest() {
-        Optional<MemberProfile> memberProfile = memberProfileRepository.findMemberAndProfileByIdAndStatusUsingFetchJoin(BigInteger.valueOf(1), StatusKind.NORMAL.getId());
+        Member member = new Member(BigInteger.valueOf(9));
+        Optional<MemberProfile> memberProfile = memberProfileRepository.findMemberAndProfileByMemberAndStatusUsingFetchJoin(member, StatusKind.NORMAL.getId());
 
         assertThat(memberProfile).isNotNull();
         assertThat(emf.getPersistenceUnitUtil().isLoaded(memberProfile.get().getMember())).isEqualTo(true);

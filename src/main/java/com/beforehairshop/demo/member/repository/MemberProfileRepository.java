@@ -21,6 +21,6 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfile, Bi
 
     Optional<MemberProfile> findByIdAndStatus(BigInteger memberProfileId, Integer id);
 
-    @Query(value = "select mp from MemberProfile mp join fetch mp.member where mp.id = :memberProfileId and mp.status = :status")
-    Optional<MemberProfile> findMemberAndProfileByIdAndStatusUsingFetchJoin(@Param("memberProfileId") BigInteger memberProfileId, @Param("status") Integer status);
+    @Query(value = "select mp from MemberProfile mp join fetch mp.member where mp.member = :member and mp.status = :status")
+    Optional<MemberProfile> findMemberAndProfileByMemberAndStatusUsingFetchJoin(@Param("member") Member member, @Param("status") Integer status);
 }

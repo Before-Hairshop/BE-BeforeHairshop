@@ -16,14 +16,14 @@ public class GlobalExceptionController {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception ex) {
-        log.error("Handle - HttpRequestMethodNotSupportedException", ex);
+        log.error("Handle - Exception", ex);
 
         return ErrorResponse.makeErrorResponse(ErrorCode.INTERNAL_SEVER_ERROR);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> illegalStateExceptionHandler(IllegalStateException ex) {
-        log.error("Handle - HttpRequestMethodNotSupportedException", ex);
+        log.error("Handle - IllegalStateException", ex);
 
         return ErrorResponse.makeErrorResponse(ErrorCode.INVALID_INPUT_VALUE);
     }
